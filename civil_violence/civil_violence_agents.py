@@ -1,5 +1,10 @@
-from mesa import Agent
 import random
+import math
+from mesa import Agent
+
+QUIESCENT = "quiescent"
+ACTIVE = "active"
+JAILED = "jailed"
 
 
 class Citizen(Agent):
@@ -28,20 +33,83 @@ class Citizen(Agent):
         self.risk_aversion = risk_aversion
         self.threshold = threshold
         self.vision = vision
+        self.state = QUIESCENT
+        self.jail_sentence = 0
 
         self.neighbors = []
         self.empty_cells = []
 
     def step(self):
-        """ TODO """
+        """
+        Citizen agent rules (Epstein 2002 model)
+        """
+
+        if self.jail_sentence:
+            self.jail_sentence -= 1
+            return
+
         self.update_neighbors()
+
+        rule_a = self.get_grievance() - self.get_net_risk() > self.threshold
+        if self.state is QUIESCENT and rule_a:
+            self.state = ACTIVE
+        elif self.state is ACTIVE and not rule_a:
+            self.state = QUIESCENT
 
         if self.model.movement and self.empty_cells:
             new_pos = random.choice(self.empty_cells)
             self.model.grid.move_agent(self, new_pos)
 
     def update_neighbors(self):
+        """
+        Store surrounding neighborhood object and
+        :return:
+        """
         # Moore = False because we check N/S/E/W
         neighborhood = self.model.grid.get_neighborhood(self.pos, moore=False, radius=self.vision)
         self.neighbors = self.model.grid.get_cell_list_contents(neighborhood)
         self.empty_cells = [c for c in neighborhood if self.model.grid.is_cell_empty(c)]
+
+    def get_arrest_probability(self):
+        """
+        Compute the arrest probability P of the agent (Epstein 2002 model)
+        :return: 1 - exp(-k * C_v / (A_v + 1))
+        """
+        c_v = sum(isinstance(n, Cop) for n in self.neighbors)
+        a_v = sum(isinstance(n, Citizen) and n.state is ACTIVE for n in self.neighbors)
+        return 1 - math.exp(-1 * self.model.k * c_v / (a_v + 1))
+
+    def get_net_risk(self):
+        """
+        Compute the agent's net risk N (Epstein 2002 model)
+        TODO : extends with Jail term: N = R * P * J^alpha
+        :return: R * P
+        """
+        return self.risk_aversion * self.get_arrest_probability()
+
+    def get_grievance(self):
+        """
+        Compute the agent's grievence (Epstein 2002 model)
+        :return: H(1 - L)
+        """
+        return self.hardship * (1 - self.legitimacy)
+
+
+class Cop(Agent):
+    def __init__(self, unique_id, model, pos, vision):
+        """
+        Create a new law enforcement officer agent.
+        :param unique_id: unique id of the agent
+        :param model: model to which agent belongs to
+        :param pos: position of the agent in the space
+        :param vision: number of cells visible for each direction
+        """
+
+        super().__init__(unique_id, model)
+        self.unique_id = unique_id
+        self.model = model
+        self.pos = pos
+        self.vision = vision
+
+    def step(self):
+        raise NotImplementedError

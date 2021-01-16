@@ -41,7 +41,7 @@ class CivilViolenceModel(Model):
         self.max_iter = max_iter
         self.iteration = 0  # Simulation iteration counter
         self.running = True
-        self.movement = True
+        self.movement = movement
 
         # Set Model main attributes
         self.max_jail_term = max_jail_term
