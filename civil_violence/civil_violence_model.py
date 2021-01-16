@@ -3,6 +3,7 @@ from mesa.space import MultiGrid
 from mesa.time import RandomActivation
 from mesa.datacollection import DataCollector
 
+from civil_violence_agents import Citizen
 
 class CivilViolenceModel(Model):
     """ Civil violence model class """
@@ -11,7 +12,8 @@ class CivilViolenceModel(Model):
                  agent_density, agent_vision,
                  cop_density, cop_vision,
                  initial_legitimacy_l0, max_iter,
-                 max_jail_term, active_threshold_t, k):
+                 max_jail_term, active_threshold_t,
+                 k, movement=True):
         """
         Create a new civil violence model.
 
@@ -26,6 +28,7 @@ class CivilViolenceModel(Model):
         :param max_jail_term: Maximal jail term.
         :param active_threshold_t: Threshold where citizen agent became active.
         :param k: Arrest term constant k.
+        :param movement: Can agent move at end of an iteration
         """
 
         super().__init__()
@@ -38,6 +41,7 @@ class CivilViolenceModel(Model):
         self.max_iter = max_iter
         self.iteration = 0  # Simulation iteration counter
         self.running = True
+        self.movement = True
 
         # Set Model main attributes
         self.max_jail_term = max_jail_term
@@ -55,6 +59,21 @@ class CivilViolenceModel(Model):
             model_reporters=self.get_model_reporters(),
             agent_reporters=self.get_agent_reporters()
         )
+
+        unique_id = 0
+        for (contents, x, y) in self.grid.coord_iter():
+            if self.random.random() < self.agent_density:
+                agent = Citizen(
+                    unique_id=unique_id, model=self,
+                    pos=(x, y), hardship=self.random.random(),
+                    legitimacy=self.initial_legitimacy_l0, risk_aversion=self.random.random(),
+                    threshold=self.active_threshold_t, vision=self.agent_vision)
+                unique_id += 1
+                self.grid.place_agent(agent, (x, y))
+                self.schedule.add(agent)
+
+        self.running = True
+        self.data_collector.collect(self)
 
     def step(self):
         """ One step in agent-based model simulation """
