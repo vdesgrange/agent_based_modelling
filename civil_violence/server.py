@@ -1,8 +1,10 @@
 from mesa.visualization.ModularVisualization import ModularServer
 from mesa.visualization.UserParam import UserSettableParameter
-from mesa.visualization.modules import CanvasGrid
+from mesa.visualization.modules import CanvasGrid  # For MultiGrid visualization
+from mesa.visualization.modules import NetworkModule  # For NetworkGrid visualization
+
 from civil_violence_model import CivilViolenceModel
-from graphics_portrayal import get_agent_portrayal
+from graphics_portrayal import get_agent_portrayal, get_network_portrayal
 
 
 def get_user_model_parameters():
@@ -31,7 +33,13 @@ def get_user_model_parameters():
 
 
 def get_visualization_elements():
-    canvas_element = CanvasGrid(get_agent_portrayal, 40, 40, 500, 500)
+
+    # 2D cellular automata representing real-world environment
+    canvas_element = CanvasGrid(get_agent_portrayal, grid_width=40, grid_height=40, canvas_width=500, canvas_height=500)
+
+    # Graph representing agent's social network
+    # network_element = NetworkModule(get_network_portrayal, canvas_width=500, canvas_height=500, library='sigma')
+
     return [canvas_element]
 
 

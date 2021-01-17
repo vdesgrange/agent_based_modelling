@@ -1,9 +1,12 @@
+import networkx as nx
 from mesa import Model
-from mesa.space import MultiGrid
+from mesa.space import MultiGrid, NetworkGrid
 from mesa.time import RandomActivation
 from mesa.datacollection import DataCollector
 
 from civil_violence_agents import Citizen
+from graph_generator import generate_network
+
 
 class CivilViolenceModel(Model):
     """ Civil violence model class """
@@ -29,6 +32,19 @@ class CivilViolenceModel(Model):
         :param active_threshold_t: Threshold where citizen agent became active.
         :param k: Arrest term constant k.
         :param movement: Can agent move at end of an iteration
+
+        Additionnal attributes:
+            running : is the model running
+            iteration : current step of the simulation
+            citizen_list : a list storing the citizen agents added to the model.
+
+            grid : A 2D cellular automata representing the real world space environment
+            network : A NetworkGrid with as many nodes as (citizen) agents representing the social network.
+            Agent in the NetworkGrid are deep copy of agent in the MultiGrid has Mesa implementation is based on
+            the usage of a single space. (Example: NetworkGrid place_agent method will change "pos" attribute from agent
+            meaning one agent can't be on both MultiGrid and NetworkGrid).
+            We maintain a dictionary of agent position instead.
+
         """
 
         super().__init__()
@@ -40,7 +56,6 @@ class CivilViolenceModel(Model):
         self.schedule = RandomActivation(self)
         self.max_iter = max_iter
         self.iteration = 0  # Simulation iteration counter
-        self.running = True
         self.movement = movement
 
         # Set Model main attributes
@@ -60,6 +75,9 @@ class CivilViolenceModel(Model):
             agent_reporters=self.get_agent_reporters()
         )
 
+        self.citizen_list = []
+
+        # Add agents to the model
         unique_id = 0
         for (contents, x, y) in self.grid.coord_iter():
             if self.random.random() < self.agent_density:
@@ -68,9 +86,15 @@ class CivilViolenceModel(Model):
                     pos=(x, y), hardship=self.random.random(),
                     legitimacy=self.initial_legitimacy_l0, risk_aversion=self.random.random(),
                     threshold=self.active_threshold_t, vision=self.agent_vision)
+
                 unique_id += 1
+                # Place agent in the MultiGrid (layer 0)
                 self.grid.place_agent(agent, (x, y))
+                self.citizen_list.append(agent)
                 self.schedule.add(agent)
+
+        # Generate a social network composed of every population agents (layer 1)
+        # self.G, self.network = generate_network(self.citizen_list, 0.1, False, None)
 
         self.running = True
         self.data_collector.collect(self)
@@ -101,3 +125,8 @@ class CivilViolenceModel(Model):
         count = 0
 
         return count
+
+
+if __name__ == "__main__":
+    test = CivilViolenceModel(40, 40, 0.7, 4, 0.074, 4, 0.7, 1000, 1000, 0.5, 2.3, True)
+    print("=== test ===")
