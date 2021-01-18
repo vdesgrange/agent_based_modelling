@@ -121,7 +121,8 @@ class Citizen(Agent):
 
         neighbors = nx.all_neighbors(self.model.G, self.network_node)
         for node_id in neighbors:
-            print(self.model.network_dict[node_id])
+            print(self.model.network_dict[node_id].unique_id)
+
 
 
 class Cop(Agent):

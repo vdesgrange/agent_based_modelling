@@ -36,6 +36,6 @@ def generate_erdos_renyi(agent_list, p, directed=False, seed=None):
 
         # new_agent = deepcopy(agent)
         # new_agent.layer = Layer.NETWORK
-        # network.place_agent(new_agent, idx)
+        # network.place_agent(new_agent, idx)  # Note : if we want to get
 
     return graph, network_dict

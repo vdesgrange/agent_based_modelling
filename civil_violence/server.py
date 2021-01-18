@@ -5,6 +5,7 @@ from mesa.visualization.modules import NetworkModule  # For NetworkGrid visualiz
 
 from civil_violence_model import CivilViolenceModel
 from graphics_portrayal import get_agent_portrayal, get_network_portrayal
+from constants import GRID_WIDTH, GRID_HEIGHT
 
 
 def get_user_model_parameters():
@@ -35,9 +36,10 @@ def get_user_model_parameters():
 def get_visualization_elements():
 
     # 2D cellular automata representing real-world environment
-    canvas_element = CanvasGrid(get_agent_portrayal, grid_width=40, grid_height=40, canvas_width=200, canvas_height=200)
+    canvas_element = CanvasGrid(get_agent_portrayal, grid_width=GRID_WIDTH, grid_height=GRID_HEIGHT, canvas_width=200, canvas_height=200)
 
     # Graph representing agent's social network
+    # todo : high order function to get access to the model ?
     network_element = NetworkModule(get_network_portrayal, canvas_width=200, canvas_height=200, library='sigma')
 
     return [canvas_element, network_element]
@@ -49,8 +51,8 @@ def run():
     """
 
     model_params = {
-        "width": 40,
-        "height": 40,
+        "width": GRID_WIDTH,
+        "height": GRID_HEIGHT,
         "max_iter": 1000,
         "max_jail_term": 1000,
         "k": 2.3,

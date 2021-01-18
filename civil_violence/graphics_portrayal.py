@@ -20,9 +20,12 @@ def get_agent_portrayal(agent):
 def get_network_portrayal(G):
     """
     Generate a portrayal (JSON-ready dictionary used by the relevant JavaScript code (sigma.js) to draw shapes)
+    TODO : Resolve issue with agent that can't be added to NetworkGrid if already on MultiGrid + deepcopy modification.
+    TODO : Hide edge when agent jailed
     :param graph: Generated networkx graph representing social network
     :return:
     """
+
     portrayal = dict()
     portrayal["nodes"] = [
         {
@@ -33,7 +36,7 @@ def get_network_portrayal(G):
             "size": 3,
             "color": "#CC0000",
         }
-        for (node_id, agents) in G.nodes.data("agent")
+        for (node_id, agents) in G.nodes.data("agent")  # Must add agent to NetworkGrid. Problem to be resolved.
     ]
 
     portrayal["edges"] = [
@@ -45,5 +48,5 @@ def get_network_portrayal(G):
         }
         for edge_id, (source, target) in enumerate(G.edges)
     ]
-
+    # if ((source.state is not State.JAILED) or (target.state is not State.JAILED) )
     return portrayal
