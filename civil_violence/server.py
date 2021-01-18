@@ -2,10 +2,11 @@ import random
 from mesa.visualization.ModularVisualization import ModularServer
 from mesa.visualization.UserParam import UserSettableParameter
 from mesa.visualization.modules import CanvasGrid  # For MultiGrid visualization
+
 from graph_utils import NetworkModuleExtended  # For NetworkGrid visualization
 from civil_violence_model import CivilViolenceModel
 from graphics_portrayal import get_agent_portrayal, get_network_portrayal
-from constants import GRID_WIDTH, GRID_HEIGHT
+from constants import GRID_WIDTH, GRID_HEIGHT, GraphType
 
 
 def get_user_model_parameters():
@@ -36,10 +37,10 @@ def get_user_model_parameters():
 def get_visualization_elements():
 
     # 2D cellular automata representing real-world environment
-    canvas_element = CanvasGrid(get_agent_portrayal, grid_width=GRID_WIDTH, grid_height=GRID_HEIGHT, canvas_width=200, canvas_height=200)
+    canvas_element = CanvasGrid(get_agent_portrayal, grid_width=GRID_WIDTH, grid_height=GRID_HEIGHT, canvas_width=500, canvas_height=500)
 
     # Graph representing agent's social network
-    network_element = NetworkModuleExtended(get_network_portrayal, canvas_width=200, canvas_height=200, library='sigma')
+    network_element = NetworkModuleExtended(get_network_portrayal, canvas_width=500, canvas_height=500, library='sigma')
 
     return [canvas_element, network_element]
 
@@ -55,6 +56,9 @@ def run(seed=None):
         "max_iter": 1000,
         "max_jail_term": 1000,
         "k": 2.3,
+        "graph_type": GraphType.ERDOS_RENYI,
+        "p": 0.1,
+        "directed": False,
         "seed": seed,
     }
     model_params.update(get_user_model_parameters())

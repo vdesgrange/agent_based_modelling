@@ -4,6 +4,8 @@ GRID_WIDTH = GRID_HEIGHT = 5
 
 State = Enum('State', 'QUIESCENT ACTIVE JAILED')
 
+GraphType = Enum('GraphType', 'ERDOS_RENYI')
+
 
 class Color(Enum):
     QUIESCENT = "#138AF2"  # blue

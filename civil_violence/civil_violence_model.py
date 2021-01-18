@@ -4,7 +4,7 @@ from mesa.time import RandomActivation
 from mesa.datacollection import DataCollector
 
 from civil_violence_agents import Citizen
-from graph_utils import generate_network
+from graph_utils import generate_network, print_network
 
 
 class CivilViolenceModel(Model):
@@ -15,9 +15,12 @@ class CivilViolenceModel(Model):
                  cop_density, cop_vision,
                  initial_legitimacy_l0, max_iter,
                  max_jail_term, active_threshold_t,
-                 k, movement=True, seed=None):
+                 k, graph_type,
+                 p, directed,
+                 movement=True, seed=None):
         """
         Create a new civil violence model.
+        TODO - This class is not fully implemented
 
         :param height: Grid height.
         :param width: Grid width.
@@ -30,7 +33,11 @@ class CivilViolenceModel(Model):
         :param max_jail_term: Maximal jail term.
         :param active_threshold_t: Threshold where citizen agent became active.
         :param k: Arrest term constant k.
+        :param graph_type: Graph used to build network
+        :param p: Probability for edge creation
+        :param directed: Is graph directed
         :param movement: Can agent move at end of an iteration
+        :param seed: random seed
 
         Additionnal attributes:
             running : is the model running
@@ -47,6 +54,8 @@ class CivilViolenceModel(Model):
         """
 
         super().__init__()
+
+        # === Initialize attributes ===
         self.seed = seed
         self.random.seed(self.seed)
 
@@ -70,13 +79,15 @@ class CivilViolenceModel(Model):
         self.cop_density = cop_density
         self.cop_vision = cop_vision
 
-        # Data collection
+        self.citizen_list = []
+
+        # === Set Data collection ===
         self.data_collector = DataCollector(
             model_reporters=self.get_model_reporters(),
             agent_reporters=self.get_agent_reporters()
         )
 
-        self.citizen_list = []
+        # === Initialize environment ===
 
         # Add agents to the model
         unique_id = 0
@@ -89,13 +100,13 @@ class CivilViolenceModel(Model):
                     threshold=self.active_threshold_t, vision=self.agent_vision)
 
                 unique_id += 1
-                # Place agent in the MultiGrid (layer 0)
-                self.grid.place_agent(agent, (x, y))
                 self.citizen_list.append(agent)
+                self.grid.place_agent(agent, (x, y))  # Place agent in the MultiGrid
                 self.schedule.add(agent)
 
-        # Generate a social network composed of every population agents (layer 1)
-        self.G, self.network_dict = generate_network(self.citizen_list, 0.1, False, None)
+        # Generate a social network composed of every population agents
+        self.G, self.network_dict = generate_network(self.citizen_list, graph_type, p, directed, seed)
+        print_network(self.G, self.network_dict)  # Print the network. Can be commented.
 
         self.running = True
         self.data_collector.collect(self)

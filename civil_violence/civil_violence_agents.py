@@ -1,7 +1,7 @@
 import random
 import math
-import networkx as nx
 from mesa import Agent
+
 from constants import State
 
 
@@ -116,6 +116,7 @@ class Citizen(Agent):
         #     print(self.model.network_dict[node_id].unique_id)
 
         pass
+
 
 class Cop(Agent):
     def __init__(self, unique_id, model, pos, vision):

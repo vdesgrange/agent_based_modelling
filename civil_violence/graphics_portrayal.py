@@ -15,6 +15,7 @@ def get_agent_portrayal(agent):
         "Color": Color[agent.state.name].value,
         "r": .8,
         "Layer": 0,
+        "Agent": agent.unique_id,
     }
 
     return portrayal
@@ -34,7 +35,7 @@ def get_network_portrayal(model):
         {
             # Main attributes
             "id": agent.network_node,
-            "label": None,
+            "label": "{}".format(agent.unique_id),
             # Display attributes
             "size": 3,
             "color": Color[agent.state.name].value,
