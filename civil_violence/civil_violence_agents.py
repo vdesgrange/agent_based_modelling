@@ -1,5 +1,6 @@
 import random
 import math
+import networkx as nx
 from mesa import Agent
 from constants import Layer, State
 
@@ -62,6 +63,8 @@ class Citizen(Agent):
             self.jail_sentence -= 1
             return
 
+        self.get_network_neighbors()
+
         self.update_neighbors()  # Should we run this at each turn instead of retrieving the neighbors when necessary ?
 
         rule_a = self.get_grievance() - self.get_net_risk() > self.threshold
@@ -112,6 +115,13 @@ class Citizen(Agent):
         :return: H(1 - L)
         """
         return self.hardship * (1 - self.legitimacy)
+
+    def get_network_neighbors(self):
+        """ TODO Example to retrieve attributes from the network layer"""
+
+        neighbors = nx.all_neighbors(self.model.G, self.network_node)
+        for node_id in neighbors:
+            print(self.model.network_dict[node_id])
 
 
 class Cop(Agent):

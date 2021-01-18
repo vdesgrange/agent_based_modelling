@@ -35,12 +35,12 @@ def get_user_model_parameters():
 def get_visualization_elements():
 
     # 2D cellular automata representing real-world environment
-    canvas_element = CanvasGrid(get_agent_portrayal, grid_width=40, grid_height=40, canvas_width=500, canvas_height=500)
+    canvas_element = CanvasGrid(get_agent_portrayal, grid_width=40, grid_height=40, canvas_width=200, canvas_height=200)
 
     # Graph representing agent's social network
-    # network_element = NetworkModule(get_network_portrayal, canvas_width=500, canvas_height=500, library='sigma')
+    network_element = NetworkModule(get_network_portrayal, canvas_width=200, canvas_height=200, library='sigma')
 
-    return [canvas_element]
+    return [canvas_element, network_element]
 
 
 def run():

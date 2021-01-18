@@ -5,7 +5,7 @@ from mesa.time import RandomActivation
 from mesa.datacollection import DataCollector
 
 from civil_violence_agents import Citizen
-from graph_generator import generate_network
+from graph_utils import generate_network
 
 
 class CivilViolenceModel(Model):
@@ -94,7 +94,7 @@ class CivilViolenceModel(Model):
                 self.schedule.add(agent)
 
         # Generate a social network composed of every population agents (layer 1)
-        # self.G, self.network = generate_network(self.citizen_list, 0.1, False, None)
+        self.G, self.network_dict = generate_network(self.citizen_list, 0.1, False, None)
 
         self.running = True
         self.data_collector.collect(self)

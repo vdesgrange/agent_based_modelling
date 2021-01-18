@@ -30,7 +30,7 @@ def get_network_portrayal(G):
             "id": node_id,
             "label": None,
             # Display attributes
-            "size": 3 if agents else 1,
+            "size": 3,
             "color": "#CC0000",
         }
         for (node_id, agents) in G.nodes.data("agent")
