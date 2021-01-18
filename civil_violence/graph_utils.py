@@ -2,6 +2,19 @@ import networkx as nx
 from copy import deepcopy
 from mesa.space import NetworkGrid
 from constants import Layer
+from mesa.visualization.modules import NetworkModule
+
+
+class NetworkModuleExtended(NetworkModule):
+    """
+    NetworkModuleExtended is exactly NetworkModule class.
+    Except it will provide the model as parameters instead of the graph G from model.G.
+    This extended version is used to vizualise social network between agents
+    while going around the limitation of mesa (implemented with the idea of using only one Space object).
+    """
+    def render(self, model):
+        return self.portrayal_method(model)
+
 
 def generate_network(agent_list, p, directed=False, seed=None, graph_type=None):
 

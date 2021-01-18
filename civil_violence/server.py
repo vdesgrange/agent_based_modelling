@@ -1,8 +1,7 @@
 from mesa.visualization.ModularVisualization import ModularServer
 from mesa.visualization.UserParam import UserSettableParameter
 from mesa.visualization.modules import CanvasGrid  # For MultiGrid visualization
-from mesa.visualization.modules import NetworkModule  # For NetworkGrid visualization
-
+from graph_utils import NetworkModuleExtended  # For NetworkGrid visualization
 from civil_violence_model import CivilViolenceModel
 from graphics_portrayal import get_agent_portrayal, get_network_portrayal
 from constants import GRID_WIDTH, GRID_HEIGHT
@@ -40,7 +39,7 @@ def get_visualization_elements():
 
     # Graph representing agent's social network
     # todo : high order function to get access to the model ?
-    network_element = NetworkModule(get_network_portrayal, canvas_width=200, canvas_height=200, library='sigma')
+    network_element = NetworkModuleExtended(get_network_portrayal, canvas_width=200, canvas_height=200, library='sigma')
 
     return [canvas_element, network_element]
 

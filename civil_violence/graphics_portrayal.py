@@ -17,7 +17,7 @@ def get_agent_portrayal(agent):
     return portrayal
 
 
-def get_network_portrayal(G):
+def get_network_portrayal(model):
     """
     Generate a portrayal (JSON-ready dictionary used by the relevant JavaScript code (sigma.js) to draw shapes)
     TODO : Resolve issue with agent that can't be added to NetworkGrid if already on MultiGrid + deepcopy modification.
@@ -30,13 +30,13 @@ def get_network_portrayal(G):
     portrayal["nodes"] = [
         {
             # Main attributes
-            "id": node_id,
+            "id": agent.network_node,
             "label": None,
             # Display attributes
             "size": 3,
-            "color": "#CC0000",
+            "color": Color[agent.state.name].value,
         }
-        for (node_id, agents) in G.nodes.data("agent")  # Must add agent to NetworkGrid. Problem to be resolved.
+        for agent in model.citizen_list  # Must add agent to NetworkGrid. Problem to be resolved.
     ]
 
     portrayal["edges"] = [
@@ -44,9 +44,11 @@ def get_network_portrayal(G):
             "id": edge_id,
             "source": source,
             "target": target,
-            "color": "#000000"
+            "color": Color.JAILED if model.network_dict[source].state == State.JAILED
+                                     or model.network_dict[target].state == State.JAILED
+            else "#000000"
         }
-        for edge_id, (source, target) in enumerate(G.edges)
+        for edge_id, (source, target) in enumerate(model.G.edges)
     ]
-    # if ((source.state is not State.JAILED) or (target.state is not State.JAILED) )
+
     return portrayal
