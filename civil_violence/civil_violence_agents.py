@@ -2,7 +2,7 @@ import random
 import math
 import networkx as nx
 from mesa import Agent
-from constants import Layer, State
+from constants import State
 
 
 class Citizen(Agent):
@@ -10,7 +10,7 @@ class Citizen(Agent):
     A citizen agent, part of the population.
     """
 
-    def __init__(self, unique_id, model, pos, hardship, legitimacy, risk_aversion, threshold, vision, layer=Layer.GRID):
+    def __init__(self, unique_id, model, pos, hardship, legitimacy, risk_aversion, threshold, vision):
         """
         Create a new citizen agent.
 
@@ -24,18 +24,18 @@ class Citizen(Agent):
         :param threshold: threshold beyond which agent become active
         :param vision: number of cells visible for each direction (N/S/E/W)
 
+        network_node : agent's node_id in the graph representing the social network
         state: current state of the agent (default: Quiescent)
         jail_sentence: current jail sentence of the agent (default: 0)
         neighbors: List of neighbors in agent vision
         empty_cells: List of empty cells in agent vision
-        layer: Environment layer of the agent. Due to Mesa implementation based on the idea an agent should
-        be only in one network. We must use trick to follow agent on an additional network.
         """
 
         super().__init__(unique_id, model)
+        random.seed(model.seed)  # Should not be required given it's set in the server.
 
-        self.pos = pos
-        self.network_node = 0
+        self.pos = pos  # Position in MultiGrid space
+        self.network_node = 0  # Position in graph
 
         self.hardship = hardship
         self.legitimacy = legitimacy
@@ -45,18 +45,13 @@ class Citizen(Agent):
         self.state = State.QUIESCENT
         self.jail_sentence = 0
 
-        self.neighbors = []
-        self.empty_cells = []
-        self.layer = layer
+        self.neighbors = []  # Neighbors in MultiGrid space
+        self.empty_cells = []  # Empty cells around the agent in MultiGrid space
 
     def step(self):
         """
         Citizen agent rules (Epstein 2002 model)
         """
-
-        # NetworkGrid agent should not perform any action. They are only copy of MultiGrid agent.
-        if self.layer == Layer.NETWORK:
-            return
 
         # Jailed agent can't perform any action
         if self.jail_sentence:
@@ -83,9 +78,6 @@ class Citizen(Agent):
         Store surrounding neighborhood object and
         :return:
         """
-
-        if self.layer == Layer.NETWORK:
-            return
 
         # Moore = False because we check N/S/E/W
         neighborhood = self.model.grid.get_neighborhood(self.pos, moore=False, radius=self.vision)
@@ -119,11 +111,11 @@ class Citizen(Agent):
     def get_network_neighbors(self):
         """ TODO Example to retrieve attributes from the network layer"""
 
-        neighbors = nx.all_neighbors(self.model.G, self.network_node)
-        for node_id in neighbors:
-            print(self.model.network_dict[node_id].unique_id)
+        # neighbors = nx.all_neighbors(self.model.G, self.network_node)
+        # for node_id in neighbors:
+        #     print(self.model.network_dict[node_id].unique_id)
 
-
+        pass
 
 class Cop(Agent):
     def __init__(self, unique_id, model, pos, vision):

@@ -1,3 +1,4 @@
+import random
 from mesa.visualization.ModularVisualization import ModularServer
 from mesa.visualization.UserParam import UserSettableParameter
 from mesa.visualization.modules import CanvasGrid  # For MultiGrid visualization
@@ -38,23 +39,23 @@ def get_visualization_elements():
     canvas_element = CanvasGrid(get_agent_portrayal, grid_width=GRID_WIDTH, grid_height=GRID_HEIGHT, canvas_width=200, canvas_height=200)
 
     # Graph representing agent's social network
-    # todo : high order function to get access to the model ?
     network_element = NetworkModuleExtended(get_network_portrayal, canvas_width=200, canvas_height=200, library='sigma')
 
     return [canvas_element, network_element]
 
 
-def run():
+def run(seed=None):
     """
     Run the mesa server
     """
-
+    random.seed(seed)
     model_params = {
         "width": GRID_WIDTH,
         "height": GRID_HEIGHT,
         "max_iter": 1000,
         "max_jail_term": 1000,
         "k": 2.3,
+        "seed": seed,
     }
     model_params.update(get_user_model_parameters())
 

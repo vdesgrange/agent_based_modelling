@@ -1,7 +1,4 @@
 import networkx as nx
-from copy import deepcopy
-from mesa.space import NetworkGrid
-from constants import Layer
 from mesa.visualization.modules import NetworkModule
 
 
@@ -41,14 +38,9 @@ def generate_erdos_renyi(agent_list, p, directed=False, seed=None):
     num_nodes = len(agent_list)
     graph = nx.generators.random_graphs.erdos_renyi_graph(num_nodes, p, seed, directed)
     network_dict = dict()
-    # network = NetworkGrid(graph)
 
     for idx, agent in enumerate(agent_list):
         agent.network_node = idx
         network_dict[idx] = agent
-
-        # new_agent = deepcopy(agent)
-        # new_agent.layer = Layer.NETWORK
-        # network.place_agent(new_agent, idx)  # Note : if we want to get
 
     return graph, network_dict

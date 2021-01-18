@@ -1,6 +1,5 @@
-import networkx as nx
 from mesa import Model
-from mesa.space import MultiGrid, NetworkGrid
+from mesa.space import MultiGrid
 from mesa.time import RandomActivation
 from mesa.datacollection import DataCollector
 
@@ -16,7 +15,7 @@ class CivilViolenceModel(Model):
                  cop_density, cop_vision,
                  initial_legitimacy_l0, max_iter,
                  max_jail_term, active_threshold_t,
-                 k, movement=True):
+                 k, movement=True, seed=None):
         """
         Create a new civil violence model.
 
@@ -48,6 +47,8 @@ class CivilViolenceModel(Model):
         """
 
         super().__init__()
+        self.seed = seed
+        self.random.seed(self.seed)
 
         # Initialize Model grid and schedule
         self.height = height
@@ -109,11 +110,11 @@ class CivilViolenceModel(Model):
             self.running = False
 
     def get_model_reporters(self):
-        """ Dictionary of model reporter names and attributes/funcs """
+        """ TODO Dictionary of model reporter names and attributes/funcs """
         return {}
 
     def get_agent_reporters(self):
-        """ Dictionary of agent reporter names and attributes/funcs """
+        """ TODO Dictionary of agent reporter names and attributes/funcs """
         return {}
 
     def count_type_citizens(model, condition, exclude_jailed=True):
@@ -125,8 +126,3 @@ class CivilViolenceModel(Model):
         count = 0
 
         return count
-
-
-if __name__ == "__main__":
-    test = CivilViolenceModel(40, 40, 0.7, 4, 0.074, 4, 0.7, 1000, 1000, 0.5, 2.3, True)
-    print("=== test ===")

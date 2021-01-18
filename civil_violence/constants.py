@@ -2,7 +2,6 @@ from enum import Enum
 
 GRID_WIDTH = GRID_HEIGHT = 5
 
-Layer = Enum('Layer', 'GRID NETWORK')
 State = Enum('State', 'QUIESCENT ACTIVE JAILED')
 
 

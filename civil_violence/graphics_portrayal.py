@@ -1,9 +1,12 @@
-from constants import State, Layer, Shape, Color
+from constants import State, Shape, Color
 
 
 def get_agent_portrayal(agent):
-    if agent is None or agent.layer is not Layer.GRID:
-        return
+    """
+    Generate a portrayal of the agent (citizen, cop, etc.(
+    :param agent: agent to be portrayed
+    :return: json-ready dictionary
+    """
 
     portrayal = {
         "Shape": Shape[type(agent).__name__.upper()].value,
@@ -12,7 +15,7 @@ def get_agent_portrayal(agent):
         "Color": Color[agent.state.name].value,
         "r": .8,
         "Layer": 0,
-     }
+    }
 
     return portrayal
 
