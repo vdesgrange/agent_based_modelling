@@ -37,7 +37,7 @@ def generate_network(agent_list, graph_type, p, directed=False, seed=None):
 def generate_erdos_renyi(agent_list, p, directed=False, seed=None):
     """
     Generate an Erdos Renyi graph. Add as many nodes as there's agents.
-    :param agent_list: List of agents
+    :param agent_list: List of agents (citizen)
     :param p: probability of creating an edge
     :param directed: True if graph is directed
     :param seed: randomization seed
@@ -48,12 +48,12 @@ def generate_erdos_renyi(agent_list, p, directed=False, seed=None):
     graph = nx.generators.random_graphs.erdos_renyi_graph(num_nodes, p, seed, directed)
     network_dict = dict()
 
+    agent_number = 0
     for agent in agent_list:
-
         # Set the localisation of the agent in the social network
-        agent.network_node = list(graph.nodes)[agent.unique_id]
+        agent.network_node = list(graph.nodes)[agent_number]
         network_dict[agent.network_node] = agent
-
+        agent_number += 1
     return graph, network_dict
 
 
