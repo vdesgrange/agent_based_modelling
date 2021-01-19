@@ -34,7 +34,6 @@ class Citizen(Agent):
         super().__init__(unique_id, model)
         random.seed(model.seed)  # Should not be required given it's set in the server.
 
-        self.breed = 'citizen'
         self.pos = pos  # Position in MultiGrid space
         self.network_node = 0  # Position in graph
 
@@ -139,7 +138,6 @@ class Cop(Agent):
         self.pos = pos
         self.vision = vision
         self.state = State.COP
-        self.breed = 'cop'
 
         self.neighbors = []  # Neighbors in MultiGrid space
         self.empty_cells = []  # Empty cells around the agent in MultiGrid space
@@ -153,8 +151,8 @@ class Cop(Agent):
         
         # Check for all active neighbors in vision
         for agent in self.neighbors:
-            if agent.breed == 'citizen' \
-                    and agent.state == 'Active' \
+            if type(agent).__name__.upper() == 'CITIZEN' \
+                    and agent.state is State.ACTIVE \
                     and agent.jail_sentence == 0:
                 active_neighbors.append(agent)
 
@@ -163,6 +161,7 @@ class Cop(Agent):
             arrestee = random.choice(active_neighbors)
             sentence = random.randint(0, self.model.max_jail_term)
             arrestee.jail_sentence = sentence
+            arrestee.state = State.JAILED
             new_pos = arrestee.pos
             if self.model.movement:
                 self.model.grid.move_agent(self, new_pos)
