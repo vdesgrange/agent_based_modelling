@@ -103,7 +103,7 @@ class Citizen(Agent):
 
     def get_grievance(self):
         """
-        Compute the agent's grievence (Epstein 2002 model)
+        Compute the agent's grievance (Epstein 2002 model)
         :return: H(1 - L)
         """
         return self.hardship * (1 - self.legitimacy)
@@ -119,6 +119,10 @@ class Citizen(Agent):
 
 
 class Cop(Agent):
+    """
+    Check local vision and arrest active citizen
+    """
+
     def __init__(self, unique_id, model, pos, vision):
         """
         Create a new law enforcement officer agent.
@@ -133,6 +137,45 @@ class Cop(Agent):
         self.model = model
         self.pos = pos
         self.vision = vision
+        self.state = State.COP
+
+        self.neighbors = []  # Neighbors in MultiGrid space
+        self.empty_cells = []  # Empty cells around the agent in MultiGrid space
 
     def step(self):
-        raise NotImplementedError
+        """
+        Inspect vision and arrest a random agent. Move there
+        """
+        self.update_neighbors()
+        active_neighbors = []
+        
+        # Check for all active neighbors in vision
+        for agent in self.neighbors:
+            if type(agent).__name__.upper() == 'CITIZEN' \
+                    and agent.state is State.ACTIVE \
+                    and agent.jail_sentence == 0:
+                active_neighbors.append(agent)
+
+        # If there are any active arrest one randomly and move there
+        if active_neighbors:
+            arrestee = random.choice(active_neighbors)
+            sentence = random.randint(0, self.model.max_jail_term)
+            arrestee.jail_sentence = sentence
+            arrestee.state = State.JAILED
+            new_pos = arrestee.pos
+            if self.model.movement:
+                self.model.grid.move_agent(self, new_pos)
+
+        # No active citizens, move to random empty cell
+        elif self.model.movement and self.empty_cells:
+            new_pos = random.choice(self.empty_cells)
+            self.model.grid.move_agent(self, new_pos)
+
+    def update_neighbors(self):
+        """
+        Create a list of neighbors & empty neighbor cells
+        """
+        # Moore = False because we check N/S/E/W
+        neighborhood = self.model.grid.get_neighborhood(self.pos, moore=False, radius=self.vision)
+        self.neighbors = self.model.grid.get_cell_list_contents(neighborhood)
+        self.empty_cells = [c for c in neighborhood if self.model.grid.is_cell_empty(c)]
