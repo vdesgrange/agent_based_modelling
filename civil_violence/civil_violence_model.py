@@ -108,7 +108,7 @@ class CivilViolenceModel(Model):
             elif random_x < (self.agent_density + self.cop_density):
                 agent = Cop(
                     unique_id=unique_id, model=self,
-                    pos=(x, y), vision=self.agent_vision)
+                    pos=(x, y), vision=self.cop_vision)
 
                 unique_id += 1
                 self.cop_list.append(agent)
