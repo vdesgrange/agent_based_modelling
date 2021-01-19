@@ -14,6 +14,8 @@ def get_agent_portrayal(agent):
         "Filled": "true",
         "Color": Color[agent.state.name].value,
         "r": .8,
+        "w": 0.7,
+        "h": 0.7,
         "Layer": 0,
         "Agent": agent.unique_id,
     }
@@ -48,9 +50,9 @@ def get_network_portrayal(model):
             "id": edge_id,
             "source": source,
             "target": target,
-            "color": Color.JAILED if model.network_dict[source].state == State.JAILED
-                                     or model.network_dict[target].state == State.JAILED
-            else "#000000"
+            # "color": Color.JAILED if model.network_dict[source].state == State.JAILED
+            #                          or model.network_dict[target].state == State.JAILED
+            # else "#000000"
         }
         for edge_id, (source, target) in enumerate(model.G.edges)
     ]
