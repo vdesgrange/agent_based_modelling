@@ -1,6 +1,6 @@
 from enum import Enum
 
-GRID_WIDTH = GRID_HEIGHT = 5
+GRID_WIDTH = GRID_HEIGHT = 10
 
 State = Enum('State', 'QUIESCENT ACTIVE JAILED COP')
 
