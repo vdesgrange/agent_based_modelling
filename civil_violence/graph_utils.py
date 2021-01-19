@@ -33,7 +33,6 @@ def generate_network(agent_list, graph_type, p, directed=False, seed=None):
 
     return generate_erdos_renyi(agent_list, p, directed, seed)  # Default
 
-
 def generate_erdos_renyi(agent_list, p, directed=False, seed=None):
     """
     Generate an Erdos Renyi graph. Add as many nodes as there's agents.
