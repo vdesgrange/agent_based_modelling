@@ -3,7 +3,7 @@ from mesa.space import MultiGrid
 from mesa.time import RandomActivation
 from mesa.datacollection import DataCollector
 
-from civil_violence_agents import Citizen
+from civil_violence_agents import Citizen, Cop
 from graph_utils import generate_network, print_network
 
 
@@ -80,6 +80,7 @@ class CivilViolenceModel(Model):
         self.cop_vision = cop_vision
 
         self.citizen_list = []
+        self.cop_list = []
 
         # === Set Data collection ===
         self.data_collector = DataCollector(
@@ -92,7 +93,8 @@ class CivilViolenceModel(Model):
         # Add agents to the model
         unique_id = 0
         for (contents, x, y) in self.grid.coord_iter():
-            if self.random.random() < self.agent_density:
+            random_x = self.random.random()
+            if random_x < self.agent_density:
                 agent = Citizen(
                     unique_id=unique_id, model=self,
                     pos=(x, y), hardship=self.random.random(),
@@ -103,8 +105,18 @@ class CivilViolenceModel(Model):
                 self.citizen_list.append(agent)
                 self.grid.place_agent(agent, (x, y))  # Place agent in the MultiGrid
                 self.schedule.add(agent)
+            elif random_x < (self.agent_density + self.cop_density):
+                agent = Cop(
+                    unique_id=unique_id, model=self,
+                    pos=(x, y), vision=self.agent_vision)
+
+                unique_id += 1
+                self.cop_list.append(agent)
+                self.grid.place_agent(agent, (x, y))  # Place agent in the MultiGrid
+                self.schedule.add(agent)
 
         # Generate a social network composed of every population agents
+
         self.G, self.network_dict = generate_network(self.citizen_list, graph_type, p, directed, seed)
         print_network(self.G, self.network_dict)  # Print the network. Can be commented.
 
