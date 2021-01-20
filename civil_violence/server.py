@@ -1,12 +1,12 @@
 import random
 from mesa.visualization.ModularVisualization import ModularServer
 from mesa.visualization.UserParam import UserSettableParameter
-from mesa.visualization.modules import CanvasGrid  # For MultiGrid visualization
+from mesa.visualization.modules import CanvasGrid, ChartModule, PieChartModule
 
 from graph_utils import NetworkModuleExtended  # For NetworkGrid visualization
 from civil_violence_model import CivilViolenceModel
 from graphics_portrayal import get_agent_portrayal, get_network_portrayal
-from constants import GRID_WIDTH, GRID_HEIGHT, GraphType
+from constants import GRID_WIDTH, GRID_HEIGHT, GraphType, Color
 
 
 def get_user_model_parameters():
@@ -44,7 +44,20 @@ def get_visualization_elements():
     # Graph representing agent's social network
     network_element = NetworkModuleExtended(get_network_portrayal, canvas_width=500, canvas_height=500, library='sigma')
 
-    return [canvas_element, network_element]
+    # Chart for amount of agents during the run
+    agents_state_chart = ChartModule([{"Label": "QUIESCENT", "Color": Color['QUIESCENT'].value},
+                                      {"Label": "ACTIVE", "Color": Color['ACTIVE'].value},
+                                      {"Label": "JAILED", "Color": Color['JAILED'].value}], 100, 270)
+
+    # grievance_chart = ChartModule([{"Label": "Total Inactive Grievance", "Color": AGENT_QUIET_COLOR},
+    #                                {"Label": "Total Inactive Net Risk", "Color": COP_COLOR},
+    #                                {"Label": "Total Influence", "Color": end_prop}], 50, 135)
+    #
+    pie_chart = PieChartModule([{"Label": "QUIESCENT", "Color": Color['QUIESCENT'].value},
+                                {"Label": "ACTIVE", "Color": Color['ACTIVE'].value},
+                                {"Label": "JAILED", "Color": Color['JAILED'].value}], 200, 500)
+
+    return [canvas_element, network_element, agents_state_chart, pie_chart]
 
 
 def run(seed=None):
@@ -66,6 +79,9 @@ def run(seed=None):
     }
     model_params.update(get_user_model_parameters())
 
+
+
+
     server = ModularServer(
         CivilViolenceModel,
         get_visualization_elements(),
@@ -75,6 +91,7 @@ def run(seed=None):
 
     server.port = 8521
     server.launch()
+
 
 
 if __name__ == '__main__':
