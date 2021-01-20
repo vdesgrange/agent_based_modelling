@@ -56,8 +56,9 @@ def run(seed=None):
         "max_iter": 1000,
         "max_jail_term": 1000,
         "k": 2.3,
-        "graph_type": GraphType.ERDOS_RENYI,
+        "graph_type": GraphType.WATTS_STROGATZ,   # Possibilities: ERDOS_RENYI, BARABASI_ALBERT, WATTS_STROGATZ
         "p": 0.1,
+        "p_ws": 0.1,   # Probability rewiring in Watts-Strogatz model (amount of far away connections)
         "directed": False,
         "seed": seed,
     }

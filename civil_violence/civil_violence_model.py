@@ -16,7 +16,7 @@ class CivilViolenceModel(Model):
                  initial_legitimacy_l0, max_iter,
                  max_jail_term, active_threshold_t,
                  k, graph_type,
-                 p, directed,
+                 p, p_ws, directed,
                  movement=True, seed=None):
         """
         Create a new civil violence model.
@@ -117,7 +117,7 @@ class CivilViolenceModel(Model):
 
         # Generate a social network composed of every population agents
 
-        self.G, self.network_dict = generate_network(self.citizen_list, graph_type, p, directed, seed)
+        self.G, self.network_dict = generate_network(self.citizen_list, graph_type, p, p_ws, directed, seed)
         print_network(self.G, self.network_dict)  # Print the network. Can be commented.
 
         self.running = True
