@@ -9,7 +9,7 @@ def create_fig(data, draw=False):
         df = pd.DataFrame(data)
         df.columns = ['Node', 'Edges']
         
-        sns.displot(df['Edges'], bins=max(df['Edges'])+1, kde=True)
+        sns.distplot(df['Edges'], bins=max(df['Edges'])+1, kde=True)
         plt.title('Amount of edges per node')
         plt.show()
     
