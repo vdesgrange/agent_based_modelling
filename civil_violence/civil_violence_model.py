@@ -139,7 +139,7 @@ class CivilViolenceModel(Model):
         self.datacollector.collect(self)
         self.iteration += 1
         self.update_legitimacy()
-        self.data_collector.collect(self)
+        self.datacollector.collect(self)
 
         if self.iteration > self.max_iter:
             self.running = False
