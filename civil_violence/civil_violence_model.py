@@ -87,7 +87,7 @@ class CivilViolenceModel(Model):
 
 
         # === Set Data collection ===
-        self.data_collector = DataCollector(
+        self.datacollector = DataCollector(
             model_reporters=self.get_model_reporters(),
             agent_reporters=self.get_agent_reporters()
         )
@@ -135,15 +135,15 @@ class CivilViolenceModel(Model):
         plt.show()
 
         self.running = True
-        self.data_collector.collect(self)
+        self.datacollector.collect(self)
 
     def step(self):
         """ One step in agent-based model simulation """
         self.schedule.step()
-        self.data_collector.collect(self)
+        self.datacollector.collect(self)
         self.iteration += 1
 
-        self.data_collector.collect(self)
+        self.datacollector.collect(self)
 
         if self.iteration > self.max_iter:
             self.running = False
@@ -192,3 +192,4 @@ class CivilViolenceModel(Model):
         new_pos = self.random.choice(list(self.grid.empties))
         self.grid.place_agent(agent, new_pos)
         # print(agent.unique_id, " was placed back on the grid at pos: ", new_pos) # TEST
+
