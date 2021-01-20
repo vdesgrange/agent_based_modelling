@@ -160,8 +160,8 @@ class CivilViolenceModel(Model):
         self.legitimacy = self.initial_legitimacy_l0 * (1 - self.jailings_list[1] - self.jailings_list[2] ** 2 - self.jailings_list[3] ** 3)
         if self.legitimacy <= 0:
             self.legitimacy = 0
-        print(self.initial_legitimacy_l0)
-        print(self.legitimacy)
+        # print(self.initial_legitimacy_l0)
+        # print(self.legitimacy)
 
 
     def get_model_reporters(self):
