@@ -83,9 +83,11 @@ class Citizen(Agent):
         # After sentence resets state and contagious hardship
         if self.jail_sentence:
             self.jail_sentence -= 1
+            # print(self.unique_id, self.jail_sentence) # TEST
             if self.jail_sentence == 0:
                 self.state = State.QUIESCENT # Jailed agent returns quiescent
                 self.hardship_cont = 0
+                self.model.add_jailed(self)
             return
 
         self.hardship = self.update_hardship()
@@ -96,7 +98,6 @@ class Citizen(Agent):
         #     print(self.get_grievance(), self.get_arrest_probability(), self.get_net_risk())
 
         self.get_network_neighbors()
-
         self.update_neighbors()  # Should we run this at each turn instead of retrieving the neighbors when necessary ?
 
         rule_a = self.get_grievance() - self.get_net_risk() > self.threshold
@@ -239,10 +240,13 @@ class Cop(Agent):
         # If there are any active arrest one randomly and move there
         if active_neighbors:
             arrestee = random.choice(active_neighbors)
-            sentence = random.randint(0, self.model.max_jail_term)
+            sentence = random.randint(1, self.model.max_jail_term)
             arrestee.jail_sentence = sentence
             arrestee.state = State.JAILED
             new_pos = arrestee.pos
+            # print('Arrested: ', arrestee.unique_id, ' for this long: ', sentence) # TEST
+            if sentence > 0:
+                self.model.remove_agent_grid(arrestee)
             if self.model.movement:
                 self.model.grid.move_agent(self, new_pos)
 

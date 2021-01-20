@@ -157,9 +157,27 @@ class CivilViolenceModel(Model):
     def count_type_citizens(model, condition, exclude_jailed=True):
         """
         Helper method to count agents.
-        Cop agents can't disappear from the map, so number of cops can be retrieved from model attributes.
+        Cop agents can't disappear from the map, so number of cops can be retrieved from 
+        model attributes.
         TODO
         """
         count = 0
 
         return count
+
+    def remove_agent_grid(self, agent):
+        """
+        Removes an agent from the grid.
+        """
+        self.grid.remove_agent(agent)
+
+    def add_jailed(self, agent):
+        """
+        If the sentence of a jailed agent is over, place him back on a 
+        random empty cell in the grid.
+        """
+        if (len(self.grid.empties) == 0):
+            raise Exception("There are no empty cells.")
+        new_pos = self.random.choice(list(self.grid.empties))
+        self.grid.place_agent(agent, new_pos)
+        # print(agent.unique_id, " was placed back on the grid at pos: ", new_pos) # TEST
