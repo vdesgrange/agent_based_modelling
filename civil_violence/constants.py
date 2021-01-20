@@ -4,7 +4,7 @@ GRID_WIDTH = GRID_HEIGHT = 10
 
 State = Enum('State', 'QUIESCENT ACTIVE JAILED COP')
 
-GraphType = Enum('GraphType', 'ERDOS_RENYI')
+GraphType = Enum('GraphType', 'ERDOS_RENYI BARABASI_ALBERT WATTS_STROGATZ')
 
 
 class Color(Enum):
