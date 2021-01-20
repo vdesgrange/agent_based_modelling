@@ -56,6 +56,8 @@ class Citizen(Agent):
         # Jailed agent can't perform any action
         if self.jail_sentence:
             self.jail_sentence -= 1
+            if self.jail_sentence == 0:
+                self.state = State.QUIESCENT # Jailed agent returns quiescent
             return
 
         self.get_network_neighbors()
