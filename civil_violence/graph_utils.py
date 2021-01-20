@@ -95,10 +95,7 @@ def generate_watts_strogatz(agent_list, p, p_ws, seed=None):
     """
 
     num_nodes = len(agent_list)
-    print(num_nodes)
     k = int((num_nodes-1)*p)
-    print(k)
-    print(p_ws)
     graph = nx.generators.random_graphs.watts_strogatz_graph(num_nodes, k, p_ws, seed)
     network_dict = dict()
 
