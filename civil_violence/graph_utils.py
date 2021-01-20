@@ -28,13 +28,13 @@ def generate_network(agent_list, graph_type, p, p_ws, directed=False, seed=None)
     :return:
     """
 
-    if graph_type == GraphType.ERDOS_RENYI:
+    if graph_type == 'GraphType.ERDOS_RENYI':
         return generate_erdos_renyi(agent_list, p, directed, seed)
 
-    if graph_type == GraphType.BARABASI_ALBERT:
+    if graph_type == 'GraphType.BARABASI_ALBERT':
         return generate_barabasi_albert(agent_list, p, seed)
 
-    if graph_type == GraphType.WATTS_STROGATZ:
+    if graph_type == 'GraphType.WATTS_STROGATZ':
         return generate_watts_strogatz(agent_list, p, p_ws, seed)
 
     return generate_erdos_renyi(agent_list, p, directed, seed)  # Default

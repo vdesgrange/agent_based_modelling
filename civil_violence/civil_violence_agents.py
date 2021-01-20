@@ -84,7 +84,7 @@ class Citizen(Agent):
         if self.jail_sentence:
             self.jail_sentence -= 1
             if self.jail_sentence == 0:
-                self.state = State.QUIESCENT
+                self.state = State.QUIESCENT # Jailed agent returns quiescent
                 self.hardship_cont = 0
             return
 
