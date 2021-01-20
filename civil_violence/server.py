@@ -30,7 +30,9 @@ def get_user_model_parameters():
         "active_threshold_t": UserSettableParameter("slider", "Active Threshold", .01, 0, 1, step=.001,
                                                   description="Threshold that agent's Grievance must exceed Net Risk to go active"),
         "max_jail_term": UserSettableParameter("slider", "Max Jail Term", 1000, 0, 1000,
-                                               description="Maximum number of steps that jailed citizens stay in")
+                                               description="Maximum number of steps that jailed citizens stay in"),
+        "graph_type": UserSettableParameter("choice", "GraphType",  value='GraphType.ERDOS_RENYI',
+                                              choices=['GraphType.ERDOS_RENYI', 'GraphType.BARABASI_ALBERT', 'GraphType.WATTS_STROGATZ'])
     }
 
 
@@ -56,8 +58,8 @@ def run(seed=None):
         "max_iter": 1000,
         "max_jail_term": 1000,
         "k": 2.3,
-        "graph_type": GraphType.BARABASI_ALBERT,   # Possibilities: ERDOS_RENYI, BARABASI_ALBERT, WATTS_STROGATZ
-        "p": 0.1,
+        # "graph_type": GraphType.BARABASI_ALBERT,   # Possibilities: ERDOS_RENYI, BARABASI_ALBERT, WATTS_STROGATZ
+        "p": 0.1,  # Determines number of degrees of a node, average number of degrees = p * (total_nodes - 1)
         "p_ws": 0.1,   # Probability rewiring in Watts-Strogatz model (amount of far away connections)
         "directed": False,
         "seed": seed,
