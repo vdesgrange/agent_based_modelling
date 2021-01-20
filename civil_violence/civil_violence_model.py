@@ -8,6 +8,7 @@ from civil_violence_agents import Citizen, Cop
 from constants import State
 from graph_utils import generate_network, print_network
 
+from figure import create_fig
 
 class CivilViolenceModel(Model):
     """ Civil violence model class """
@@ -126,13 +127,7 @@ class CivilViolenceModel(Model):
         print_network(self.G, self.network_dict)  # Print the network. Can be commented.
 
         # Create the graph show the frequency of degrees for the nodes
-        node_degree = self.G.degree
-        degrees = []
-        for i in range(len(node_degree)):
-            degrees.append(node_degree[i])
-        plt.hist(degrees, bins = max(degrees)+1, range = (-0.5, max(degrees) + 0.5)) #range = (min(degrees), max(degrees)), align = "mid") #bins = len(set(degrees)))
-        plt.title(self.graph_type)
-        plt.show()
+        create_fig(self.G.degree, draw=True) # Set =True when we want to draw a figure
 
         self.running = True
         self.datacollector.collect(self)
