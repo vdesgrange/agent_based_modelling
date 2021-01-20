@@ -64,6 +64,12 @@ class Citizen(Agent):
             self.jail_sentence -= 1
             return
 
+
+        # TESTING IF HARDSHIP IS UPDATING:
+        self.hardship = self.update_hardship()
+        if self.unique_id == 1:
+            print('Agent ', self.unique_id, ' feels this much hardship: ', self.hardship)
+
         self.get_network_neighbors()
 
         self.update_neighbors()  # Should we run this at each turn instead of retrieving the neighbors when necessary ?
@@ -132,6 +138,9 @@ class Citizen(Agent):
         
         if self.hardship < 1:
             received_hardship = self.get_received_hardship()
+            if self.unique_id == 1:
+                print('N-Neighbors: ', len(self.neighbors))
+                print('Received hardship from neighbors: ', received_hardship)
             self.hardship_cont += received_hardship
 
         return self.hardship_cont + self.hardship_endo
