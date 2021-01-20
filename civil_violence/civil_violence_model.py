@@ -5,6 +5,7 @@ from mesa.datacollection import DataCollector
 import matplotlib.pyplot as plt
 
 from civil_violence_agents import Citizen, Cop
+from constants import State
 from graph_utils import generate_network, print_network
 
 
@@ -84,6 +85,7 @@ class CivilViolenceModel(Model):
         self.citizen_list = []
         self.cop_list = []
 
+
         # === Set Data collection ===
         self.data_collector = DataCollector(
             model_reporters=self.get_model_reporters(),
@@ -132,8 +134,6 @@ class CivilViolenceModel(Model):
         plt.title(self.graph_type)
         plt.show()
 
-
-
         self.running = True
         self.data_collector.collect(self)
 
@@ -143,32 +143,35 @@ class CivilViolenceModel(Model):
         self.data_collector.collect(self)
         self.iteration += 1
 
+        self.datacollector.collect(self)
+
         if self.iteration > self.max_iter:
             self.running = False
 
     def get_model_reporters(self):
         """ TODO Dictionary of model reporter names and attributes/funcs """
-        return {}
+        return {"QUIESCENT": lambda m: self.count_type_citizens("QUIESCENT"),
+                "ACTIVE": lambda m: self.count_type_citizens("ACTIVE"),
+                "JAILED": lambda m: self.count_type_citizens("JAILED")}
 
     def get_agent_reporters(self):
         """ TODO Dictionary of agent reporter names and attributes/funcs """
         return {}
 
-    def count_type_citizens(model, condition, exclude_jailed=True):
+    def count_type_citizens(self, state_req):
         """
         Helper method to count agents.
         Cop agents can't disappear from the map, so number of cops can be retrieved from model attributes.
-        TODO
         """
         count = 0
-        for agent in model.schedule.agents:
-            if agent.agent_class in [COP_AGENT_CLASS, PROPAGANDA_AGENT_CLASS]:
+        for agent in self.citizen_list:
+            if type(agent).__name__.upper() == 'COP':
                 continue
-            if exclude_jailed and agent.jail_time:
-                continue
-            if count_actives and agent.active:
+            if agent.jail_sentence and state_req == 'JAILED':
                 count += 1
-            elif not count_actives and not agent.active:
-                count += 1
-
+            else:
+                if agent.state is State.ACTIVE and state_req == 'ACTIVE':
+                    count += 1
+                elif agent.state == State.QUIESCENT and state_req == 'QUIESCENT':
+                    count += 1
         return count
