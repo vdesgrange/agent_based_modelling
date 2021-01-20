@@ -143,7 +143,7 @@ class CivilViolenceModel(Model):
         self.data_collector.collect(self)
         self.iteration += 1
 
-        self.datacollector.collect(self)
+        self.data_collector.collect(self)
 
         if self.iteration > self.max_iter:
             self.running = False
