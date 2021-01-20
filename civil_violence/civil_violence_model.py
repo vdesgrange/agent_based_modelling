@@ -97,7 +97,8 @@ class CivilViolenceModel(Model):
             if random_x < self.agent_density:
                 agent = Citizen(
                     unique_id=unique_id, model=self,
-                    pos=(x, y), hardship=self.random.random(),
+                    pos=(x, y), hardship=self.random.random(), susceptibility=self.random.random(), 
+                    influence=self.random.random(), expression_intensity=self.random.random(),
                     legitimacy=self.initial_legitimacy_l0, risk_aversion=self.random.random(),
                     threshold=self.active_threshold_t, vision=self.agent_vision)
 

@@ -10,7 +10,8 @@ class Citizen(Agent):
     A citizen agent, part of the population.
     """
 
-    def __init__(self, unique_id, model, pos, hardship, legitimacy, risk_aversion, threshold, vision):
+    def __init__(self, unique_id, model, pos, hardship, susceptibility, influence, expression_intensity, 
+        legitimacy, risk_aversion, threshold, vision):
         """
         Create a new citizen agent.
 
@@ -18,9 +19,14 @@ class Citizen(Agent):
         :param unique_id: unique id of the agent
         :param model: model to which agent belongs to
         :param pos: position of the agent in the space
+        
         :param hardship_endo: endogenous hardship
         :param hardship_cont: contagious hardship
         :param hardship: agent's perceived hardship, sum of endogenous and contagious hardship
+        :param susceptibility: How susceptible this agent is to contagious hardship
+        :param influence: How influentual this agent is to other agents
+        :param expression_intensity: How strongly this agent expresses their hardship
+
         :param legitimacy: legitimacy of the central authority
         :param risk_aversion: agent's level risk aversion
         :param threshold: threshold beyond which agent become active
@@ -43,6 +49,9 @@ class Citizen(Agent):
         self.hardship_endo = hardship
         self.hardship_cont = 0
         self.hardship = hardship
+        self.susceptibility = susceptibility
+        self.influence = influence
+        self.expression_intensity = expression_intensity
 
         self.legitimacy = legitimacy
         self.risk_aversion = risk_aversion
@@ -64,11 +73,12 @@ class Citizen(Agent):
             self.jail_sentence -= 1
             return
 
-
         # TESTING IF HARDSHIP IS UPDATING:
         self.hardship = self.update_hardship()
+
         if self.unique_id == 1:
             print('Agent ', self.unique_id, ' feels this much hardship: ', self.hardship)
+            print(self.get_grievance(), self.get_arrest_probability(), self.get_net_risk())
 
         self.get_network_neighbors()
 
@@ -159,15 +169,11 @@ class Citizen(Agent):
         timestep = 1
         transmission_rate = 0.5
 
-        # These parameters should be class specific:
-        susceptibility = random.random()
-        influence_strength_neighbor = random.random()
-        expression_intensity = random.random()
-
         hardship = 0
         for n in self.neighbors:
             if n.state == State.ACTIVE:
-                hardship += timestep * transmission_rate * susceptibility * influence_strength_neighbor * expression_intensity * distance
+                hardship += (distance * timestep * transmission_rate * 
+                    n.influence * n.expression_intensity * self.susceptibility)
 
         return hardship
 
