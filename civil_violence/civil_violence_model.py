@@ -160,5 +160,14 @@ class CivilViolenceModel(Model):
         TODO
         """
         count = 0
+        for agent in model.schedule.agents:
+            if agent.agent_class in [COP_AGENT_CLASS, PROPAGANDA_AGENT_CLASS]:
+                continue
+            if exclude_jailed and agent.jail_time:
+                continue
+            if count_actives and agent.active:
+                count += 1
+            elif not count_actives and not agent.active:
+                count += 1
 
         return count
