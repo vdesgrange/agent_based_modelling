@@ -75,6 +75,7 @@ class CivilViolenceModel(Model):
         self.max_jail_term = max_jail_term
         self.active_threshold_t = active_threshold_t
         self.initial_legitimacy_l0 = initial_legitimacy_l0
+        self.legitimacy = initial_legitimacy_l0
         self.k = k
         self.graph_type = graph_type
 
@@ -85,7 +86,7 @@ class CivilViolenceModel(Model):
 
         self.citizen_list = []
         self.cop_list = []
-
+        self.jailings_list = [0, 0, 0, 0]
 
         # === Set Data collection ===
         self.datacollector = DataCollector(
@@ -137,11 +138,26 @@ class CivilViolenceModel(Model):
         self.schedule.step()
         self.datacollector.collect(self)
         self.iteration += 1
-
-        self.datacollector.collect(self)
+        self.update_legitimacy()
+        self.data_collector.collect(self)
 
         if self.iteration > self.max_iter:
             self.running = False
+
+    def update_legitimacy(self):
+        """
+        Compute legitimacy (Epstein Working Paper 2001)
+        """
+        self.jailings_list[3] = self.jailings_list[2]
+        self.jailings_list[2] = self.jailings_list[1]
+        self.jailings_list[1] = self.jailings_list[0]/self.count_type_citizens("ACTIVE")
+        self.jailings_list[0] = 0
+        self.legitimacy = self.initial_legitimacy_l0 * (1 - self.jailings_list[1] - self.jailings_list[2] ** 2 - self.jailings_list[3] ** 3)
+        if self.legitimacy <= 0:
+            self.legitimacy = 0
+        # print(self.initial_legitimacy_l0)
+        # print(self.legitimacy)
+
 
     def get_model_reporters(self):
         """ TODO Dictionary of model reporter names and attributes/funcs """
@@ -187,4 +203,3 @@ class CivilViolenceModel(Model):
         new_pos = self.random.choice(list(self.grid.empties))
         self.grid.place_agent(agent, new_pos)
         # print(agent.unique_id, " was placed back on the grid at pos: ", new_pos) # TEST
-

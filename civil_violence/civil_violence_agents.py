@@ -145,7 +145,7 @@ class Citizen(Agent):
         described in Huang et al. (2018) since only hardship is calculated differently.
         :return: H(1 - L)
         """
-        return self.hardship * (1 - self.legitimacy)
+        return self.hardship * (1 - self.model.legitimacy)
 
     def update_hardship(self):
         """
@@ -244,6 +244,7 @@ class Cop(Agent):
             arrestee.jail_sentence = sentence
             arrestee.state = State.JAILED
             new_pos = arrestee.pos
+            self.model.jailings_list[0] += 1
             # print('Arrested: ', arrestee.unique_id, ' for this long: ', sentence) # TEST
             if sentence > 0:
                 self.model.remove_agent_grid(arrestee)
