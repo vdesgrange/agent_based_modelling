@@ -2,6 +2,7 @@ from mesa import Model
 from mesa.space import MultiGrid
 from mesa.time import RandomActivation
 from mesa.datacollection import DataCollector
+import matplotlib.pyplot as plt
 
 from civil_violence_agents import Citizen, Cop
 from graph_utils import generate_network, print_network
@@ -16,7 +17,7 @@ class CivilViolenceModel(Model):
                  initial_legitimacy_l0, max_iter,
                  max_jail_term, active_threshold_t,
                  k, graph_type,
-                 p, directed,
+                 p, p_ws, directed,
                  movement=True, seed=None):
         """
         Create a new civil violence model.
@@ -73,6 +74,7 @@ class CivilViolenceModel(Model):
         self.active_threshold_t = active_threshold_t
         self.initial_legitimacy_l0 = initial_legitimacy_l0
         self.k = k
+        self.graph_type = graph_type
 
         self.agent_density = agent_density
         self.agent_vision = agent_vision
@@ -118,8 +120,19 @@ class CivilViolenceModel(Model):
 
         # Generate a social network composed of every population agents
 
-        self.G, self.network_dict = generate_network(self.citizen_list, graph_type, p, directed, seed)
+        self.G, self.network_dict = generate_network(self.citizen_list, graph_type, p, p_ws, directed, seed)
         print_network(self.G, self.network_dict)  # Print the network. Can be commented.
+
+        # Create the graph show the frequency of degrees for the nodes
+        node_degree = self.G.degree
+        degrees = []
+        for i in range(len(node_degree)):
+            degrees.append(node_degree[i])
+        plt.hist(degrees, bins = max(degrees)+1, range = (-0.5, max(degrees) + 0.5)) #range = (min(degrees), max(degrees)), align = "mid") #bins = len(set(degrees)))
+        plt.title(self.graph_type)
+        plt.show()
+
+
 
         self.running = True
         self.data_collector.collect(self)

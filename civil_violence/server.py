@@ -20,9 +20,9 @@ def get_user_model_parameters():
                                                  description="Initial percentage of citizen in population"),
         "cop_density": UserSettableParameter("slider", "Cop Density", .074, 0, 1, step=.001,
                                              description="Initial percentage of cops in population"),
-        "agent_vision": UserSettableParameter("slider", "Agent Vision", 7, 0, 10,
+        "agent_vision": UserSettableParameter("slider", "Agent Vision", 1, 0, 10,
                                               description="Number of patches visible to citizens"),
-        "cop_vision": UserSettableParameter("slider", "Cop Vision", 7, 0, 10,
+        "cop_vision": UserSettableParameter("slider", "Cop Vision", 1, 0, 10,
                                             description="Number of patches visible to cops"),
         "initial_legitimacy_l0": UserSettableParameter("slider", "Initial Central authority legitimacy", .8, 0, 1,
                                                        step=.001,
@@ -56,8 +56,9 @@ def run(seed=None):
         "max_iter": 1000,
         "max_jail_term": 1000,
         "k": 2.3,
-        "graph_type": GraphType.ERDOS_RENYI,
+        "graph_type": GraphType.BARABASI_ALBERT,   # Possibilities: ERDOS_RENYI, BARABASI_ALBERT, WATTS_STROGATZ
         "p": 0.1,
+        "p_ws": 0.1,   # Probability rewiring in Watts-Strogatz model (amount of far away connections)
         "directed": False,
         "seed": seed,
     }

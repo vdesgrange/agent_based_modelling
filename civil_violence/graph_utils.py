@@ -15,7 +15,7 @@ class NetworkModuleExtended(NetworkModule):
         return self.portrayal_method(model)
 
 
-def generate_network(agent_list, graph_type, p, directed=False, seed=None):
+def generate_network(agent_list, graph_type, p, p_ws, directed=False, seed=None):
     """
     Generate a network based on the provided parameters
     TODO : If  the signature for all graph is the same, this could be improved as we might not need switch
@@ -30,6 +30,12 @@ def generate_network(agent_list, graph_type, p, directed=False, seed=None):
 
     if graph_type == GraphType.ERDOS_RENYI:
         return generate_erdos_renyi(agent_list, p, directed, seed)
+
+    if graph_type == GraphType.BARABASI_ALBERT:
+        return generate_barabasi_albert(agent_list, p, seed)
+
+    if graph_type == GraphType.WATTS_STROGATZ:
+        return generate_watts_strogatz(agent_list, p, p_ws, seed)
 
     return generate_erdos_renyi(agent_list, p, directed, seed)  # Default
 
@@ -55,6 +61,54 @@ def generate_erdos_renyi(agent_list, p, directed=False, seed=None):
         agent_number += 1
     return graph, network_dict
 
+def generate_barabasi_albert(agent_list, p, seed=None):
+    """
+    Generate an Erdos Renyi graph. Add as many nodes as there's agents.
+    :param agent_list: List of agents (citizen)
+    :param p: probability of creating an edge
+    :param directed: True if graph is directed
+    :param seed: randomization seed
+    :return: networkx graph and dictionnary mapping graph node to agent reference.
+    """
+
+    num_nodes = len(agent_list)
+    m = int((p*num_nodes-1)/2)
+    graph = nx.generators.random_graphs.barabasi_albert_graph(num_nodes, m, seed)
+    network_dict = dict()
+
+    agent_number = 0
+    for agent in agent_list:
+        # Set the localisation of the agent in the social network
+        agent.network_node = list(graph.nodes)[agent_number]
+        network_dict[agent.network_node] = agent
+        agent_number += 1
+    return graph, network_dict
+
+def generate_watts_strogatz(agent_list, p, p_ws, seed=None):
+    """
+    Generate an Erdos Renyi graph. Add as many nodes as there's agents.
+    :param agent_list: List of agents (citizen)
+    :param p: probability of creating an edge
+    :param directed: True if graph is directed
+    :param seed: randomization seed
+    :return: networkx graph and dictionnary mapping graph node to agent reference.
+    """
+
+    num_nodes = len(agent_list)
+    print(num_nodes)
+    k = int((num_nodes-1)*p)
+    print(k)
+    print(p_ws)
+    graph = nx.generators.random_graphs.watts_strogatz_graph(num_nodes, k, p_ws, seed)
+    network_dict = dict()
+
+    agent_number = 0
+    for agent in agent_list:
+        # Set the localisation of the agent in the social network
+        agent.network_node = list(graph.nodes)[agent_number]
+        network_dict[agent.network_node] = agent
+        agent_number += 1
+    return graph, network_dict
 
 def print_network(G, network_dict):
     """
