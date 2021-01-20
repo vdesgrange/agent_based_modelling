@@ -5,6 +5,7 @@ from mesa.datacollection import DataCollector
 import matplotlib.pyplot as plt
 
 from civil_violence_agents import Citizen, Cop
+from constants import State
 from graph_utils import generate_network, print_network
 
 
@@ -84,6 +85,7 @@ class CivilViolenceModel(Model):
         self.citizen_list = []
         self.cop_list = []
 
+
         # === Set Data collection ===
         self.data_collector = DataCollector(
             model_reporters=self.get_model_reporters(),
@@ -99,7 +101,7 @@ class CivilViolenceModel(Model):
             if random_x < self.agent_density:
                 agent = Citizen(
                     unique_id=unique_id, model=self,
-                    pos=(x, y), hardship=self.random.random(), susceptibility=self.random.random(), 
+                    pos=(x, y), hardship=self.random.random(), susceptibility=self.random.random(),
                     influence=self.random.random(), expression_intensity=self.random.random(),
                     legitimacy=self.initial_legitimacy_l0, risk_aversion=self.random.random(),
                     threshold=self.active_threshold_t, vision=self.agent_vision)
@@ -132,8 +134,6 @@ class CivilViolenceModel(Model):
         plt.title(self.graph_type)
         plt.show()
 
-
-
         self.running = True
         self.data_collector.collect(self)
 
@@ -143,26 +143,37 @@ class CivilViolenceModel(Model):
         self.data_collector.collect(self)
         self.iteration += 1
 
+        self.datacollector.collect(self)
+
         if self.iteration > self.max_iter:
             self.running = False
 
     def get_model_reporters(self):
         """ TODO Dictionary of model reporter names and attributes/funcs """
-        return {}
+        return {"QUIESCENT": lambda m: self.count_type_citizens("QUIESCENT"),
+                "ACTIVE": lambda m: self.count_type_citizens("ACTIVE"),
+                "JAILED": lambda m: self.count_type_citizens("JAILED")}
 
     def get_agent_reporters(self):
         """ TODO Dictionary of agent reporter names and attributes/funcs """
         return {}
 
-    def count_type_citizens(model, condition, exclude_jailed=True):
+    def count_type_citizens(self, state_req):
         """
         Helper method to count agents.
-        Cop agents can't disappear from the map, so number of cops can be retrieved from 
-        model attributes.
-        TODO
+        Cop agents can't disappear from the map, so number of cops can be retrieved from model attributes.
         """
         count = 0
-
+        for agent in self.citizen_list:
+            if type(agent).__name__.upper() == 'COP':
+                continue
+            if agent.jail_sentence and state_req == 'JAILED':
+                count += 1
+            else:
+                if agent.state is State.ACTIVE and state_req == 'ACTIVE':
+                    count += 1
+                elif agent.state == State.QUIESCENT and state_req == 'QUIESCENT':
+                    count += 1
         return count
 
     def remove_agent_grid(self, agent):
@@ -173,7 +184,7 @@ class CivilViolenceModel(Model):
 
     def add_jailed(self, agent):
         """
-        If the sentence of a jailed agent is over, place him back on a 
+        If the sentence of a jailed agent is over, place him back on a
         random empty cell in the grid.
         """
         if (len(self.grid.empties) == 0):
