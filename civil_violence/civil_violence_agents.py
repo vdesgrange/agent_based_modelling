@@ -11,7 +11,7 @@ class Citizen(Agent):
     """
 
     def __init__(self, unique_id, model, pos, hardship, susceptibility, influence, expression_intensity, 
-        legitimacy, risk_aversion, threshold, vision):
+        legitimacy, risk_aversion, threshold, vision, jailable=True, influencer=False):
         """
         Create a new citizen agent.
 
@@ -26,11 +26,14 @@ class Citizen(Agent):
         :param susceptibility: How susceptible this agent is to contagious hardship
         :param influence: How influentual this agent is to other agents
         :param expression_intensity: How strongly this agent expresses their hardship
-
         :param legitimacy: legitimacy of the central authority
         :param risk_aversion: agent's level risk aversion
         :param threshold: threshold beyond which agent become active
         :param vision: number of cells visible for each direction (N/S/E/W)
+        :param state: Model state of the agent
+        :param jail_sentence: Current to-be-served jail sentence of agent
+        :param jailable: Flag that indicates if an agent can get arrested
+        :param influencer: Flag that indicates if an agent is of the influencer subtype
 
         network_node : agent's node_id in the graph representing the social network
         state: current state of the agent (default: Quiescent)
@@ -59,9 +62,17 @@ class Citizen(Agent):
         self.vision = vision
         self.state = State.QUIESCENT
         self.jail_sentence = 0
+        self.jailable = jailable
+        self.influencer = influencer
 
         self.neighbors = []  # Neighbors in MultiGrid space
         self.empty_cells = []  # Empty cells around the agent in MultiGrid space
+
+        # PLACEHOLDER INFLUENCER TAG - CURRENTLY NOT WORKING
+        if len(self.neighbors) > 10:
+            self.influencer = True
+
+
 
     def step(self):
         """
@@ -69,16 +80,20 @@ class Citizen(Agent):
         """
 
         # Jailed agent can't perform any action
+        # After sentence resets state and contagious hardship
         if self.jail_sentence:
             self.jail_sentence -= 1
+            if self.jail_sentence == 0:
+                self.state = State.QUIESCENT
+                self.hardship_cont = 0
             return
 
-        # TESTING IF HARDSHIP IS UPDATING:
         self.hardship = self.update_hardship()
 
-        if self.unique_id == 1:
-            print('Agent ', self.unique_id, ' feels this much hardship: ', self.hardship)
-            print(self.get_grievance(), self.get_arrest_probability(), self.get_net_risk())
+        # TESTING IF HARDSHIP IS UPDATING:
+        # if self.unique_id == 1:
+        #     print('Agent ', self.unique_id, ' feels this much hardship: ', self.hardship)
+        #     print(self.get_grievance(), self.get_arrest_probability(), self.get_net_risk())
 
         self.get_network_neighbors()
 
@@ -125,18 +140,11 @@ class Citizen(Agent):
 
     def get_grievance(self):
         """
-        Compute the agent's grievance (Epstein 2002 model)
+        Compute the agent's grievance (Epstein 2002 model), also works with the ABEC-model 
+        described in Huang et al. (2018) since only hardship is calculated differently.
         :return: H(1 - L)
         """
         return self.hardship * (1 - self.legitimacy)
-
-    def get_grievance_contagious(self):
-        """
-        Computes the agent's grievance based on the Grievance Contagion Process as defined in the
-        ABEC-model described in Huang et al. (2018)
-        G(i, t) = (1-L) H(i, t) 
-
-        """
 
     def update_hardship(self):
         """
@@ -148,9 +156,9 @@ class Citizen(Agent):
         
         if self.hardship < 1:
             received_hardship = self.get_received_hardship()
-            if self.unique_id == 1:
-                print('N-Neighbors: ', len(self.neighbors))
-                print('Received hardship from neighbors: ', received_hardship)
+            # if self.unique_id == 1:
+                # print('N-Neighbors: ', len(self.neighbors))
+                # print('Received hardship from neighbors: ', received_hardship)
             self.hardship_cont += received_hardship
 
         return self.hardship_cont + self.hardship_endo
@@ -224,7 +232,8 @@ class Cop(Agent):
         for agent in self.neighbors:
             if type(agent).__name__.upper() == 'CITIZEN' \
                     and agent.state is State.ACTIVE \
-                    and agent.jail_sentence == 0:
+                    and agent.jail_sentence == 0 \
+                    and agent.jailable:
                 active_neighbors.append(agent)
 
         # If there are any active arrest one randomly and move there
