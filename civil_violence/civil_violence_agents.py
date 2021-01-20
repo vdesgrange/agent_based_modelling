@@ -18,7 +18,9 @@ class Citizen(Agent):
         :param unique_id: unique id of the agent
         :param model: model to which agent belongs to
         :param pos: position of the agent in the space
-        :param hardship: agent's perceived hardship
+        :param hardship_endo: endogenous hardship
+        :param hardship_cont: contagious hardship
+        :param hardship: agent's perceived hardship, sum of endogenous and contagious hardship
         :param legitimacy: legitimacy of the central authority
         :param risk_aversion: agent's level risk aversion
         :param threshold: threshold beyond which agent become active
@@ -37,7 +39,11 @@ class Citizen(Agent):
         self.pos = pos  # Position in MultiGrid space
         self.network_node = 0  # Position in graph
 
+        # Implementation for contagious hardship. Hardship is updated per turn, but is set equal to U(0, 1) for initialization.
+        self.hardship_endo = hardship
+        self.hardship_cont = 0
         self.hardship = hardship
+
         self.legitimacy = legitimacy
         self.risk_aversion = risk_aversion
         self.threshold = threshold
@@ -107,6 +113,56 @@ class Citizen(Agent):
         :return: H(1 - L)
         """
         return self.hardship * (1 - self.legitimacy)
+
+    def get_grievance_contagious(self):
+        """
+        Computes the agent's grievance based on the Grievance Contagion Process as defined in the
+        ABEC-model described in Huang et al. (2018)
+        G(i, t) = (1-L) H(i, t) 
+
+        """
+
+    def update_hardship(self):
+        """
+        Hardship in the ABEC-model consists of endogenous hardship (U(0, 1) as the Epstein model)
+        and contagious hardship which is updated at every timestep.
+
+        Updates the contagious hardship and the perceived hardship.
+        """
+        
+        if self.hardship < 1:
+            received_hardship = self.get_received_hardship()
+            self.hardship_cont += received_hardship
+
+        return self.hardship_cont + self.hardship_endo
+
+    def get_received_hardship(self):
+        """
+        Calculates the received contagious hardship of an agent by its neighbors. Is a product of various 
+        endo- and exogenous parameters. 
+        Transmission_rate is a parameter we can consider setting fixed because it is not of importance to our
+        project, but removing it will increase the received hardship.
+        Timestep, or delta_time, can also be considered fixed in this discrete time model.
+        Distance is a parameter that is more or less incorporated in NetworkX, so perhaps set this fixed as well.
+        """
+        # Fixed values for parameters
+        distance = 0.5
+        timestep = 1
+        transmission_rate = 0.5
+
+        # These parameters should be class specific:
+        susceptibility = random.random()
+        influence_strength_neighbor = random.random()
+        expression_intensity = random.random()
+
+        hardship = 0
+        for n in self.neighbors:
+            if n.state == State.ACTIVE:
+                hardship += timestep * transmission_rate * susceptibility * influence_strength_neighbor * expression_intensity * distance
+
+        return hardship
+
+
 
     def get_network_neighbors(self):
         """ TODO Example to retrieve attributes from the network layer"""
