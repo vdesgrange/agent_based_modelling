@@ -10,7 +10,8 @@ class Citizen(Agent):
     A citizen agent, part of the population.
     """
 
-    def __init__(self, unique_id, model, pos, hardship, legitimacy, risk_aversion, threshold, vision):
+    def __init__(self, unique_id, model, pos, hardship, susceptibility, influence, expression_intensity, 
+        legitimacy, risk_aversion, threshold, vision, jailable=True, influencer=False):
         """
         Create a new citizen agent.
 
@@ -18,11 +19,21 @@ class Citizen(Agent):
         :param unique_id: unique id of the agent
         :param model: model to which agent belongs to
         :param pos: position of the agent in the space
-        :param hardship: agent's perceived hardship
+        
+        :param hardship_endo: endogenous hardship
+        :param hardship_cont: contagious hardship
+        :param hardship: agent's perceived hardship, sum of endogenous and contagious hardship
+        :param susceptibility: How susceptible this agent is to contagious hardship
+        :param influence: How influentual this agent is to other agents
+        :param expression_intensity: How strongly this agent expresses their hardship
         :param legitimacy: legitimacy of the central authority
         :param risk_aversion: agent's level risk aversion
         :param threshold: threshold beyond which agent become active
         :param vision: number of cells visible for each direction (N/S/E/W)
+        :param state: Model state of the agent
+        :param jail_sentence: Current to-be-served jail sentence of agent
+        :param jailable: Flag that indicates if an agent can get arrested
+        :param influencer: Flag that indicates if an agent is of the influencer subtype
 
         network_node : agent's node_id in the graph representing the social network
         state: current state of the agent (default: Quiescent)
@@ -37,16 +48,31 @@ class Citizen(Agent):
         self.pos = pos  # Position in MultiGrid space
         self.network_node = 0  # Position in graph
 
+        # Implementation for contagious hardship. Hardship is updated per turn, but is set equal to U(0, 1) for initialization.
+        self.hardship_endo = hardship
+        self.hardship_cont = 0
         self.hardship = hardship
+        self.susceptibility = susceptibility
+        self.influence = influence
+        self.expression_intensity = expression_intensity
+
         self.legitimacy = legitimacy
         self.risk_aversion = risk_aversion
         self.threshold = threshold
         self.vision = vision
         self.state = State.QUIESCENT
         self.jail_sentence = 0
+        self.jailable = jailable
+        self.influencer = influencer
 
         self.neighbors = []  # Neighbors in MultiGrid space
         self.empty_cells = []  # Empty cells around the agent in MultiGrid space
+
+        # PLACEHOLDER INFLUENCER TAG - CURRENTLY NOT WORKING
+        if len(self.neighbors) > 10:
+            self.influencer = True
+
+
 
     def step(self):
         """
@@ -54,11 +80,20 @@ class Citizen(Agent):
         """
 
         # Jailed agent can't perform any action
+        # After sentence resets state and contagious hardship
         if self.jail_sentence:
             self.jail_sentence -= 1
             if self.jail_sentence == 0:
                 self.state = State.QUIESCENT # Jailed agent returns quiescent
+                self.hardship_cont = 0
             return
+
+        self.hardship = self.update_hardship()
+
+        # TESTING IF HARDSHIP IS UPDATING:
+        # if self.unique_id == 1:
+        #     print('Agent ', self.unique_id, ' feels this much hardship: ', self.hardship)
+        #     print(self.get_grievance(), self.get_arrest_probability(), self.get_net_risk())
 
         self.get_network_neighbors()
 
@@ -105,10 +140,52 @@ class Citizen(Agent):
 
     def get_grievance(self):
         """
-        Compute the agent's grievance (Epstein 2002 model)
+        Compute the agent's grievance (Epstein 2002 model), also works with the ABEC-model 
+        described in Huang et al. (2018) since only hardship is calculated differently.
         :return: H(1 - L)
         """
         return self.hardship * (1 - self.legitimacy)
+
+    def update_hardship(self):
+        """
+        Hardship in the ABEC-model consists of endogenous hardship (U(0, 1) as the Epstein model)
+        and contagious hardship which is updated at every timestep.
+
+        Updates the contagious hardship and the perceived hardship.
+        """
+        
+        if self.hardship < 1:
+            received_hardship = self.get_received_hardship()
+            # if self.unique_id == 1:
+                # print('N-Neighbors: ', len(self.neighbors))
+                # print('Received hardship from neighbors: ', received_hardship)
+            self.hardship_cont += received_hardship
+
+        return self.hardship_cont + self.hardship_endo
+
+    def get_received_hardship(self):
+        """
+        Calculates the received contagious hardship of an agent by its neighbors. Is a product of various 
+        endo- and exogenous parameters. 
+        Transmission_rate is a parameter we can consider setting fixed because it is not of importance to our
+        project, but removing it will increase the received hardship.
+        Timestep, or delta_time, can also be considered fixed in this discrete time model.
+        Distance is a parameter that is more or less incorporated in NetworkX, so perhaps set this fixed as well.
+        """
+        # Fixed values for parameters
+        distance = 0.5
+        timestep = 1
+        transmission_rate = 0.5
+
+        hardship = 0
+        for n in self.neighbors:
+            if n.state == State.ACTIVE:
+                hardship += (distance * timestep * transmission_rate * 
+                    n.influence * n.expression_intensity * self.susceptibility)
+
+        return hardship
+
+
 
     def get_network_neighbors(self):
         """ TODO Example to retrieve attributes from the network layer"""
@@ -155,7 +232,8 @@ class Cop(Agent):
         for agent in self.neighbors:
             if type(agent).__name__.upper() == 'CITIZEN' \
                     and agent.state is State.ACTIVE \
-                    and agent.jail_sentence == 0:
+                    and agent.jail_sentence == 0 \
+                    and agent.jailable:
                 active_neighbors.append(agent)
 
         # If there are any active arrest one randomly and move there
