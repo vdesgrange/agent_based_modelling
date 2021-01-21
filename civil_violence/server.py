@@ -49,15 +49,15 @@ def get_visualization_elements():
                                       {"Label": "ACTIVE", "Color": Color['ACTIVE'].value},
                                       {"Label": "JAILED", "Color": Color['JAILED'].value}], 100, 270)
 
-    # grievance_chart = ChartModule([{"Label": "Total Inactive Grievance", "Color": AGENT_QUIET_COLOR},
-    #                                {"Label": "Total Inactive Net Risk", "Color": COP_COLOR},
-    #                                {"Label": "Total Influence", "Color": end_prop}], 50, 135)
+    grievance_chart = ChartModule([{"Label": "LEGITIMACY", "Color": Color['QUIESCENT'].value},
+                                   # {"Label": "Hardship", "Color": Color['ACTIVE'].value}
+                                   ], 50, 135)
     #
     pie_chart = PieChartModule([{"Label": "QUIESCENT", "Color": Color['QUIESCENT'].value},
                                 {"Label": "ACTIVE", "Color": Color['ACTIVE'].value},
                                 {"Label": "JAILED", "Color": Color['JAILED'].value}], 200, 500)
 
-    return [canvas_element, network_element, agents_state_chart, pie_chart]
+    return [canvas_element, network_element, agents_state_chart, pie_chart,grievance_chart]
 
 
 def run(seed=None):
