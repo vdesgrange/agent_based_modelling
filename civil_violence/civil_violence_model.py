@@ -16,7 +16,8 @@ class CivilViolenceModel(Model):
                  height, width,
                  agent_density, agent_vision,
                  cop_density, cop_vision,
-                 initial_legitimacy_l0, max_iter,
+                 initial_legitimacy_l0, inf_threshold, 
+                 removal_step, max_iter,
                  max_jail_term, active_threshold_t,
                  k, graph_type,
                  p, p_ws, directed,
@@ -32,6 +33,7 @@ class CivilViolenceModel(Model):
         :param cop_density: Approximate percentage of cells occupied by cops.
         :param cop_vision: Radius of the cop vision in every direction.
         :param initial_legitimacy_l0: Initial legitimacy of the central authority.
+        :param inf_threshold: Amount of nodes that need to be connected before an agent is considered an influencer.
         :param max_iter: Maximum number of steps in the simulation.
         :param max_jail_term: Maximal jail term.
         :param active_threshold_t: Threshold where citizen agent became active.
@@ -84,6 +86,8 @@ class CivilViolenceModel(Model):
         self.agent_vision = agent_vision
         self.cop_density = cop_density
         self.cop_vision = cop_vision
+        self.inf_threshold = inf_threshold
+        self.removal_step = removal_step
 
         self.citizen_list = []
         self.cop_list = []
@@ -131,7 +135,7 @@ class CivilViolenceModel(Model):
 
         # With network in place, set the influencers. Change the parameter value to determine how
         # many connections a node needs to be considered an influencer.
-        self.set_influencers(inf_threshold=10)
+        self.set_influencers(self.inf_threshold)
 
         # Create the graph show the frequency of degrees for the nodes
         create_fig(self.G.degree, draw=False) # Set =True when we want to draw a figure
@@ -147,8 +151,13 @@ class CivilViolenceModel(Model):
         self.update_legitimacy()
         self.datacollector.collect(self)
 
+        # Stop the model after a certain amount of iterations.
         if self.iteration > self.max_iter:
             self.running = False
+
+        # Remove influencer after certain amount of iterations.
+        if self.iteration == self.removal_step:
+            self.remove_influencer()
 
         # for agent in self.influencer_list:
         #     print('Agent ', agent.unique_id, ' is an influencer ')
@@ -233,7 +242,10 @@ class CivilViolenceModel(Model):
         manual control over the model to evaluate the influence of influencers.
         """
         to_remove = self.random.choice(self.influencer_list)
-        self.grid.remove_agent(to_remove)
+        if to_remove.pos: # Check if influencer is jailed.
+            self.grid.remove_agent(to_remove)
         self.influencer_list.remove(to_remove)
         self.citizen_list.remove(to_remove)
-        print(agent.unique_id, ' was an influencer and has been removed.')
+        self.schedule.remove(to_remove)
+        self.G.remove_node(to_remove.network_node)
+        # print(to_remove.unique_id, ' was an influencer and has been removed.')
