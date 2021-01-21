@@ -70,12 +70,6 @@ class Citizen(Agent):
         self.neighbors = []  # Neighbors in MultiGrid space
         self.empty_cells = []  # Empty cells around the agent in MultiGrid space
 
-        # PLACEHOLDER INFLUENCER TAG - CURRENTLY NOT WORKING
-        if len(self.neighbors) > 10:
-            self.influencer = True
-
-
-
     def step(self):
         """
         Citizen agent rules (Epstein 2002 model)
@@ -161,11 +155,17 @@ class Citizen(Agent):
         if self.hardship < 1:
             received_hardship = self.get_received_hardship()
             # if self.unique_id == 1:
-                # print('N-Neighbors: ', len(self.neighbors))
-                # print('Received hardship from neighbors: ', received_hardship)
+            #     print('N-Neighbors: ', len(self.neighbors))
+            #     print('Received hardship from neighbors: ', received_hardship)
             self.hardship_cont += received_hardship
-
-        return self.hardship_cont + self.hardship_endo
+        
+        hardship = self.hardship_cont + self.hardship_endo
+        
+        # Ensure hardship has a maximum value of 1
+        if hardship > 1:
+            return 1
+        else:
+            return hardship
 
     def get_received_hardship(self):
         """
@@ -180,16 +180,18 @@ class Citizen(Agent):
         distance = 0.5
         timestep = 1
         transmission_rate = 0.5
-
         hardship = 0
-        for n in self.neighbors:
-            if n.state == State.ACTIVE:
+
+        for n in self.model.G.neighbors(self.network_node): # Network neighbors
+            agent = self.model.network_dict[n]
+            if agent.state == State.ACTIVE:
                 hardship += (distance * timestep * transmission_rate * 
-                    n.influence * n.expression_intensity * self.susceptibility)
+                    agent.influence * agent.expression_intensity * self.susceptibility)
 
         return hardship
 
-
+    def set_influencer(self):
+        self.influencer = True
 
     def get_network_neighbors(self):
         """ TODO Example to retrieve attributes from the network layer"""

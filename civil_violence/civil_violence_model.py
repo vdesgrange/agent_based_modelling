@@ -45,7 +45,8 @@ class CivilViolenceModel(Model):
         Additionnal attributes:
             running : is the model running
             iteration : current step of the simulation
-            citizen_list : a list storing the citizen agents added to the model.
+            citizen_list : a list storing the citizen agents added to the model.   
+            influencer_list : a list storing the citizien agents that are influencers
 
             grid : A 2D cellular automata representing the real world space environment
             network : A NetworkGrid with as many nodes as (citizen) agents representing the social network.
@@ -86,6 +87,7 @@ class CivilViolenceModel(Model):
 
         self.citizen_list = []
         self.cop_list = []
+        self.influencer_list = []
         self.jailings_list = [0, 0, 0, 0]
 
         # === Set Data collection ===
@@ -127,6 +129,10 @@ class CivilViolenceModel(Model):
         self.G, self.network_dict = generate_network(self.citizen_list, graph_type, p, p_ws, directed, seed)
         print_network(self.G, self.network_dict)  # Print the network. Can be commented.
 
+        # With network in place, set the influencers. Change the parameter value to determine how
+        # many connections a node needs to be considered an influencer.
+        self.set_influencers(inf_threshold=10)
+
         # Create the graph show the frequency of degrees for the nodes
         create_fig(self.G.degree, draw=False) # Set =True when we want to draw a figure
 
@@ -143,6 +149,9 @@ class CivilViolenceModel(Model):
 
         if self.iteration > self.max_iter:
             self.running = False
+
+        # for agent in self.influencer_list:
+        #     print('Agent ', agent.unique_id, ' is an influencer ')
 
     def update_legitimacy(self):
         """
@@ -207,3 +216,24 @@ class CivilViolenceModel(Model):
         new_pos = self.random.choice(list(self.grid.empties))
         self.grid.place_agent(agent, new_pos)
         # print(agent.unique_id, " was placed back on the grid at pos: ", new_pos) # TEST
+
+    def set_influencers(self, inf_threshold=10):
+        """
+        If an agent in the network is connected to a large amount of nodes, this agent can
+        be considered an influencer and receives a corresponding tag.
+        """
+        for agent in self.citizen_list:
+            if len(list(self.G.neighbors(agent.network_node))) > inf_threshold:
+                agent.set_influencer()
+                self.influencer_list.append(agent)
+
+    def remove_influencer(self):
+        """
+        Function that removes a random agent with the influencer tag from the gird. Gives 
+        manual control over the model to evaluate the influence of influencers.
+        """
+        to_remove = self.random.choice(self.influencer_list)
+        self.grid.remove_agent(to_remove)
+        self.influencer_list.remove(to_remove)
+        self.citizen_list.remove(to_remove)
+        print(agent.unique_id, ' was an influencer and has been removed.')
