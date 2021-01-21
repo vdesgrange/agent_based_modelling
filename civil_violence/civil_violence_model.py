@@ -128,7 +128,7 @@ class CivilViolenceModel(Model):
         print_network(self.G, self.network_dict)  # Print the network. Can be commented.
 
         # Create the graph show the frequency of degrees for the nodes
-        create_fig(self.G.degree, draw=True) # Set =True when we want to draw a figure
+        create_fig(self.G.degree, draw=False) # Set =True when we want to draw a figure
 
         self.running = True
         self.datacollector.collect(self)
@@ -150,7 +150,7 @@ class CivilViolenceModel(Model):
         """
         self.jailings_list[3] = self.jailings_list[2]
         self.jailings_list[2] = self.jailings_list[1]
-        self.jailings_list[1] = self.jailings_list[0]/self.count_type_citizens("ACTIVE")
+        self.jailings_list[1] = self.jailings_list[0]/(self.count_type_citizens("ACTIVE")+1)  # +1 otherwise it can divide by zero
         self.jailings_list[0] = 0
         self.legitimacy = self.initial_legitimacy_l0 * (1 - self.jailings_list[1] - self.jailings_list[2] ** 2 - self.jailings_list[3] ** 3)
         if self.legitimacy <= 0:
@@ -160,14 +160,18 @@ class CivilViolenceModel(Model):
 
 
     def get_model_reporters(self):
-        """ TODO Dictionary of model reporter names and attributes/funcs """
+        """ Dictionary of model reporter names and attributes/funcs """
         return {"QUIESCENT": lambda m: self.count_type_citizens("QUIESCENT"),
                 "ACTIVE": lambda m: self.count_type_citizens("ACTIVE"),
-                "JAILED": lambda m: self.count_type_citizens("JAILED")}
+                "JAILED": lambda m: self.count_type_citizens("JAILED"),
+                "LEGITIMACY": lambda m: self.legitimacy}
 
     def get_agent_reporters(self):
-        """ TODO Dictionary of agent reporter names and attributes/funcs """
-        return {}
+        """ TODO Dictionary of agent reporter names and attributes/funcs
+            TODO Doesn't work the way it should"""
+
+        return {"Grievance": lambda a: getattr(a, 'grievance', None),
+                "Hardship": lambda a: getattr(a, 'hardship', None)}
 
     def count_type_citizens(self, state_req):
         """
