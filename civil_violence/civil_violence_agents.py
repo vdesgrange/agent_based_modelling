@@ -51,6 +51,7 @@ class Citizen(Agent):
         # Implementation for contagious hardship. Hardship is updated per turn, but is set equal to U(0, 1) for initialization.
         self.hardship_endo = hardship
         self.hardship_cont = 0
+        self.grievance = 0
         self.hardship = hardship
         self.susceptibility = susceptibility
         self.influence = influence
@@ -64,6 +65,7 @@ class Citizen(Agent):
         self.jail_sentence = 0
         self.jailable = jailable
         self.influencer = influencer
+
 
         self.neighbors = []  # Neighbors in MultiGrid space
         self.empty_cells = []  # Empty cells around the agent in MultiGrid space
@@ -100,7 +102,8 @@ class Citizen(Agent):
         self.get_network_neighbors()
         self.update_neighbors()  # Should we run this at each turn instead of retrieving the neighbors when necessary ?
 
-        rule_a = self.get_grievance() - self.get_net_risk() > self.threshold
+        self.grievance = self.get_grievance()
+        rule_a = self.grievance - self.get_net_risk() > self.threshold
         if self.state is State.QUIESCENT and rule_a:
             self.state = State.ACTIVE
         elif self.state is State.ACTIVE and not rule_a:
