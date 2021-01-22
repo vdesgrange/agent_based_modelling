@@ -35,6 +35,8 @@ def get_user_model_parameters():
                                                 description="Amount of nodes that need to be connected to consider agents influencers."),
         "removal_step": UserSettableParameter("slider", "Iteration of influencer removal", 0, 0, 100, step=5,
                                                 description="Iteration at which a random influencer is removed from the model."),
+        # "removal_step": UserSettableParameter("choice", "Removel of influencers", value=False,
+        #                                       choices=[False, True]),
         "graph_type": UserSettableParameter("choice", "GraphType",  value='GraphType.ERDOS_RENYI',
                                               choices=['GraphType.ERDOS_RENYI', 'GraphType.BARABASI_ALBERT', 'GraphType.WATTS_STROGATZ'])
     }
