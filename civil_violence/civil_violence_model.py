@@ -131,7 +131,7 @@ class CivilViolenceModel(Model):
         # Generate a social network composed of every population agents
 
         self.G, self.network_dict = generate_network(self.citizen_list, graph_type, p, p_ws, directed, seed)
-        print_network(self.G, self.network_dict)  # Print the network. Can be commented.
+        # print_network(self.G, self.network_dict)  # Print the network. Can be commented.
 
         # With network in place, set the influencers. Change the parameter value to determine how
         # many connections a node needs to be considered an influencer.

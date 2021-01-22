@@ -2,7 +2,7 @@ import random
 import math
 from mesa import Agent
 
-from constants import State
+from constants import State, HardshipConst
 
 
 class Citizen(Agent):
@@ -154,6 +154,8 @@ class Citizen(Agent):
         
         if self.hardship < 1:
             received_hardship = self.get_received_hardship()
+            print("========")
+            print(received_hardship)
             # if self.unique_id == 1:
             #     print('N-Neighbors: ', len(self.neighbors))
             #     print('Received hardship from neighbors: ', received_hardship)
@@ -167,7 +169,7 @@ class Citizen(Agent):
         else:
             return hardship
 
-    def get_received_hardship(self):
+    def get_received_hardship(self, hardship_params=HardshipConst):
         """
         Calculates the received contagious hardship of an agent by its neighbors. Is a product of various 
         endo- and exogenous parameters. 
@@ -175,16 +177,17 @@ class Citizen(Agent):
         project, but removing it will increase the received hardship.
         Timestep, or delta_time, can also be considered fixed in this discrete time model.
         Distance is a parameter that is more or less incorporated in NetworkX, so perhaps set this fixed as well.
+        :param hardship_params: default values
         """
         # Fixed values for parameters
-        distance = 0.5
-        timestep = 1
-        transmission_rate = 0.5
-        hardship = 0
+        distance = hardship_params.DISTANCE.value
+        timestep = hardship_params.TIME_STEP.value
+        transmission_rate = hardship_params.TRANSMISSION_RATE.value
+        hardship = hardship_params.HARDSHIP.value
 
-        for n in self.model.G.neighbors(self.network_node): # Network neighbors
-            agent = self.model.network_dict[n]
-            if agent.state == State.ACTIVE:
+        for n in self.model.G.neighbors(self.network_node):  # Network neighbors
+            agent = self.model.network_dict[n]  # Get agent at the neighbor node
+            if agent.state == State.ACTIVE:  # If the agent is active state
                 hardship += (distance * timestep * transmission_rate * 
                     agent.influence * agent.expression_intensity * self.susceptibility)
 

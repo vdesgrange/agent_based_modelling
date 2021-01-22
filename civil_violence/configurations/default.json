@@ -1,0 +1,17 @@
+{
+  "width": 40,
+  "height": 40,
+  "max_iter": 200,
+  "max_jail_term": 30,
+  "k": 2.3,
+  "agent_density": 0.7,
+  "cop_density": 0.04,
+  "agent_vision": 7,
+  "cop_vision": 7,
+  "initial_legitimacy_l0": 0.8,
+  "active_threshold_t": 0.1,
+  "graph_type": "BARABASI_ALBERT",
+  "p": 0.1,
+  "p_ws": 0.1,
+  "directed": false
+}

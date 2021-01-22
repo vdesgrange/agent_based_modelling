@@ -28,16 +28,17 @@ def generate_network(agent_list, graph_type, p, p_ws, directed=False, seed=None)
     :return:
     """
 
-    if graph_type == 'GraphType.ERDOS_RENYI':
+    if graph_type == GraphType.ERDOS_RENYI.name:
         return generate_erdos_renyi(agent_list, p, directed, seed)
 
-    if graph_type == 'GraphType.BARABASI_ALBERT':
+    if graph_type == GraphType.BARABASI_ALBERT.name:
         return generate_barabasi_albert(agent_list, p, seed)
 
-    if graph_type == 'GraphType.WATTS_STROGATZ':
+    if graph_type == GraphType.WATTS_STROGATZ.name:
         return generate_watts_strogatz(agent_list, p, p_ws, seed)
 
     return generate_erdos_renyi(agent_list, p, directed, seed)  # Default
+
 
 def generate_erdos_renyi(agent_list, p, directed=False, seed=None):
     """
@@ -60,6 +61,7 @@ def generate_erdos_renyi(agent_list, p, directed=False, seed=None):
         network_dict[agent.network_node] = agent
         agent_number += 1
     return graph, network_dict
+
 
 def generate_barabasi_albert(agent_list, p, seed=None):
     """
@@ -84,6 +86,7 @@ def generate_barabasi_albert(agent_list, p, seed=None):
         agent_number += 1
     return graph, network_dict
 
+
 def generate_watts_strogatz(agent_list, p, p_ws, seed=None):
     """
     Generate an Erdos Renyi graph. Add as many nodes as there's agents.
@@ -106,6 +109,7 @@ def generate_watts_strogatz(agent_list, p, p_ws, seed=None):
         network_dict[agent.network_node] = agent
         agent_number += 1
     return graph, network_dict
+
 
 def print_network(G, network_dict):
     """
