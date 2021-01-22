@@ -241,11 +241,12 @@ class CivilViolenceModel(Model):
         Function that removes a random agent with the influencer tag from the gird. Gives 
         manual control over the model to evaluate the influence of influencers.
         """
-        to_remove = self.random.choice(self.influencer_list)
-        if to_remove.pos: # Check if influencer is jailed.
-            self.grid.remove_agent(to_remove)
-        self.influencer_list.remove(to_remove)
-        self.citizen_list.remove(to_remove)
-        self.schedule.remove(to_remove)
-        self.G.remove_node(to_remove.network_node)
-        # print(to_remove.unique_id, ' was an influencer and has been removed.')
+        if self.influencer_list:
+            to_remove = self.random.choice(self.influencer_list)
+            if to_remove.pos: # Check if influencer is jailed.
+                self.grid.remove_agent(to_remove)
+            self.influencer_list.remove(to_remove)
+            self.citizen_list.remove(to_remove)
+            self.schedule.remove(to_remove)
+            self.G.remove_node(to_remove.network_node)
+            # print(to_remove.unique_id, ' was an influencer and has been removed.')
