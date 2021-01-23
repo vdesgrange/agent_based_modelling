@@ -37,7 +37,15 @@ def generate_network(agent_list, graph_type, p, p_ws, directed=False, seed=None)
     if graph_type == GraphType.WATTS_STROGATZ.name:
         return generate_watts_strogatz(agent_list, p, p_ws, seed)
 
-    return generate_erdos_renyi(agent_list, p, directed, seed)  # Default
+    # Default - no network
+    no_graph = nx.Graph()
+    network_dict = dict()
+    for idx, agent in enumerate(agent_list):
+        no_graph.add_node(idx)
+        agent.network_node = idx
+        network_dict[agent.network_node] = agent
+
+    return no_graph, network_dict
 
 
 def generate_erdos_renyi(agent_list, p, directed=False, seed=None):
