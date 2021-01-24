@@ -19,16 +19,20 @@ def get_user_model_parameters():
     return {
         "agent_density": UserSettableParameter("slider", "Agent Density", .7, 0., 1., step=.001,
                                                  description="Initial percentage of citizen in population"),
-        "cop_density": UserSettableParameter("slider", "Cop Density", .074, 0, 1, step=.001,
+        "cop_density": UserSettableParameter("slider", "Cop Density", .04, 0, 1, step=.001,
                                              description="Initial percentage of cops in population"),
         "agent_vision": UserSettableParameter("slider", "Agent Vision", 7, 0, 10,
                                               description="Number of patches visible to citizens"),
         "cop_vision": UserSettableParameter("slider", "Cop Vision", 7, 0, 10,
                                             description="Number of patches visible to cops"),
         "initial_legitimacy_l0": UserSettableParameter("slider", "Initial Central authority legitimacy", .8, 0, 1,
-                                                       step=.001,
+                                                       step=.01,
                                                        description="Global parameter: Central authority legitimacy"),
+<<<<<<< Updated upstream
         "active_threshold_t": UserSettableParameter("slider", "Active Threshold", .1, 0, 1, step=.001,
+=======
+        "active_threshold_t": UserSettableParameter("slider", "Active Threshold", .1, 0, 1, step=.01,
+>>>>>>> Stashed changes
                                                   description="Threshold that agent's Grievance must exceed Net Risk to go active"),
         "max_jail_term": UserSettableParameter("slider", "Max Jail Term", 1000, 0, 1000,
                                                description="Maximum number of steps that jailed citizens stay in"),
