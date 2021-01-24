@@ -1,4 +1,11 @@
+from utils import linear_gradient
 from constants import State, Shape, Color
+from civil_violence_agents import Citizen
+
+# we generate an array of hex values in between start and end hex values
+# in order to represent agents with an array of susceptibility values
+# in the grid
+grad_grievance = linear_gradient("#FFD1D7", "#860110", n=100)['hex']
 
 
 def get_agent_portrayal(agent):
@@ -58,3 +65,25 @@ def get_network_portrayal(model):
     ]
 
     return portrayal
+
+
+def get_grievance_portrayal(agent):
+
+    portrayal = {
+        "Shape": "rect",
+        "x": agent.pos[0], "y": agent.pos[1],
+        "Filled": "true",
+        "Color": "#000000",
+        "w": 0.7,
+        "h": 0.7,
+        "Layer": 1,
+        "Agent": agent.unique_id,
+    }
+
+    if isinstance(agent, Citizen):
+        grievance_value = int(agent.grievance * 100)
+        portrayal["Color"] = grad_grievance[grievance_value]
+        portrayal["Grievance"] = int(agent.grievance * 100)
+
+    return portrayal
+

@@ -5,7 +5,7 @@ from mesa.visualization.modules import CanvasGrid, ChartModule, PieChartModule
 
 from graph_utils import NetworkModuleExtended  # For NetworkGrid visualization
 from civil_violence_model import CivilViolenceModel
-from graphics_portrayal import get_agent_portrayal, get_network_portrayal
+from graphics_portrayal import get_agent_portrayal, get_network_portrayal, get_grievance_portrayal
 from constants import GRID_WIDTH, GRID_HEIGHT, GraphType, Color
 from utils import read_configuration
 
@@ -51,6 +51,12 @@ def get_visualization_elements(model_paramsl, show_network=False):
         grid_width=model_paramsl['width'], grid_height=model_paramsl['height'],
         canvas_width=500, canvas_height=500)
 
+    grievance_element = CanvasGrid(
+        get_grievance_portrayal,
+        grid_width=model_paramsl['width'], grid_height=model_paramsl['height'],
+        canvas_width=500, canvas_height=500)
+
+
     # Graph representing agent's social network
     network_element = NetworkModuleExtended(get_network_portrayal, canvas_width=500, canvas_height=500, library='sigma')
 
@@ -67,7 +73,7 @@ def get_visualization_elements(model_paramsl, show_network=False):
                                 {"Label": "ACTIVE", "Color": Color['ACTIVE'].value},
                                 {"Label": "JAILED", "Color": Color['JAILED'].value}], 200, 500)
 
-    elements = [canvas_element, agents_state_chart, pie_chart, grievance_chart]
+    elements = [canvas_element, grievance_element, agents_state_chart, pie_chart, grievance_chart]
     if show_network:
         elements.insert(1, network_element)
 
