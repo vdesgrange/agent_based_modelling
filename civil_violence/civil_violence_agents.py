@@ -154,8 +154,8 @@ class Citizen(Agent):
         
         if self.hardship < 1:
             received_hardship = self.get_received_hardship()
-            print("========")
-            print(received_hardship)
+            #print("========")
+            #print(received_hardship)
             # if self.unique_id == 1:
             #     print('N-Neighbors: ', len(self.neighbors))
             #     print('Received hardship from neighbors: ', received_hardship)
