@@ -149,6 +149,7 @@ class CivilViolenceModel(Model):
         self.datacollector.collect(self)
         self.iteration += 1
         self.update_legitimacy()
+        print('legitimacy:', self.legitimacy)
         self.datacollector.collect(self)
 
         # Stop the model after a certain amount of iterations.
@@ -168,7 +169,7 @@ class CivilViolenceModel(Model):
         """
         self.jailings_list[3] = self.jailings_list[2]
         self.jailings_list[2] = self.jailings_list[1]
-        self.jailings_list[1] = self.jailings_list[0]/(self.count_type_citizens("ACTIVE")+1)  # +1 otherwise it can divide by zero
+        self.jailings_list[1] = self.jailings_list[0]/(self.count_type_citizens("ACTIVE")+ self.count_type_citizens("QUIESCENT"))  # +1 otherwise it can divide by zero
         self.jailings_list[0] = 0
         self.legitimacy = self.initial_legitimacy_l0 * (1 - self.jailings_list[1] - self.jailings_list[2] ** 2 - self.jailings_list[3] ** 3)
         if self.legitimacy <= 0:
