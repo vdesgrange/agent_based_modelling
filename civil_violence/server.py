@@ -28,11 +28,7 @@ def get_user_model_parameters():
         "initial_legitimacy_l0": UserSettableParameter("slider", "Initial Central authority legitimacy", .8, 0, 1,
                                                        step=.01,
                                                        description="Global parameter: Central authority legitimacy"),
-<<<<<<< Updated upstream
-        "active_threshold_t": UserSettableParameter("slider", "Active Threshold", .1, 0, 1, step=.001,
-=======
         "active_threshold_t": UserSettableParameter("slider", "Active Threshold", .1, 0, 1, step=.01,
->>>>>>> Stashed changes
                                                   description="Threshold that agent's Grievance must exceed Net Risk to go active"),
         "max_jail_term": UserSettableParameter("slider", "Max Jail Term", 1000, 0, 1000,
                                                description="Maximum number of steps that jailed citizens stay in"),
