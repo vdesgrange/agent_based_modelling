@@ -128,7 +128,8 @@ class Citizen(Agent):
         """
         c_v = sum(isinstance(n, Cop) for n in self.neighbors)
         a_v = sum(isinstance(n, Citizen) and n.state is State.ACTIVE for n in self.neighbors)
-        return 1 - math.exp(-1 * self.model.k * c_v / (a_v + 1))
+        cop_to_agent_ratio = int(c_v / (a_v + 1))  # Or int(round(c_v / (a_v + 1)))
+        return 1 - math.exp(-1 * self.model.k * cop_to_agent_ratio)  # Rounding to min integer
 
     def get_net_risk(self):
         """
@@ -164,7 +165,7 @@ class Citizen(Agent):
             self.hardship_cont += received_hardship
 
         hardship = self.hardship_cont + self.hardship_endo
-        
+
         # Ensure hardship has a maximum value of 1
         if hardship > 1:
             return 1
