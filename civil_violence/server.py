@@ -41,7 +41,7 @@ def get_user_model_parameters():
         # "removal_step": UserSettableParameter("choice", "Removel of influencers", value=False,
         #                                       choices=[False, True]),
         "graph_type": UserSettableParameter("choice", "GraphType",  value=GraphType.ERDOS_RENYI.name,
-                                              choices=[GraphType.ERDOS_RENYI.name, GraphType.BARABASI_ALBERT.name, GraphType.WATTS_STROGATZ.name])
+                                              choices=["NONE", GraphType.ERDOS_RENYI.name, GraphType.BARABASI_ALBERT.name, GraphType.WATTS_STROGATZ.name])
     }
 
 
