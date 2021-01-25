@@ -10,7 +10,6 @@
   "agent_vision": 7,
   "cop_vision": 7,
   "initial_legitimacy_l0": 0.82,
-  "graph_type": "NONE",
   "p": 0.1,
   "p_ws": 0.1,
   "directed": false
