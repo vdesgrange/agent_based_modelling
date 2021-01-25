@@ -50,33 +50,33 @@ def draw_multiple_graphs(num_nodes=100, p=0.2, p_ws=0.1, seed=None):
     # nx.draw_circular(erdos, node_size=10, ax=ax[3])
     df = pd.DataFrame(list(nx.clustering(erdos).items()))
     df.columns = ['Node', 'Clustering']
-    sns.histplot(df['Clustering'], kde=True, ax=ax[3])
+    sns.distplot(df['Clustering'], kde=True, ax=ax[3])
 
     df = pd.DataFrame(erdos.degree())
     df.columns = ['Node', 'Edges']
-    sns.histplot(df['Edges'], kde=True, ax=ax[6])
+    sns.distplot(df['Edges'], kde=True, ax=ax[6])
 
     # draw watts
     nx.draw_circular(watts_small, node_size=10, ax=ax[1])
 
     df = pd.DataFrame(list(nx.clustering(watts).items()))
     df.columns = ['Node', 'Clustering']
-    sns.histplot(df['Clustering'], kde=True, ax=ax[4])
+    sns.distplot(df['Clustering'], kde=True, ax=ax[4])
 
     df = pd.DataFrame(watts.degree())
     df.columns = ['Node', 'Edges']
-    sns.histplot(df['Edges'], kde=True, ax=ax[7])
+    sns.distplot(df['Edges'], kde=True, ax=ax[7])
 
     # draw barabasi
     nx.draw_circular(barabasi_small, node_size=10, ax=ax[2])
 
     df = pd.DataFrame(list(nx.clustering(barabasi).items()))
     df.columns = ['Node', 'Clustering']
-    sns.histplot(df['Clustering'], kde=True, ax=ax[5])
+    sns.distplot(df['Clustering'], kde=True, ax=ax[5])
 
     df = pd.DataFrame(barabasi.degree())
     df.columns = ['Node', 'Edges']
-    sns.histplot(df['Edges'], kde=True, ax=ax[8])
+    sns.distplot(df['Edges'], kde=True, ax=ax[8])
     
     # create_fig(erdos.edges, draw=True)
     # Draw the graphs
