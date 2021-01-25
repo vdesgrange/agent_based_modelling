@@ -3,10 +3,13 @@ from mesa.space import MultiGrid
 from mesa.time import RandomActivation
 from mesa.datacollection import DataCollector
 import matplotlib.pyplot as plt
+import json
 
 from civil_violence_agents import Citizen, Cop
 from constants import State
 from graph_utils import generate_network, print_network
+
+from datetime import datetime
 
 from figure import create_fig
 
@@ -170,8 +173,18 @@ class CivilViolenceModel(Model):
         # print('legitimacy:', self.legitimacy)
         self.datacollector.collect(self)
 
+        date = datetime.now()
+        path = f'output/{date.month}_{date.day}_{date.hour}_{date.second}_'
+
+        # Save initial values
+        if self.iteration == 1:
+            self.save_initial_values(path)
+
         # Stop the model after a certain amount of iterations.
         if self.iteration > self.max_iter:
+            df_end = self.datacollector.get_agent_vars_dataframe()
+            name = path + 'run_values.csv'
+            df_end.to_csv(name)
             self.running = False
 
         # Remove influencer after certain amount of iterations.
@@ -180,6 +193,29 @@ class CivilViolenceModel(Model):
 
         # for agent in self.influencer_list:
         #     print('Agent ', agent.unique_id, ' is an influencer ')
+    
+    def save_initial_values(self, path):
+        
+        dictionary_data = {
+            'agent_density': self.agent_density,
+            'agent_vision': self.agent_vision,
+            'active_agent_density': self.active_agent_density,
+            'cop_density': self.cop_density,
+            'initial_legitimacy_l0': self.initial_legitimacy_l0,
+            'inf_threshold': self.inf_threshold,
+            'removal_step': self.removal_step,
+            'max_iter': self.max_iter,
+            'max_jail_term': self.max_jail_term,
+            'active_threshold_t': self.active_threshold_t,
+            'k': self.k,
+            'graph_type': self.graph_type,
+        }
+        
+        path = path + 'ini_values.json'
+        a_file = open(path, "w")
+        json.dump(dictionary_data, a_file)
+        a_file.close()
+
 
     def update_legitimacy(self):
         """
@@ -208,7 +244,10 @@ class CivilViolenceModel(Model):
             TODO Doesn't work the way it should"""
 
         return {"Grievance": lambda a: getattr(a, 'grievance', None),
-                "Hardship": lambda a: getattr(a, 'hardship', None)}
+                "Hardship": lambda a: getattr(a, 'hardship', None),
+                "State": lambda a: getattr(a, 'state', None),
+                "Legitimacy": lambda m: self.legitimacy,
+                "Influencer": lambda m: self.influencer}
 
     def count_type_citizens(self, state_req):
         """

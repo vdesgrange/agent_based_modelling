@@ -1,0 +1,1 @@
+{"agent_density": 0.69, "agent_vision": 7, "active_agent_density": 0.01, "cop_density": 0.04, "initial_legitimacy_l0": 0.82, "inf_threshold": 10, "removal_step": 0, "max_iter": 500, "max_jail_term": 30, "active_threshold_t": 0.1, "k": 2.3, "graph_type": "ERDOS_RENYI"}
