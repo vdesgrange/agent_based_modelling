@@ -51,7 +51,6 @@ class Citizen(Agent):
         # Implementation for contagious hardship. Hardship is updated per turn, but is set equal to U(0, 1) for initialization.
         self.hardship_endo = hardship
         self.hardship_cont = 0
-        self.grievance = 0
         self.hardship = hardship
         self.susceptibility = susceptibility
         self.influence = influence
@@ -59,16 +58,19 @@ class Citizen(Agent):
 
         self.legitimacy = legitimacy
         self.risk_aversion = risk_aversion
-        self.threshold = threshold
         self.vision = vision
-        self.state = State.QUIESCENT
         self.jail_sentence = 0
+        self.threshold = threshold
+        # self.grievance = 0
+        self.grievance = self.get_grievance()
+
         self.jailable = jailable
         self.influencer = influencer
 
-
         self.neighbors = []  # Neighbors in MultiGrid space
         self.empty_cells = []  # Empty cells around the agent in MultiGrid space
+
+        self.state = State.ACTIVE if threshold == 0 else State.QUIESCENT
 
     def step(self):
         """
@@ -160,7 +162,7 @@ class Citizen(Agent):
             #     print('N-Neighbors: ', len(self.neighbors))
             #     print('Received hardship from neighbors: ', received_hardship)
             self.hardship_cont += received_hardship
-        
+
         hardship = self.hardship_cont + self.hardship_endo
         
         # Ensure hardship has a maximum value of 1

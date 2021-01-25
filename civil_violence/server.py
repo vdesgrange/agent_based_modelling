@@ -19,6 +19,8 @@ def get_user_model_parameters():
     return {
         "agent_density": UserSettableParameter("slider", "Agent Density", .7, 0., 1., step=.001,
                                                  description="Initial percentage of citizen in population"),
+        "active_agent_density": UserSettableParameter("slider", "Active agent Density", .1, 0., 1., step=.001,
+                                               description="Initial percentage of active citizen in population"),
         "cop_density": UserSettableParameter("slider", "Cop Density", .04, 0, 1, step=.001,
                                              description="Initial percentage of cops in population"),
         "agent_vision": UserSettableParameter("slider", "Agent Vision", 7, 0, 10,

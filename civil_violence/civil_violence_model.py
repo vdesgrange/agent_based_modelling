@@ -15,6 +15,7 @@ class CivilViolenceModel(Model):
     def __init__(self,
                  height, width,
                  agent_density, agent_vision,
+                 active_agent_density,
                  cop_density, cop_vision,
                  initial_legitimacy_l0, inf_threshold, 
                  removal_step, max_iter,
@@ -84,6 +85,7 @@ class CivilViolenceModel(Model):
 
         self.agent_density = agent_density
         self.agent_vision = agent_vision
+        self.active_agent_density = active_agent_density
         self.cop_density = cop_density
         self.cop_vision = cop_vision
         self.inf_threshold = inf_threshold
@@ -107,6 +109,7 @@ class CivilViolenceModel(Model):
         for (contents, x, y) in self.grid.coord_iter():
             random_x = self.random.random()
             if random_x < self.agent_density:
+                # Add quiescent agents
                 agent = Citizen(
                     unique_id=unique_id, model=self,
                     pos=(x, y), hardship=self.random.random(), susceptibility=self.random.random(),
@@ -118,7 +121,22 @@ class CivilViolenceModel(Model):
                 self.citizen_list.append(agent)
                 self.grid.place_agent(agent, (x, y))  # Place agent in the MultiGrid
                 self.schedule.add(agent)
-            elif random_x < (self.agent_density + self.cop_density):
+
+            elif random_x < (self.agent_density + self.active_agent_density):
+                # Enforce an initial proportion of active agents
+                agent = Citizen(
+                    unique_id=unique_id, model=self,
+                    pos=(x, y), hardship=self.random.random(), susceptibility=self.random.random(),
+                    influence=self.random.random(), expression_intensity=self.random.random(),
+                    legitimacy=self.initial_legitimacy_l0, risk_aversion=self.random.random(),
+                    threshold=0, vision=self.agent_vision)
+
+                unique_id += 1
+                self.citizen_list.append(agent)
+                self.grid.place_agent(agent, (x, y))  # Place agent in the MultiGrid
+                self.schedule.add(agent)
+            elif random_x < (self.agent_density + self.active_agent_density + self.cop_density):
+                # Add law enforcement officer
                 agent = Cop(
                     unique_id=unique_id, model=self,
                     pos=(x, y), vision=self.cop_vision)
@@ -149,7 +167,7 @@ class CivilViolenceModel(Model):
         self.datacollector.collect(self)
         self.iteration += 1
         self.update_legitimacy()
-        print('legitimacy:', self.legitimacy)
+        # print('legitimacy:', self.legitimacy)
         self.datacollector.collect(self)
 
         # Stop the model after a certain amount of iterations.
