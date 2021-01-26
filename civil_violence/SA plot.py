@@ -13,19 +13,15 @@ problem = {
 
 def load_plot_archive():
     file_path = [
-        './archives/saved_data1611673237.npy',
+        './archives/saved_data1611678407.npy',
     ]
 
-    data = np.load('archives/saved_data1611673237.npy', allow_pickle=True)
+    data = np.load('archives/saved_data1611678407.npy', allow_pickle=True)
     # print(dir(data))
     # print(vars(data))
     for path in file_path:
         with open(path, 'rb') as f:
             data = np.load(f, allow_pickle=True)[()]
-            # print(data.keys(), '\n')
-            thresh_data = data['active_threshold_t']
-            print(thresh_data["initial_legitimacy_l0"])
-    # dataset = pd.DataFrame({'Column1': thresh_data[:, 0], 'Column2': thresh_data[:, 1]})
 
     param ='OUTBREAKS'
     plot_all_vars(data, param)
@@ -49,13 +45,13 @@ def plot_param_var_conf(ax, df, var, param, i):
     x = df.groupby(var).mean().reset_index()[var]
     y = df.groupby(var).mean()[param]
 
-    print(param)
-    print(var)
-    print(df.groupby(var)[param].count())
+    # print(param)
+    # print(var)
+    # print(df.groupby(var)[param].count())
     replicates = df.groupby(var)[param].count()
     err = (1.96 * df.groupby(var)[param].std()) / np.sqrt(replicates)
     # print(df["active_threshold_t"])
-    ax.plot(x, y, c='red')
+    ax.plot(x, y, c='k')
     ax.fill_between(x, y - err, y + err)
 
     ax.set_xlabel(var)
