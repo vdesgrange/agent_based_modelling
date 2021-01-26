@@ -24,10 +24,10 @@ def load_plot_archive():
             data = np.load(f, allow_pickle=True)[()]
             print(data.keys(), '\n')
             thresh_data = data['active_threshold_t']
-            print(thresh_data["ACTIVE"])
+            print(thresh_data["OUTBREAKS"])
     # dataset = pd.DataFrame({'Column1': data[:, 0], 'Column2': data[:, 1]})
 
-    for param in ('ACTIVE', 'JAILED'):
+    for param in ('OUTBREAKS'):
         plot_all_vars(data, param)
         plt.show()
 
