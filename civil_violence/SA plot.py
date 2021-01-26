@@ -12,19 +12,19 @@ problem = {
 }
 
 def load_plot_archive():
-    file_paths = [
+    file_path = [
         './archives/saved_data1611653315.npy',
     ]
 
-    data = np.load('./archives/saved_data1611653315.npy', allow_pickle=True)
+    data = np.load('archives/saved_data1611653315.npy', allow_pickle=True)
     # print(dir(data))
     # print(vars(data))
-    # for path in file_paths:
-    #     with open(path, 'rb') as f:
-    #         data = np.load(f, allow_pickle = True)
-            # data_stored_next = np.load(f)
-            # et_caetera = np.load(f)
-
+    for path in file_path:
+        with open(path, 'rb') as f:
+            data = np.load(f, allow_pickle=True)[()]
+            print(data.keys(), '\n')
+            thresh_data = data['active_threshold_t']
+            print(thresh_data["ACTIVE"])
     # dataset = pd.DataFrame({'Column1': data[:, 0], 'Column2': data[:, 1]})
 
     for param in ('ACTIVE', 'JAILED'):
