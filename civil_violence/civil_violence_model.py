@@ -95,6 +95,8 @@ class CivilViolenceModel(Model):
         self.cop_list = []
         self.influencer_list = []
         self.jailings_list = [0, 0, 0, 0]
+        self.outbreaks = 0
+        self.outbreak_now = 0
 
         # === Set Data collection ===
         self.datacollector = DataCollector(
@@ -167,6 +169,15 @@ class CivilViolenceModel(Model):
         self.datacollector.collect(self)
         self.iteration += 1
         self.update_legitimacy()
+
+        # Count amount of outbreaks
+        # print(self.count_type_citizens("ACTIVE"))
+        if self.count_type_citizens("ACTIVE") > 200 and self.outbreak_now == 0:
+            self.outbreaks += 1
+            self.outbreak_now = 1
+        if self.count_type_citizens("ACTIVE") < 200:
+            self.outbreak_now = 0
+
         # print('legitimacy:', self.legitimacy)
         self.datacollector.collect(self)
 
@@ -201,7 +212,8 @@ class CivilViolenceModel(Model):
         return {"QUIESCENT": lambda m: self.count_type_citizens("QUIESCENT"),
                 "ACTIVE": lambda m: self.count_type_citizens("ACTIVE"),
                 "JAILED": lambda m: self.count_type_citizens("JAILED"),
-                "LEGITIMACY": lambda m: self.legitimacy}
+                "LEGITIMACY": lambda m: self.legitimacy,
+                "OUTBREAKS": lambda m: self.outbreaks}
 
     def get_agent_reporters(self):
         """ TODO Dictionary of agent reporter names and attributes/funcs
