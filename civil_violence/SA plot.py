@@ -4,12 +4,12 @@ import matplotlib.pyplot as plt
 
 def load_plot_archive():
     file_paths = [
-        './archives/saved_data_XXXX.npy',
+        './archives/saved_data1611648500.npy',
     ]
 
     for path in file_paths:
         with open(path, 'rb') as f:
-            data_stored_first = np.load(f)
+            data = np.load(f, allow_pickle = True)
             data_stored_next = np.load(f)
             et_caetera = np.load(f)
 
