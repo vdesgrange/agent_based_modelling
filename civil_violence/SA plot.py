@@ -1,22 +1,34 @@
 import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
+# from SA import problem
+
+
+problem = {
+    'num_vars': 3,
+    'names': ['active_threshold_t', 'initial_legitimacy_l0',
+              'max_jail_term'],
+    'bounds': [[0, 1], [0, 1], [0, 100], [0.01, 0.5], [4, 8], [4, 8]]
+}
 
 def load_plot_archive():
     file_paths = [
-        './archives/saved_data1611648500.npy',
+        './archives/saved_data1611653315.npy',
     ]
 
-    for path in file_paths:
-        with open(path, 'rb') as f:
-            data = np.load(f, allow_pickle = True)
-            data_stored_next = np.load(f)
-            et_caetera = np.load(f)
+    data = np.load('./archives/saved_data1611653315.npy', allow_pickle=True)
+    # print(dir(data))
+    # print(vars(data))
+    # for path in file_paths:
+    #     with open(path, 'rb') as f:
+    #         data = np.load(f, allow_pickle = True)
+            # data_stored_next = np.load(f)
+            # et_caetera = np.load(f)
 
-    dataset = pd.DataFrame({'Column1': data[:, 0], 'Column2': data[:, 1]})
+    # dataset = pd.DataFrame({'Column1': data[:, 0], 'Column2': data[:, 1]})
 
     for param in ('ACTIVE', 'JAILED'):
-        plot_all_vars(dataset, param)
+        plot_all_vars(data, param)
         plt.show()
 
 def plot_param_var_conf(ax, df, var, param, i):
