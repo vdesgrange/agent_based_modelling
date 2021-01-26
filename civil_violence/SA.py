@@ -21,12 +21,12 @@ problem = {
     'num_vars': 3,
     'names': ['active_threshold_t', 'initial_legitimacy_l0',
               'max_jail_term'],
-    'bounds': [[0.01, 1], [0.01, 1], [0, 100]]
+    'bounds': [[0.01, 1], [0.01, 1], [1, 100]]
 }
 
-replicates = 2
+replicates = 100
 max_steps = 200
-distinct_samples = 3
+distinct_samples = 5
 
 model_reporters = {"QUIESCENT": lambda m: m.count_type_citizens("QUIESCENT"),
                    "ACTIVE": lambda m: m.count_type_citizens("ACTIVE"),
@@ -38,6 +38,11 @@ data = {}
 for i, var in enumerate(problem['names']):
     # Get the bounds for this variable and get <distinct_samples> samples within this space (uniform)
     samples = np.linspace(*problem['bounds'][i], num=distinct_samples)
+
+    # Keep in mind that max_jail_term should be integers. You will have to change
+    # your code to acommodate for this or sample in such a way that you only get integers.
+    if var == 'max_jail_term':
+        samples = np.linspace(*problem['bounds'][i], num=distinct_samples, dtype=int)
 
     configuration = read_configuration()
     model_params = {}
