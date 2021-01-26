@@ -1,12 +1,14 @@
 import random
+
 from mesa.visualization.ModularVisualization import ModularServer
 from mesa.visualization.UserParam import UserSettableParameter
+from mesa.batchrunner import BatchRunner
 from mesa.visualization.modules import CanvasGrid, ChartModule, PieChartModule
 
-from graph_utils import NetworkModuleExtended  # For NetworkGrid visualization
 from civil_violence_model import CivilViolenceModel
+from constants import GraphType, Color
+from graph_utils import NetworkModuleExtended  # For NetworkGrid visualization
 from graphics_portrayal import get_agent_portrayal, get_network_portrayal, get_grievance_portrayal
-from constants import GRID_WIDTH, GRID_HEIGHT, GraphType, Color
 from utils import read_configuration
 
 
@@ -88,6 +90,20 @@ def run(configuration, seed=None):
     :param configuration: configuration used by the model.
     :param seed: random seed. By default None.
     """
+    """
+    to get results for multiple iterations, run underlying code and add this to default.json in configurations:  
+    "inf_threshold": 50,
+    "removal_step": 50,
+    "active_threshold_t": 0.5,
+    "graph_type": "GraphType.ERDOS_RENYI.name" 
+    """
+
+    #batch_run = BatchRunner(CivilViolenceModel, fixed_parameters = config, iterations = 10)
+    #batch_run.run_all()
+    #data = batch_run.get_model_vars_dataframe()
+    #data.head()
+
+
     random.seed(seed)
 
     model_params = get_user_model_parameters()
@@ -98,12 +114,14 @@ def run(configuration, seed=None):
     model_params.update(configuration) # Overwritten user parameters don't appear in the graphic interface
     model_params.update({'seed': seed})
 
+
     server = ModularServer(
         CivilViolenceModel,
         get_visualization_elements(model_params, show_network=False),
         name="Civil violence with network model",
         model_params=model_params
     )
+    print(model_params)
 
     server.port = 8521
     server.launch()
