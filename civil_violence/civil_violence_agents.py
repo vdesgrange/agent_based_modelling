@@ -196,8 +196,11 @@ class Citizen(Agent):
 
         return hardship
 
-    def set_influencer(self):
-        self.influencer = True
+    def set_influencer(self, connections, treshold):
+        if connections > treshold:
+            self.influencer = True
+        else: 
+            self.influencer = False
 
     def get_network_neighbors(self):
         """ TODO Example to retrieve attributes from the network layer"""

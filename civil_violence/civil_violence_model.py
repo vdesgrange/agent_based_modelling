@@ -290,9 +290,8 @@ class CivilViolenceModel(Model):
         be considered an influencer and receives a corresponding tag.
         """
         for agent in self.citizen_list:
-            if len(list(self.G.neighbors(agent.network_node))) > inf_threshold:
-                agent.set_influencer()
-                self.influencer_list.append(agent)
+            agent.set_influencer(len(list(self.G.neighbors(agent.network_node))), inf_threshold)
+            self.influencer_list.append(agent)
 
     def remove_influencer(self):
         """
