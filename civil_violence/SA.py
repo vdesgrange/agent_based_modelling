@@ -9,10 +9,13 @@ import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
 from itertools import combinations
+import time
 
 from civil_violence_model import CivilViolenceModel
 from server import get_user_model_parameters
 from utils import read_configuration
+
+path = 'archives/saved_data{0}.csv'.format(int(time.time()))
 
 problem = {
     'num_vars': 3,
@@ -35,13 +38,10 @@ for i, var in enumerate(problem['names']):
     # Get the bounds for this variable and get <distinct_samples> samples within this space (uniform)
     samples = np.linspace(*problem['bounds'][i], num=distinct_samples)
 
-    # Keep in mind that wolf_gain_from_food should be integers. You will have to change
-    # your code to acommodate for this or sample in such a way that you only get integers.
     configuration = read_configuration()
     model_params = {}
     model_params.update(configuration)  # Overwritten user parameters don't appear in the graphic interface
     model_params.update({'seed': None})
-    print(model_params)
 
     batch = BatchRunner(CivilViolenceModel,
                         max_steps=max_steps,
@@ -55,6 +55,9 @@ for i, var in enumerate(problem['names']):
 
     data[var] = batch.get_model_vars_dataframe()
 
+np_data = data.to_numpy()
+with open(path, 'ab') as f:
+    np.save(f, np_data)
 
 def plot_param_var_conf(ax, df, var, param, i):
     """
