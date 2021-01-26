@@ -30,7 +30,8 @@ distinct_samples = 5
 
 model_reporters = {"QUIESCENT": lambda m: m.count_type_citizens("QUIESCENT"),
                    "ACTIVE": lambda m: m.count_type_citizens("ACTIVE"),
-                   "JAILED": lambda m: m.count_type_citizens("JAILED")}
+                   "JAILED": lambda m: m.count_type_citizens("JAILED"),
+                   "OUTBREAKS": lambda m: m.outbreaks}
 
 data = {}
 
@@ -98,6 +99,6 @@ def plot_all_vars(df, param):
         plot_param_var_conf(axs[i], df[var], var, param, i)
 
 
-for param in ('ACTIVE', 'JAILED'):
+for param in ('OUTBREAKS'):
     plot_all_vars(data, param)
     plt.show()
