@@ -1,7 +1,7 @@
 import networkx as nx
 from mesa.visualization.modules import NetworkModule
 
-from constants import GraphType
+from constant_variables import GraphType
 
 
 class NetworkModuleExtended(NetworkModule):
@@ -76,7 +76,6 @@ def generate_barabasi_albert(agent_list, p, seed=None):
     Generate an Erdos Renyi graph. Add as many nodes as there's agents.
     :param agent_list: List of agents (citizen)
     :param p: probability of creating an edge
-    :param directed: True if graph is directed
     :param seed: randomization seed
     :return: networkx graph and dictionnary mapping graph node to agent reference.
     """
@@ -100,7 +99,7 @@ def generate_watts_strogatz(agent_list, p, p_ws, seed=None):
     Generate an Erdos Renyi graph. Add as many nodes as there's agents.
     :param agent_list: List of agents (citizen)
     :param p: probability of creating an edge
-    :param directed: True if graph is directed
+    :param p_ws: probability of rewiring each edge
     :param seed: randomization seed
     :return: networkx graph and dictionnary mapping graph node to agent reference.
     """

@@ -6,7 +6,7 @@ from mesa.batchrunner import BatchRunner
 from mesa.visualization.modules import CanvasGrid, ChartModule, PieChartModule
 
 from civil_violence_model import CivilViolenceModel
-from constants import GraphType, Color
+from constant_variables import GraphType, Color
 from graph_utils import NetworkModuleExtended  # For NetworkGrid visualization
 from graphics_portrayal import get_agent_portrayal, get_network_portrayal, get_grievance_portrayal
 from utils import read_configuration

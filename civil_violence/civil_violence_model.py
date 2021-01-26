@@ -2,10 +2,11 @@ from mesa import Model
 from mesa.space import MultiGrid
 from mesa.time import RandomActivation
 from mesa.datacollection import DataCollector
+import networkx as nx
 import matplotlib.pyplot as plt
 
 from civil_violence_agents import Citizen, Cop
-from constants import State
+from constant_variables import State
 from graph_utils import generate_network, print_network
 
 from figure import create_fig
@@ -21,7 +22,7 @@ class CivilViolenceModel(Model):
                  removal_step, max_iter,
                  max_jail_term, active_threshold_t,
                  k, graph_type,
-                 p, p_ws, directed,
+                 p=0.1, p_ws=0.1, directed=False,
                  movement=True, seed=None):
         """
         Create a new civil violence model.
@@ -201,14 +202,17 @@ class CivilViolenceModel(Model):
         return {"QUIESCENT": lambda m: self.count_type_citizens("QUIESCENT"),
                 "ACTIVE": lambda m: self.count_type_citizens("ACTIVE"),
                 "JAILED": lambda m: self.count_type_citizens("JAILED"),
-                "LEGITIMACY": lambda m: self.legitimacy}
+                "LEGITIMACY": lambda m: self.legitimacy,
+                "INFLUENCERS": lambda m: len(m.influencer_list),
+                "CLUSTERING": lambda m: nx.average_clustering(m.G)}
 
     def get_agent_reporters(self):
         """ TODO Dictionary of agent reporter names and attributes/funcs
             TODO Doesn't work the way it should"""
 
         return {"Grievance": lambda a: getattr(a, 'grievance', None),
-                "Hardship": lambda a: getattr(a, 'hardship', None)}
+                "Hardship": lambda a: getattr(a, 'hardship', None),
+                "Degree": lambda a: getattr(a, '', 0)}
 
     def count_type_citizens(self, state_req):
         """

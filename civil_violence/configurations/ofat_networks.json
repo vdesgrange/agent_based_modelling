@@ -1,0 +1,18 @@
+{
+  "width": 40,
+  "height": 40,
+  "max_iter": 200,
+  "max_jail_term": 30,
+  "k": 2.3,
+  "agent_density": 0.69,
+  "active_agent_density": 0.01,
+  "cop_density": 0.04,
+  "agent_vision": 7,
+  "cop_vision": 7,
+  "initial_legitimacy_l0": 0.82,
+  "directed": false,
+  "inf_threshold": 150,
+  "active_threshold_t": 0.1,
+  "graph_type": "NONE",
+  "removal_step": 100
+}
