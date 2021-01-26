@@ -71,6 +71,10 @@ def get_visualization_elements(model_paramsl, show_network=False):
                                    # {"Label": "Hardship", "Color": Color['ACTIVE'].value}
                                    ], 50, 135)
 
+    # outbreak_chart = ChartModule([{"Label": "OUTBREAKS", "Color": Color['QUIESCENT'].value},
+    #                                # {"Label": "Hardship", "Color": Color['ACTIVE'].value}
+    #                                ], 50, 135)
+
     pie_chart = PieChartModule([{"Label": "QUIESCENT", "Color": Color['QUIESCENT'].value},
                                 {"Label": "ACTIVE", "Color": Color['ACTIVE'].value},
                                 {"Label": "JAILED", "Color": Color['JAILED'].value}], 200, 500)
