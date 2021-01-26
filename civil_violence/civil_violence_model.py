@@ -16,12 +16,12 @@ class CivilViolenceModel(Model):
                  height, width,
                  agent_density, agent_vision,
                  active_agent_density,
-                 cop_density, cop_vision,
-                 initial_legitimacy_l0, inf_threshold, 
+                 cop_density, cop_vision, inf_threshold,
                  removal_step, max_iter,
-                 max_jail_term, active_threshold_t,
                  k, graph_type,
                  p, p_ws, directed,
+                 max_jail_term=30, active_threshold_t=0.1,
+                 initial_legitimacy_l0=0.82,
                  movement=True, seed=None):
         """
         Create a new civil violence model.
