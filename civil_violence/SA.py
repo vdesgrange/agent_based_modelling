@@ -21,12 +21,12 @@ problem = {
     'num_vars': 3,
     'names': ['active_threshold_t', 'initial_legitimacy_l0',
               'max_jail_term'],
-    'bounds': [[0, 1], [0, 1], [0, 100], [0.01, 0.5], [4, 8], [4, 8]]
+    'bounds': [[0.01, 1], [0.01, 1], [0, 100]]
 }
 
-replicates = 5
+replicates = 2
 max_steps = 200
-distinct_samples = 5
+distinct_samples = 3
 
 model_reporters = {"QUIESCENT": lambda m: m.count_type_citizens("QUIESCENT"),
                    "ACTIVE": lambda m: m.count_type_citizens("ACTIVE"),
@@ -43,6 +43,8 @@ for i, var in enumerate(problem['names']):
     model_params = {}
     model_params.update(configuration)  # Overwritten user parameters don't appear in the graphic interface
     model_params.update({'seed': None})
+
+    # print({var: samples})
 
     batch = BatchRunner(CivilViolenceModel,
                         max_steps=max_steps,
@@ -99,6 +101,6 @@ def plot_all_vars(df, param):
         plot_param_var_conf(axs[i], df[var], var, param, i)
 
 
-for param in ('OUTBREAKS'):
+for param in ('OUTBREAKS', "ACTIVE"):
     plot_all_vars(data, param)
     plt.show()
