@@ -15,7 +15,7 @@ from civil_violence_model import CivilViolenceModel
 from server import get_user_model_parameters
 from utils import read_configuration
 
-path = 'archives/saved_data{0}.csv'.format(int(time.time()))
+path = 'archives/saved_data{0}.npy'.format(int(time.time()))
 
 problem = {
     'num_vars': 3,
@@ -55,9 +55,9 @@ for i, var in enumerate(problem['names']):
 
     data[var] = batch.get_model_vars_dataframe()
 
-np_data = data.to_numpy()
+
 with open(path, 'ab') as f:
-    np.save(f, np_data)
+    np.save(f, data)
 
 def plot_param_var_conf(ax, df, var, param, i):
     """
