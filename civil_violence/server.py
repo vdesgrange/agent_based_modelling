@@ -34,7 +34,7 @@ def get_user_model_parameters():
                                                   description="Threshold that agent's Grievance must exceed Net Risk to go active"),
         "max_jail_term": UserSettableParameter("slider", "Max Jail Term", 1000, 0, 1000,
                                                description="Maximum number of steps that jailed citizens stay in"),
-        "inf_threshold": UserSettableParameter("slider", "Influencer threshold", 10, 0, 100, 
+        "inf_threshold": UserSettableParameter("slider", "Influencer threshold", 150, 0, 150, 
                                                 description="Amount of nodes that need to be connected to consider agents influencers."),
         "removal_step": UserSettableParameter("slider", "Iteration of influencer removal", 0, 0, 100, step=5,
                                                 description="Iteration at which a random influencer is removed from the model."),

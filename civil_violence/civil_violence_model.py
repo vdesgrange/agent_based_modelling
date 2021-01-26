@@ -166,6 +166,7 @@ class CivilViolenceModel(Model):
 
     def step(self):
         """ One step in agent-based model simulation """
+        print(len(self.influencer_list))
         self.schedule.step()
         self.datacollector.collect(self)
         self.iteration += 1
@@ -247,7 +248,7 @@ class CivilViolenceModel(Model):
                 "Hardship": lambda a: getattr(a, 'hardship', None),
                 "State": lambda a: getattr(a, 'state', None),
                 "Legitimacy": lambda m: self.legitimacy,
-                "Influencer": lambda m: self.influencer}
+                "Influencer": lambda a: getattr(a, 'influencer', None)}
 
     def count_type_citizens(self, state_req):
         """
@@ -284,13 +285,17 @@ class CivilViolenceModel(Model):
         self.grid.place_agent(agent, new_pos)
         # print(agent.unique_id, " was placed back on the grid at pos: ", new_pos) # TEST
 
-    def set_influencers(self, inf_threshold=10):
+    def set_influencers(self, inf_threshold=150):
         """
         If an agent in the network is connected to a large amount of nodes, this agent can
         be considered an influencer and receives a corresponding tag.
         """
+        print(len(list(self.G.neighbors(self.citizen_list[0].network_node))))
+        print(len(list(self.G.neighbors(self.citizen_list[-1].network_node))))
         for agent in self.citizen_list:
             if len(list(self.G.neighbors(agent.network_node))) > inf_threshold:
+                # print('###')
+                # print(len(list(self.G.neighbors(agent.network_node))))
                 agent.set_influencer()
                 self.influencer_list.append(agent)
 
