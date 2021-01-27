@@ -2,7 +2,6 @@ from mesa.batchrunner import BatchRunner
 from multiprocessing import Pool, cpu_count
 from tqdm import tqdm
 from collections import OrderedDict
-from pprint import pprint
 
 class BatchRunnerMP(BatchRunner):
     """ Child class of BatchRunner, extended with multiprocessing support. """

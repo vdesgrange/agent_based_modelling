@@ -101,3 +101,7 @@ def compute_influencers(model):
 
 def compute_outbreaks(model):
     return model.outbreaks
+
+
+def compute_datacollector(model):
+    return model.datacollector

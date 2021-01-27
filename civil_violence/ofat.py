@@ -14,9 +14,9 @@ def ofat_barabasi_albert_analysis(problem):
     Analyse the network transmission
     :param problem :
     """
-    max_steps = 20  # Simulation number of steps
-    replicates = 10  # Number of simulations # 10
-    distinct_samples = 20
+    replicates = 2  # Number of simulations # 10
+    max_steps = 2  # Simulation number of steps
+    distinct_samples = 2
 
     model_reporters = {
         "QUIESCENT": compute_quiescent,
@@ -130,7 +130,7 @@ def load_ofat_barabasi_albert_archive():
     }
 
     file_path = [
-        './archives/ofat_data_1611742175.npy',
+        './archives/ofat_data_1611771419.npy',
     ]
     for path in file_path:
         with open(path, 'rb') as f:
@@ -142,4 +142,5 @@ def load_ofat_barabasi_albert_archive():
 
 
 if __name__ == '__main__':
-    ofat_main()
+    # ofat_main()
+    load_ofat_barabasi_albert_archive()
