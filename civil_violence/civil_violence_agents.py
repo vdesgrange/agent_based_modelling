@@ -1,6 +1,7 @@
 import random
 import math
 from mesa import Agent
+import networkx as nx
 
 from constants import State, HardshipConst
 
@@ -63,6 +64,7 @@ class Citizen(Agent):
         self.threshold = threshold
         # self.grievance = 0
         self.grievance = self.get_grievance()
+        self.network_neighbors = []
 
         self.jailable = jailable
         self.influencer = influencer
@@ -205,11 +207,8 @@ class Citizen(Agent):
     def get_network_neighbors(self):
         """ TODO Example to retrieve attributes from the network layer"""
 
-        # neighbors = nx.all_neighbors(self.model.G, self.network_node)
-        # for node_id in neighbors:
-        #     print(self.model.network_dict[node_id].unique_id)
-
-        pass
+        self.network_neighbors = (list(self.model.G.neighbors(self.network_node)))
+        
 
 
 class Cop(Agent):

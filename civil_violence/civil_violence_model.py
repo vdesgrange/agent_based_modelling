@@ -11,7 +11,7 @@ from graph_utils import generate_network, print_network
 
 from datetime import datetime
 
-from figure import create_fig
+from figure import create_fig, run_analysis
 
 class CivilViolenceModel(Model):
     """ Civil violence model class """
@@ -101,6 +101,9 @@ class CivilViolenceModel(Model):
         self.outbreaks = 0
         self.outbreak_now = 0
 
+        date = datetime.now()
+        self.path = f'output/{date.month}_{date.day}_{date.hour}_{date.second}_'
+
         # === Set Data collection ===
         self.datacollector = DataCollector(
             model_reporters=self.get_model_reporters(),
@@ -168,7 +171,7 @@ class CivilViolenceModel(Model):
 
     def step(self):
         """ One step in agent-based model simulation """
-        print(len(self.influencer_list))
+        # print(len(self.influencer_list))
         self.schedule.step()
         self.datacollector.collect(self)
         self.iteration += 1
@@ -185,18 +188,13 @@ class CivilViolenceModel(Model):
         # print('legitimacy:', self.legitimacy)
         self.datacollector.collect(self)
 
-        date = datetime.now()
-        path = f'output/{date.month}_{date.day}_{date.hour}_{date.second}_'
-
         # Save initial values
         if self.iteration == 1:
-            self.save_initial_values(path)
+            self.save_initial_values(save=False)
 
         # Stop the model after a certain amount of iterations.
         if self.iteration > self.max_iter:
-            df_end = self.datacollector.get_agent_vars_dataframe()
-            name = path + 'run_values.csv'
-            df_end.to_csv(name)
+            self.save_data(save=False)
             self.running = False
 
         # Remove influencer after certain amount of iterations.
@@ -205,28 +203,40 @@ class CivilViolenceModel(Model):
 
         # for agent in self.influencer_list:
         #     print('Agent ', agent.unique_id, ' is an influencer ')
-    
-    def save_initial_values(self, path):
+
+    def save_data(self, save=False):
+
+        if save is not False:
+            df_end = self.datacollector.get_agent_vars_dataframe()
+            name = self.path + 'run_values.csv'
+            df_end.to_csv(name)
+        else:
+            pass
+
+    def save_initial_values(self, save=False):
         
-        dictionary_data = {
-            'agent_density': self.agent_density,
-            'agent_vision': self.agent_vision,
-            'active_agent_density': self.active_agent_density,
-            'cop_density': self.cop_density,
-            'initial_legitimacy_l0': self.initial_legitimacy_l0,
-            'inf_threshold': self.inf_threshold,
-            'removal_step': self.removal_step,
-            'max_iter': self.max_iter,
-            'max_jail_term': self.max_jail_term,
-            'active_threshold_t': self.active_threshold_t,
-            'k': self.k,
-            'graph_type': self.graph_type,
-        }
-        
-        path = path + 'ini_values.json'
-        a_file = open(path, "w")
-        json.dump(dictionary_data, a_file)
-        a_file.close()
+        if save is not False:
+            dictionary_data = {
+                'agent_density': self.agent_density,
+                'agent_vision': self.agent_vision,
+                'active_agent_density': self.active_agent_density,
+                'cop_density': self.cop_density,
+                'initial_legitimacy_l0': self.initial_legitimacy_l0,
+                'inf_threshold': self.inf_threshold,
+                'removal_step': self.removal_step,
+                'max_iter': self.max_iter,
+                'max_jail_term': self.max_jail_term,
+                'active_threshold_t': self.active_threshold_t,
+                'k': self.k,
+                'graph_type': self.graph_type,
+            }
+            
+            name = self.path + 'ini_values.json'
+            a_file = open(name, "w")
+            json.dump(dictionary_data, a_file)
+            a_file.close()
+        else:
+            pass
 
 
     def update_legitimacy(self):
@@ -260,7 +270,8 @@ class CivilViolenceModel(Model):
                 "Hardship": lambda a: getattr(a, 'hardship', None),
                 "State": lambda a: getattr(a, 'state', None),
                 "Legitimacy": lambda m: self.legitimacy,
-                "Influencer": lambda a: getattr(a, 'influencer', None)}
+                "Influencer": lambda a: getattr(a, 'influencer', None),
+                "N_connections": lambda a: getattr(a, 'network_neighbors', None)}
 
     def count_type_citizens(self, state_req):
         """
@@ -302,11 +313,10 @@ class CivilViolenceModel(Model):
         If an agent in the network is connected to a large amount of nodes, this agent can
         be considered an influencer and receives a corresponding tag.
         """
-        print(len(list(self.G.neighbors(self.citizen_list[0].network_node))))
-        print(len(list(self.G.neighbors(self.citizen_list[-1].network_node))))
         for agent in self.citizen_list:
             agent.set_influencer(len(list(self.G.neighbors(agent.network_node))), inf_threshold)
-            self.influencer_list.append(agent)
+            if agent.influencer == True:
+                self.influencer_list.append(agent)
 
     def remove_influencer(self):
         """
