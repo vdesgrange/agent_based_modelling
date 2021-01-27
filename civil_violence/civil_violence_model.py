@@ -6,7 +6,7 @@ import matplotlib.pyplot as plt
 import json
 
 from civil_violence_agents import Citizen, Cop
-from constants import State
+from cv_constants import State
 from graph_utils import generate_network, print_network
 
 from datetime import datetime

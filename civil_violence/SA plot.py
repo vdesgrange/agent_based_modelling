@@ -12,20 +12,29 @@ problem = {
 }
 
 def load_plot_archive():
-    file_path = [
-        './archives/saved_data1611678407.npy',
+    file_paths = [
+        # './archives/saved_data1611648500.npy'
+        # ,'./archives/saved_data1611655989.npy'
+        # ,'./archives/saved_data1611660010.npy'
+        './archives/saved_data1611673329.npy'
+
     ]
 
-    data = np.load('archives/saved_data1611678407.npy', allow_pickle=True)
-    # print(dir(data))
-    # print(vars(data))
-    for path in file_path:
-        with open(path, 'rb') as f:
-            data = np.load(f, allow_pickle=True)[()]
+    for path in file_paths:
+        with open(path, 'rb+') as f:
+            data = np.load(f, allow_pickle = True)[()]
+            print(data.keys(), '\n')
+            thresh_data = data['active_threshold_t']
+            print(thresh_data)
+            
 
-    param ='OUTBREAKS'
-    plot_all_vars(data, param)
-    plt.show()
+            # data_stored_next = np.load(f, allow_pickle=True)
+            # et_caetera = np.load(f)
+
+    # print(thresh_data)
+
+    
+    # dataset = pd.DataFrame({'Column1': data[:, 0], 'Column2': data[:, 1]})
 
     # for param in ('OUTBREAKS', "ACTIVE"):
     #     plot_all_vars(data, param)

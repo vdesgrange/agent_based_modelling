@@ -1,5 +1,5 @@
 from utils import linear_gradient
-from constants import State, Shape, Color
+from cv_constants import State, Shape, Color
 from civil_violence_agents import Citizen
 
 # we generate an array of hex values in between start and end hex values

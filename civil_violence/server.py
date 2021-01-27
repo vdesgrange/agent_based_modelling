@@ -9,6 +9,10 @@ from civil_violence_model import CivilViolenceModel
 from constants import GraphType, Color
 from graph_utils import NetworkModuleExtended  # For NetworkGrid visualization
 from graphics_portrayal import get_agent_portrayal, get_network_portrayal, get_grievance_portrayal
+<<<<<<< HEAD
+=======
+from cv_constants import GRID_WIDTH, GRID_HEIGHT, GraphType, Color
+>>>>>>> f11e703ac8553986a7f2b776390375b337321df5
 from utils import read_configuration
 
 

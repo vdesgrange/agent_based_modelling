@@ -3,7 +3,7 @@ import math
 from mesa import Agent
 import networkx as nx
 
-from constants import State, HardshipConst
+from cv_constants import State, HardshipConst
 
 
 class Citizen(Agent):

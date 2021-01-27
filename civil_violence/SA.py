@@ -15,7 +15,7 @@ from civil_violence_model import CivilViolenceModel
 from server import get_user_model_parameters
 from utils import read_configuration
 
-path = 'archives/saved_data{0}.npy'.format(int(time.time()))
+path = 'archives/saved_data{0}'.format(int(time.time()))
 
 problem = {
     'num_vars': 3,
@@ -24,16 +24,18 @@ problem = {
     'bounds': [[0.01, 1], [0.01, 1], [1, 100]]
 }
 
-replicates = 100
-max_steps = 200
-distinct_samples = 5
+replicates = 2
+max_steps = 100
+distinct_samples = 2
 
 model_reporters = {"QUIESCENT": lambda m: m.count_type_citizens("QUIESCENT"),
                    "ACTIVE": lambda m: m.count_type_citizens("ACTIVE"),
-                   "JAILED": lambda m: m.count_type_citizens("JAILED"),
-                   "OUTBREAKS": lambda m: m.outbreaks}
+                   "JAILED": lambda m: m.count_type_citizens("JAILED")}
+                   # ,
+                   # "All_Data": lambda m: m.datacollector}
 
 data = {}
+run_data = {}
 
 for i, var in enumerate(problem['names']):
     # Get the bounds for this variable and get <distinct_samples> samples within this space (uniform)
@@ -56,16 +58,43 @@ for i, var in enumerate(problem['names']):
                         iterations=replicates,
                         variable_parameters={var: samples},
                         fixed_parameters=model_params,
-                        model_reporters=model_reporters,
+                        model_reporters={'All_Data': lambda m: m.datacollector}, #attempt all
+                        # model_reporters=model_reporters,
                         display_progress=True)
 
     batch.run_all()
 
-    data[var] = batch.get_model_vars_dataframe()
+    batch_df = batch.get_model_vars_dataframe()
+    print('Before: ', batch_df.keys())
+    batch_df = batch_df.drop('All_Data', axis=1)
+    print('After: ', batch_df.keys())
 
+    data[var] = batch_df
+    run_data[var] = batch.get_collector_model()
+
+# print(data['active_threshold_t'])
+# print(data['active_threshold_t'].keys())
+# print(data['active_threshold_t']['All_Data'])
+# print(pd.data['active_threshold_t']['All_Data'].to_numpy())
+# print(data['active_threshold_t']['All_Data'].get_model_vars_dataframe())
+
+for df in run_data:
+    print(run_data[df])
+# Single data array
+run_path = path+'_run'
+print(run_path)
 
 with open(path, 'ab') as f:
     np.save(f, data)
+
+# run_path = path+'_run'
+# with open(run_path, 'ab') as f:
+#     np.save(f, run_data)
+
+
+# Zipped multiple arrays
+# with open(path, 'ab') as f:
+#     np.savez(f, data['active_threshold_t'], data['initial_legitimacy_l0'], data['max_jail_term'])
 
 def plot_param_var_conf(ax, df, var, param, i):
     """
@@ -106,6 +135,12 @@ def plot_all_vars(df, param):
         plot_param_var_conf(axs[i], df[var], var, param, i)
 
 
+<<<<<<< HEAD
 for param in ('OUTBREAKS', "ACTIVE"):
     plot_all_vars(data, param)
     plt.show()
+=======
+# for param in ('ACTIVE', 'JAILED'):
+#     plot_all_vars(data, param)
+#     plt.show()
+>>>>>>> f11e703ac8553986a7f2b776390375b337321df5
