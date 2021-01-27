@@ -13,6 +13,6 @@
   "directed": false,
   "inf_threshold": 150,
   "active_threshold_t": 0.1,
-  "graph_type": "NONE",
+  "graph_type": "BARABASI_ALBERT",
   "removal_step": 100
 }

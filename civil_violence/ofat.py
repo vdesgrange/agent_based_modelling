@@ -15,22 +15,22 @@ def ofat_barabasi_albert_analysis(problem):
     Analyse the network transmission
     :param problem :
     """
-    max_steps = 2  # Simulation number of steps
-    replicates = 1  # Number of simulations # 10
-    distinct_samples = 2
+    max_steps = 50  # Simulation number of steps
+    replicates = 2  # Number of simulations # 10
+    distinct_samples = 50
 
     model_reporters = {
         "QUIESCENT": lambda m: m.count_type_citizens("QUIESCENT"),
         "ACTIVE": lambda m: m.count_type_citizens("ACTIVE"),
         "JAILED": lambda m: m.count_type_citizens("JAILED"),
-        "OUTBURST": lambda m: m.outburst,
+        "OUTBURST": lambda m: m.outbreaks,
         "INFLUENCERS": lambda m: len(m.influencer_list),
-        "CLUSTERING": lambda m: nx.average_clustering(m.G)
+        # "CLUSTERING": lambda m: nx.average_clustering(m.G)
     }
 
     agent_reporters = {
-        # "HARDSHIP_CONT": lambda a: getattr(a, 'hardship_cont', None),
-        # "GRIEVANCE": lambda a: getattr(a, 'grievance', None),
+        "HARDSHIP_CONT": "hardship_cont",
+        "GRIEVANCE": "grievance",
         # "DEGREE": lambda a: a.model.G.degree(a.network_node)
     }
 
@@ -43,7 +43,6 @@ def ofat_barabasi_albert_analysis(problem):
 
         if var == 'inf_threshold':
             samples = np.linspace(*problem['bounds'][i], num=distinct_samples, dtype=int)
-
 
         configuration = read_configuration('./configurations/ofat_networks.json')
         model_params = {}
@@ -62,7 +61,7 @@ def ofat_barabasi_albert_analysis(problem):
                             display_progress=True)
         batch.run_all()
         model_data[var] = batch.get_model_vars_dataframe()
-        # agent_data[var] = batch.get_agent_vars_dataframe()
+        agent_data[var] = batch.get_agent_vars_dataframe()
 
     path = 'archives/ofat_data_{0}.npy'.format(int(time.time()))
     with open(path, 'ab') as f:
@@ -84,7 +83,6 @@ def plot_param_var_conf(ax, df, var, param, i):
         i: plot index
     """
     x = df.groupby(var).mean().reset_index()[var]
-    print(df.groupby(var))
     y = df.groupby(var).mean()[param]
 
     replicates = df.groupby(var)[param].count()
@@ -119,11 +117,11 @@ def ofat_main():
     problem = {
         'num_vars': 2,
         'names': ['p', 'inf_threshold'],
-        'bounds': [[0.01, 1], [10, 200]]
+        'bounds': [[0.01, 1], [10, 300]]
     }
 
     data = ofat_barabasi_albert_analysis(problem)
-    for param in ("QUIESCENT", "ACTIVE"):
+    for param in ("OUTBURST", "INFLUENCERS", "HARDSHIP_CONT"):
         plot_all_vars(problem, data, param)
         plt.show()
 

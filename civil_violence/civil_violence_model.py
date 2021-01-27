@@ -1,15 +1,13 @@
+import networkx as nx
 from mesa import Model
 from mesa.space import MultiGrid
 from mesa.time import RandomActivation
 from mesa.datacollection import DataCollector
-import networkx as nx
-import matplotlib.pyplot as plt
-
 from civil_violence_agents import Citizen, Cop
 from constant_variables import State
 from graph_utils import generate_network, print_network
-
 from figure import create_fig
+
 
 class CivilViolenceModel(Model):
     """ Civil violence model class """
@@ -60,7 +58,6 @@ class CivilViolenceModel(Model):
             We maintain a dictionary of agent position instead.
 
         """
-
         super().__init__()
 
         # === Initialize attributes ===
@@ -215,7 +212,7 @@ class CivilViolenceModel(Model):
                 "JAILED": lambda m: self.count_type_citizens("JAILED"),
                 "LEGITIMACY": lambda m: self.legitimacy,
                 "INFLUENCERS": lambda m: len(m.influencer_list),
-                "CLUSTERING": lambda m: nx.average_clustering(m.G),
+                # "CLUSTERING": lambda m: nx.average_clustering(m.G),
                 "OUTBREAKS": lambda m: self.outbreaks}
 
     def get_agent_reporters(self):
@@ -223,8 +220,7 @@ class CivilViolenceModel(Model):
             TODO Doesn't work the way it should"""
 
         return {"Grievance": lambda a: getattr(a, 'grievance', None),
-                "Hardship": lambda a: getattr(a, 'hardship', None),
-                "Degree": lambda a: getattr(a, '', 0)}
+                "Hardship": lambda a: getattr(a, 'hardship', None)}
 
     def count_type_citizens(self, state_req):
         """

@@ -67,6 +67,9 @@ class Citizen(Agent):
         self.jailable = jailable
         self.influencer = influencer
 
+        # Data collector - sensitivity analysis
+        # self.degree = self.model.G.degree(self.network_node)
+
         self.neighbors = []  # Neighbors in MultiGrid space
         self.empty_cells = []  # Empty cells around the agent in MultiGrid space
 
@@ -229,6 +232,11 @@ class Cop(Agent):
         self.pos = pos
         self.vision = vision
         self.state = State.COP
+
+        # Data collector fix
+        self.hardship_cont = None
+        self.grievance = None
+        self.degree = None
 
         self.neighbors = []  # Neighbors in MultiGrid space
         self.empty_cells = []  # Empty cells around the agent in MultiGrid space
