@@ -7,18 +7,19 @@ from itertools import combinations
 # from Sobol import problem
 
 problem = {
-    'num_vars': 6,
+    'num_vars':5,
     'names': ['active_threshold_t', 'initial_legitimacy_l0',
               'max_jail_term',
-              'p', 'agent_vision', 'cop_vision'
+              # 'p',
+              'agent_vision', 'cop_vision'
               ],
-    'bounds': [[0.01, 1], [0.01, 1], [1, 100], [0.01, 0.4], [1, 20], [1, 20]]
+    'bounds': [[0.01, 1], [0.01, 1], [1, 100], [1, 20], [1, 20]]
 }
 
 
 file_path = [
     # './archives/saved_data_Sobol1611686089.npy',
-    './archives/saved_data_Sobol1611776923.npy',
+    './archives/saved_data_Sobol1611777808.npy',
 ]
 
 for path in file_path:
@@ -27,11 +28,12 @@ for path in file_path:
 
 data = pd.DataFrame(data, columns = ['active_threshold_t', 'initial_legitimacy_l0',
                                      'max_jail_term',
-                                     'p', 'agent_vision', 'cop_vision',
+                                     # 'p',
+                                     'agent_vision', 'cop_vision',
                                      'Run', 'QUIESCENT',
                                      'ACTIVE', 'JAILED', 'OUTBREAKS'])
 
-print(data)
+# print(data)
 
 Si_outbreaks = sobol.analyze(problem, data['OUTBREAKS'].values, print_to_console=False)
 
