@@ -1,28 +1,29 @@
 import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
-# from SA import problem
+# from SA import number_of_variables
 
 
 problem = {
-    'num_vars': 3,
+    'num_vars': 6,
     'names': ['active_threshold_t', 'initial_legitimacy_l0',
-              'max_jail_term'],
+              'max_jail_term', 'p', 'agent_vision', 'cop_vision'],
     'bounds': [[0, 1], [0, 1], [0, 100], [0.01, 0.5], [4, 8], [4, 8]]
 }
 
 def load_plot_archive():
     file_path = [
-        './archives/saved_data1611678407.npy',
+        # './archives/saved_data1611750187.npy',
+        './archives/saved_data1611756415',
     ]
 
-    data = np.load('archives/saved_data1611678407.npy', allow_pickle=True)
     # print(dir(data))
     # print(vars(data))
     for path in file_path:
         with open(path, 'rb') as f:
             data = np.load(f, allow_pickle=True)[()]
 
+    print(data)
     param ='OUTBREAKS'
     plot_all_vars(data, param)
     plt.show()
@@ -67,7 +68,7 @@ def plot_all_vars(df, param):
         param: the parameter to be plotted
     """
 
-    f, axs = plt.subplots(3, figsize=(5, 7))
+    f, axs = plt.subplots(6, figsize=(3, 5))
 
     for i, var in enumerate(problem['names']):
         plot_param_var_conf(axs[i], df[var], var, param, i)
