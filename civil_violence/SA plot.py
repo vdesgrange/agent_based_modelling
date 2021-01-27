@@ -14,7 +14,7 @@ problem = {
 def load_plot_archive():
     file_path = [
         # './archives/saved_data1611750187.npy',
-        './archives/saved_data1611756415',
+        './archives/saved_data1611757193',
     ]
 
     # print(dir(data))
@@ -23,7 +23,7 @@ def load_plot_archive():
         with open(path, 'rb') as f:
             data = np.load(f, allow_pickle=True)[()]
 
-    print(data)
+    print(data.keys())
     param ='OUTBREAKS'
     plot_all_vars(data, param)
     plt.show()
