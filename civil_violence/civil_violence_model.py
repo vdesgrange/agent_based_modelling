@@ -248,7 +248,8 @@ class CivilViolenceModel(Model):
                 "Hardship": lambda a: getattr(a, 'hardship', None),
                 "State": lambda a: getattr(a, 'state', None),
                 "Legitimacy": lambda m: self.legitimacy,
-                "Influencer": lambda a: getattr(a, 'influencer', None)}
+                "Influencer": lambda a: getattr(a, 'influencer', None),
+                "N_connections": lambda a: getattr(a, 'network_neighbors', None)}
 
     def count_type_citizens(self, state_req):
         """
@@ -290,11 +291,10 @@ class CivilViolenceModel(Model):
         If an agent in the network is connected to a large amount of nodes, this agent can
         be considered an influencer and receives a corresponding tag.
         """
-        print(len(list(self.G.neighbors(self.citizen_list[0].network_node))))
-        print(len(list(self.G.neighbors(self.citizen_list[-1].network_node))))
         for agent in self.citizen_list:
             agent.set_influencer(len(list(self.G.neighbors(agent.network_node))), inf_threshold)
-            self.influencer_list.append(agent)
+            if agent.influencer == True:
+                self.influencer_list.append(agent)
 
     def remove_influencer(self):
         """
