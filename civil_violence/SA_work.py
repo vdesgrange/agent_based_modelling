@@ -27,7 +27,7 @@ BOUNDS = [[0, 1], [0, 1], [0, 100]]
 
 file_paths = [
         # './archives/saved_data1611648500.npy'
-        './archives/saved_data1611693859',
+        './archives/saved_data1611693859'
         './archives/saved_data1611747993_run'
     ]
 
@@ -42,7 +42,6 @@ def load_datacollector():
 
             data = np.load(f, allow_pickle = True)[()]
             keys = data.keys()
-            # print('Keys of this dict: ', keys, '\n')
             data_dict[path] = data
     
     return data_dict
@@ -60,30 +59,8 @@ def map_keys():
         for j in range(STEPS):
             param_list.extend(list(zip(param_matrix[j], iter_list[j])))
         keys_dict[PARAMS[i]] = param_list
-    # print(iter_list)
-    # for i in range(len(PARAMS)):
-    #     param_range = np.linspace(BOUNDS[i][0], BOUNDS[i][1], STEPS)
-    #     param_list = []
-    #     for pr in param_range:
-    #         for j in iter_list[i*ITERATIONS:(i+1)*ITERATIONS]:
-    #             print('j: ', pr, j)
-    #             param_list.append((pr, j))
-    #     keys_dict[PARAMS[i]] = param_list
+
     return keys_dict
-
-
-
-
-###
-# FINAL RESULT: df| MEAN_N_PEAKS | MEAN_WIDTH_PEAKS | MEAN_HIGHEST_PEAK | HIGHEST_PEAK
-#        -----------------------------------------------------------------------------
-#         PARAM 1 |
-#         PARAM 2 |
-#         PARAM 3 |
-#         PARAM 4 |
-#         PARAM 5 |
-#         PARAM 6 | 
-###
 
 def get_param_means(data, parameter):
     """
@@ -119,8 +96,8 @@ def get_param_means(data, parameter):
     # print(output)
 
     df = pd.DataFrame({'PARAM_VAL': output[:, 0], 'MEAN_N': output[:, 1], 
-        'MEAN_PEAK_HEIGHT': output[:, 2], 'MEAN_PEAK_WIDTH': output[:, 3], 
-        'MAX_PEAK_HEIGHT': output[:, 4], 'MAX_PEAK_WIDTH': output[:, 5]})
+        'MEAN_PEAK_HEIGHT': output[:, 2], 'MEAN_OUTBREAK_DURATION': output[:, 3], 
+        'MAX_PEAK_HEIGHT': output[:, 4], 'MAX_OUTBREAK_DURATION': output[:, 5]})
     return df
     # return output, df
 
@@ -157,6 +134,11 @@ def get_outbreaks(data, threshold):
 
     return outbreak_peaks, outbreak_widths
 
+def save_csv(name, df):
+
+    path = 'archives/'+name+'_out.csv'
+    df.to_csv(path)
+
 
 model_data = load_datacollector()
 run_data = model_data['./archives/saved_data1611747993_run']
@@ -170,6 +152,7 @@ for param in run_data.keys():
 for df in output_data:
     print('Tested parameter: ', df)
     print(output_data[df])
+    save_cdv(str(df), output_data[df])
 
 # # print(model_data['./archives/saved_data1611693859']['active_threshold_t'])
 # for d in model_data:
@@ -177,5 +160,3 @@ for df in output_data:
 
 # test_data = np.array([10, 20, 30, 80, 201, 75, 100, 120, 220, 201, 190, 100, 80])
 # peaks, sizes = get_outbreaks(test_data, 100)
-
-# print(peaks, sizes)

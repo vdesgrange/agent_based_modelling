@@ -1,12 +1,18 @@
 import random
+
 from mesa.visualization.ModularVisualization import ModularServer
 from mesa.visualization.UserParam import UserSettableParameter
+from mesa.batchrunner import BatchRunner
 from mesa.visualization.modules import CanvasGrid, ChartModule, PieChartModule
 
-from graph_utils import NetworkModuleExtended  # For NetworkGrid visualization
 from civil_violence_model import CivilViolenceModel
+from constants import GraphType, Color
+from graph_utils import NetworkModuleExtended  # For NetworkGrid visualization
 from graphics_portrayal import get_agent_portrayal, get_network_portrayal, get_grievance_portrayal
+<<<<<<< HEAD
+=======
 from cv_constants import GRID_WIDTH, GRID_HEIGHT, GraphType, Color
+>>>>>>> f11e703ac8553986a7f2b776390375b337321df5
 from utils import read_configuration
 
 
@@ -34,7 +40,7 @@ def get_user_model_parameters():
                                                   description="Threshold that agent's Grievance must exceed Net Risk to go active"),
         "max_jail_term": UserSettableParameter("slider", "Max Jail Term", 1000, 0, 1000,
                                                description="Maximum number of steps that jailed citizens stay in"),
-        "inf_threshold": UserSettableParameter("slider", "Influencer threshold", 10, 0, 100, 
+        "inf_threshold": UserSettableParameter("slider", "Influencer threshold", 150, 0, 150, 
                                                 description="Amount of nodes that need to be connected to consider agents influencers."),
         "removal_step": UserSettableParameter("slider", "Iteration of influencer removal", 0, 0, 100, step=5,
                                                 description="Iteration at which a random influencer is removed from the model."),
@@ -71,6 +77,10 @@ def get_visualization_elements(model_paramsl, show_network=False):
                                    # {"Label": "Hardship", "Color": Color['ACTIVE'].value}
                                    ], 50, 135)
 
+    # outbreak_chart = ChartModule([{"Label": "OUTBREAKS", "Color": Color['QUIESCENT'].value},
+    #                                # {"Label": "Hardship", "Color": Color['ACTIVE'].value}
+    #                                ], 50, 135)
+
     pie_chart = PieChartModule([{"Label": "QUIESCENT", "Color": Color['QUIESCENT'].value},
                                 {"Label": "ACTIVE", "Color": Color['ACTIVE'].value},
                                 {"Label": "JAILED", "Color": Color['JAILED'].value}], 200, 500)
@@ -88,6 +98,20 @@ def run(configuration, seed=None):
     :param configuration: configuration used by the model.
     :param seed: random seed. By default None.
     """
+    """
+    to get results for multiple iterations, run underlying code and add this to default.json in configurations:  
+    "inf_threshold": 50,
+    "removal_step": 50,
+    "active_threshold_t": 0.5,
+    "graph_type": "GraphType.ERDOS_RENYI.name" 
+    """
+
+    #batch_run = BatchRunner(CivilViolenceModel, fixed_parameters = config, iterations = 10)
+    #batch_run.run_all()
+    #data = batch_run.get_model_vars_dataframe()
+    #data.head()
+
+
     random.seed(seed)
 
     model_params = get_user_model_parameters()
@@ -98,12 +122,14 @@ def run(configuration, seed=None):
     model_params.update(configuration) # Overwritten user parameters don't appear in the graphic interface
     model_params.update({'seed': seed})
 
+
     server = ModularServer(
         CivilViolenceModel,
         get_visualization_elements(model_params, show_network=False),
         name="Civil violence with network model",
         model_params=model_params
     )
+    print(model_params)
 
     server.port = 8521
     server.launch()

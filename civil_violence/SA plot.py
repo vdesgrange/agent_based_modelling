@@ -1,6 +1,15 @@
 import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
+# from SA import problem
+
+
+problem = {
+    'num_vars': 3,
+    'names': ['active_threshold_t', 'initial_legitimacy_l0',
+              'max_jail_term'],
+    'bounds': [[0, 1], [0, 1], [0, 100], [0.01, 0.5], [4, 8], [4, 8]]
+}
 
 def load_plot_archive():
     file_paths = [
@@ -27,9 +36,9 @@ def load_plot_archive():
     
     # dataset = pd.DataFrame({'Column1': data[:, 0], 'Column2': data[:, 1]})
 
-    for param in ('ACTIVE', 'JAILED'):
-        plot_all_vars(dataset, param)
-        plt.show()
+    # for param in ('OUTBREAKS', "ACTIVE"):
+    #     plot_all_vars(data, param)
+    #     plt.show()
 
 def plot_param_var_conf(ax, df, var, param, i):
     """
@@ -45,9 +54,12 @@ def plot_param_var_conf(ax, df, var, param, i):
     x = df.groupby(var).mean().reset_index()[var]
     y = df.groupby(var).mean()[param]
 
+    # print(param)
+    # print(var)
+    # print(df.groupby(var)[param].count())
     replicates = df.groupby(var)[param].count()
     err = (1.96 * df.groupby(var)[param].std()) / np.sqrt(replicates)
-
+    # print(df["active_threshold_t"])
     ax.plot(x, y, c='k')
     ax.fill_between(x, y - err, y + err)
 
@@ -64,7 +76,7 @@ def plot_all_vars(df, param):
         param: the parameter to be plotted
     """
 
-    f, axs = plt.subplots(3, figsize=(7, 10))
+    f, axs = plt.subplots(3, figsize=(5, 7))
 
     for i, var in enumerate(problem['names']):
         plot_param_var_conf(axs[i], df[var], var, param, i)

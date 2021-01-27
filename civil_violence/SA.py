@@ -21,7 +21,7 @@ problem = {
     'num_vars': 3,
     'names': ['active_threshold_t', 'initial_legitimacy_l0',
               'max_jail_term'],
-    'bounds': [[0, 1], [0, 1], [0, 100], [0.01, 0.5], [4, 8], [4, 8]]
+    'bounds': [[0.01, 1], [0.01, 1], [1, 100]]
 }
 
 replicates = 2
@@ -41,10 +41,17 @@ for i, var in enumerate(problem['names']):
     # Get the bounds for this variable and get <distinct_samples> samples within this space (uniform)
     samples = np.linspace(*problem['bounds'][i], num=distinct_samples)
 
+    # Keep in mind that max_jail_term should be integers. You will have to change
+    # your code to acommodate for this or sample in such a way that you only get integers.
+    if var == 'max_jail_term':
+        samples = np.linspace(*problem['bounds'][i], num=distinct_samples, dtype=int)
+
     configuration = read_configuration()
     model_params = {}
     model_params.update(configuration)  # Overwritten user parameters don't appear in the graphic interface
     model_params.update({'seed': None})
+
+    # print({var: samples})
 
     batch = BatchRunner(CivilViolenceModel,
                         max_steps=max_steps,
@@ -128,6 +135,12 @@ def plot_all_vars(df, param):
         plot_param_var_conf(axs[i], df[var], var, param, i)
 
 
+<<<<<<< HEAD
+for param in ('OUTBREAKS', "ACTIVE"):
+    plot_all_vars(data, param)
+    plt.show()
+=======
 # for param in ('ACTIVE', 'JAILED'):
 #     plot_all_vars(data, param)
 #     plt.show()
+>>>>>>> f11e703ac8553986a7f2b776390375b337321df5

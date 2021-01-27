@@ -3,12 +3,15 @@ from mesa.space import MultiGrid
 from mesa.time import RandomActivation
 from mesa.datacollection import DataCollector
 import matplotlib.pyplot as plt
+import json
 
 from civil_violence_agents import Citizen, Cop
 from cv_constants import State
 from graph_utils import generate_network, print_network
 
-from figure import create_fig
+from datetime import datetime
+
+from figure import create_fig, run_analysis
 
 class CivilViolenceModel(Model):
     """ Civil violence model class """
@@ -16,12 +19,12 @@ class CivilViolenceModel(Model):
                  height, width,
                  agent_density, agent_vision,
                  active_agent_density,
-                 cop_density, cop_vision,
-                 initial_legitimacy_l0, inf_threshold, 
+                 cop_density, cop_vision, inf_threshold,
                  removal_step, max_iter,
-                 max_jail_term, active_threshold_t,
                  k, graph_type,
                  p, p_ws, directed,
+                 max_jail_term=30, active_threshold_t=0.1,
+                 initial_legitimacy_l0=0.82,
                  movement=True, seed=None):
         """
         Create a new civil violence model.
@@ -95,6 +98,11 @@ class CivilViolenceModel(Model):
         self.cop_list = []
         self.influencer_list = []
         self.jailings_list = [0, 0, 0, 0]
+        self.outbreaks = 0
+        self.outbreak_now = 0
+
+        date = datetime.now()
+        self.path = f'output/{date.month}_{date.day}_{date.hour}_{date.second}_'
 
         # === Set Data collection ===
         self.datacollector = DataCollector(
@@ -163,15 +171,30 @@ class CivilViolenceModel(Model):
 
     def step(self):
         """ One step in agent-based model simulation """
+        # print(len(self.influencer_list))
         self.schedule.step()
         self.datacollector.collect(self)
         self.iteration += 1
         self.update_legitimacy()
+
+        # Count amount of outbreaks
+        # print(self.count_type_citizens("ACTIVE"))
+        if self.count_type_citizens("ACTIVE") > 200 and self.outbreak_now == 0:
+            self.outbreaks += 1
+            self.outbreak_now = 1
+        if self.count_type_citizens("ACTIVE") < 200:
+            self.outbreak_now = 0
+
         # print('legitimacy:', self.legitimacy)
         self.datacollector.collect(self)
 
+        # Save initial values
+        if self.iteration == 1:
+            self.save_initial_values(save=False)
+
         # Stop the model after a certain amount of iterations.
         if self.iteration > self.max_iter:
+            self.save_data(save=False)
             self.running = False
 
         # Remove influencer after certain amount of iterations.
@@ -180,6 +203,41 @@ class CivilViolenceModel(Model):
 
         # for agent in self.influencer_list:
         #     print('Agent ', agent.unique_id, ' is an influencer ')
+
+    def save_data(self, save=False):
+
+        if save is not False:
+            df_end = self.datacollector.get_agent_vars_dataframe()
+            name = self.path + 'run_values.csv'
+            df_end.to_csv(name)
+        else:
+            pass
+
+    def save_initial_values(self, save=False):
+        
+        if save is not False:
+            dictionary_data = {
+                'agent_density': self.agent_density,
+                'agent_vision': self.agent_vision,
+                'active_agent_density': self.active_agent_density,
+                'cop_density': self.cop_density,
+                'initial_legitimacy_l0': self.initial_legitimacy_l0,
+                'inf_threshold': self.inf_threshold,
+                'removal_step': self.removal_step,
+                'max_iter': self.max_iter,
+                'max_jail_term': self.max_jail_term,
+                'active_threshold_t': self.active_threshold_t,
+                'k': self.k,
+                'graph_type': self.graph_type,
+            }
+            
+            name = self.path + 'ini_values.json'
+            a_file = open(name, "w")
+            json.dump(dictionary_data, a_file)
+            a_file.close()
+        else:
+            pass
+
 
     def update_legitimacy(self):
         """
@@ -201,14 +259,19 @@ class CivilViolenceModel(Model):
         return {"QUIESCENT": lambda m: self.count_type_citizens("QUIESCENT"),
                 "ACTIVE": lambda m: self.count_type_citizens("ACTIVE"),
                 "JAILED": lambda m: self.count_type_citizens("JAILED"),
-                "LEGITIMACY": lambda m: self.legitimacy}
+                "LEGITIMACY": lambda m: self.legitimacy,
+                "OUTBREAKS": lambda m: self.outbreaks}
 
     def get_agent_reporters(self):
         """ TODO Dictionary of agent reporter names and attributes/funcs
             TODO Doesn't work the way it should"""
 
         return {"Grievance": lambda a: getattr(a, 'grievance', None),
-                "Hardship": lambda a: getattr(a, 'hardship', None)}
+                "Hardship": lambda a: getattr(a, 'hardship', None),
+                "State": lambda a: getattr(a, 'state', None),
+                "Legitimacy": lambda m: self.legitimacy,
+                "Influencer": lambda a: getattr(a, 'influencer', None),
+                "N_connections": lambda a: getattr(a, 'network_neighbors', None)}
 
     def count_type_citizens(self, state_req):
         """
@@ -245,14 +308,14 @@ class CivilViolenceModel(Model):
         self.grid.place_agent(agent, new_pos)
         # print(agent.unique_id, " was placed back on the grid at pos: ", new_pos) # TEST
 
-    def set_influencers(self, inf_threshold=10):
+    def set_influencers(self, inf_threshold=150):
         """
         If an agent in the network is connected to a large amount of nodes, this agent can
         be considered an influencer and receives a corresponding tag.
         """
         for agent in self.citizen_list:
-            if len(list(self.G.neighbors(agent.network_node))) > inf_threshold:
-                agent.set_influencer()
+            agent.set_influencer(len(list(self.G.neighbors(agent.network_node))), inf_threshold)
+            if agent.influencer == True:
                 self.influencer_list.append(agent)
 
     def remove_influencer(self):
