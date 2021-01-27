@@ -7,7 +7,7 @@ from civil_violence_agents import Citizen, Cop
 from constant_variables import State
 from graph_utils import generate_network, print_network
 from figure import create_fig
-
+from utils import *
 
 class CivilViolenceModel(Model):
     """ Civil violence model class """
@@ -15,10 +15,11 @@ class CivilViolenceModel(Model):
                  height, width,
                  agent_density, agent_vision,
                  active_agent_density,
-                 cop_density, cop_vision, inf_threshold,
+                 cop_density, cop_vision,
                  removal_step, max_iter,
                  k, graph_type,
-                 p=0.1, p_ws=0.1, directed=False,
+                 inf_threshold=150, directed=False,
+                 p=0.1, p_ws=0.1,
                  max_jail_term=30, active_threshold_t=0.1,
                  initial_legitimacy_l0=0.82,
                  movement=True, seed=None):
@@ -207,20 +208,20 @@ class CivilViolenceModel(Model):
 
     def get_model_reporters(self):
         """ Dictionary of model reporter names and attributes/funcs """
-        return {"QUIESCENT": lambda m: self.count_type_citizens("QUIESCENT"),
-                "ACTIVE": lambda m: self.count_type_citizens("ACTIVE"),
-                "JAILED": lambda m: self.count_type_citizens("JAILED"),
-                "LEGITIMACY": lambda m: self.legitimacy,
-                "INFLUENCERS": lambda m: len(m.influencer_list),
-                # "CLUSTERING": lambda m: nx.average_clustering(m.G),
-                "OUTBREAKS": lambda m: self.outbreaks}
+        return {"QUIESCENT": compute_quiescent,
+                "ACTIVE": compute_active,
+                "JAILED": compute_active,
+                "LEGITIMACY": compute_legitimacy,
+                "INFLUENCERS": compute_influencers,
+                "OUTBREAKS": compute_outbreaks}
 
     def get_agent_reporters(self):
         """ TODO Dictionary of agent reporter names and attributes/funcs
             TODO Doesn't work the way it should"""
 
-        return {"Grievance": lambda a: getattr(a, 'grievance', None),
-                "Hardship": lambda a: getattr(a, 'hardship', None)}
+        return {"Grievance": 'grievance',
+                "Hardship": 'hardship',
+                "HARDSHIP_CONT": 'hardship_cont'}
 
     def count_type_citizens(self, state_req):
         """

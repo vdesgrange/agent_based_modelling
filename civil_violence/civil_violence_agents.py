@@ -234,6 +234,7 @@ class Cop(Agent):
         self.state = State.COP
 
         # Data collector fix
+        self.hardship = None
         self.hardship_cont = None
         self.grievance = None
         self.degree = None

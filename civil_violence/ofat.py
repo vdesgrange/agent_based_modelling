@@ -1,12 +1,11 @@
 # %matplotlib inline
 import time
 import numpy as np
-import networkx as nx
 import matplotlib.pyplot as plt
-from mesa.batchrunner import BatchRunner
-from civil_violence_model import CivilViolenceModel
-from utils import read_configuration
 
+from batchrunner_mp import BatchRunnerMP
+from civil_violence_model import CivilViolenceModel
+from utils import *
 
 def ofat_barabasi_albert_analysis(problem):
     """
@@ -15,23 +14,21 @@ def ofat_barabasi_albert_analysis(problem):
     Analyse the network transmission
     :param problem :
     """
-    max_steps = 50  # Simulation number of steps
-    replicates = 2  # Number of simulations # 10
-    distinct_samples = 50
+    max_steps = 20  # Simulation number of steps
+    replicates = 10  # Number of simulations # 10
+    distinct_samples = 20
 
     model_reporters = {
-        "QUIESCENT": lambda m: m.count_type_citizens("QUIESCENT"),
-        "ACTIVE": lambda m: m.count_type_citizens("ACTIVE"),
-        "JAILED": lambda m: m.count_type_citizens("JAILED"),
-        "OUTBURST": lambda m: m.outbreaks,
-        "INFLUENCERS": lambda m: len(m.influencer_list),
-        # "CLUSTERING": lambda m: nx.average_clustering(m.G)
+        "QUIESCENT": compute_quiescent,
+        "ACTIVE": compute_active,
+        "JAILED": compute_jailed,
+        "LEGITIMACY": compute_legitimacy,
+        "INFLUENCERS": compute_influencers,
+        "OUTBREAKS": compute_outbreaks
     }
-
     agent_reporters = {
         "HARDSHIP_CONT": "hardship_cont",
         "GRIEVANCE": "grievance",
-        # "DEGREE": lambda a: a.model.G.degree(a.network_node)
     }
 
     model_data = {}
@@ -49,23 +46,22 @@ def ofat_barabasi_albert_analysis(problem):
         model_params.update(configuration)  # Overwritten user parameters don't appear in the graphic interface
         model_params.update({'seed': None})
 
-        # print({var: samples})
-
-        batch = BatchRunner(CivilViolenceModel,
+        batch = BatchRunnerMP(CivilViolenceModel,
                             max_steps=max_steps,
                             iterations=replicates,
                             variable_parameters={var: samples},
                             fixed_parameters=model_params,
                             model_reporters=model_reporters,
-                            agent_reporters=agent_reporters,
+                            # agent_reporters=agent_reporters,
                             display_progress=True)
         batch.run_all()
         model_data[var] = batch.get_model_vars_dataframe()
-        agent_data[var] = batch.get_agent_vars_dataframe()
+        # agent_data[var] = batch.get_agent_vars_dataframe()
 
     path = 'archives/ofat_data_{0}.npy'.format(int(time.time()))
     with open(path, 'ab') as f:
         np.save(f, model_data)
+        # np.save(f, agent_data)
 
     return model_data
 
@@ -121,7 +117,26 @@ def ofat_main():
     }
 
     data = ofat_barabasi_albert_analysis(problem)
-    for param in ("OUTBURST", "INFLUENCERS", "HARDSHIP_CONT"):
+    for param in ("OUTBREAKS", "INFLUENCERS"):  #  ,"HARDSHIP_CONT", "GRIEVANCE"
+        plot_all_vars(problem, data, param)
+        plt.show()
+
+
+def load_ofat_barabasi_albert_archive():
+    problem = {
+        'num_vars': 2,
+        'names': ['p', 'inf_threshold'],
+        'bounds': [[0.01, 1], [10, 300]]
+    }
+
+    file_path = [
+        './archives/ofat_data_1611742175.npy',
+    ]
+    for path in file_path:
+        with open(path, 'rb') as f:
+            data = np.load(f, allow_pickle=True)[()]
+
+    for param in ("OUTBREAKS", "INFLUENCERS"):  #  ,"HARDSHIP_CONT", "GRIEVANCE"
         plot_all_vars(problem, data, param)
         plt.show()
 

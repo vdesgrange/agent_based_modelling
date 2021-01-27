@@ -77,3 +77,27 @@ def linear_gradient(start_hex, finish_hex="#FFFFFF", n=10):
         RGB_list.append(curr_vector)
 
     return color_dict(RGB_list)
+
+
+def compute_quiescent(model):
+    return model.count_type_citizens("QUIESCENT")
+
+
+def compute_active(model):
+    return model.count_type_citizens("ACTIVE")
+
+
+def compute_jailed(model):
+    return model.count_type_citizens("JAILED")
+
+
+def compute_legitimacy(model):
+    return model.legitimacy
+
+
+def compute_influencers(model):
+    return len(model.influencer_list)
+
+
+def compute_outbreaks(model):
+    return model.outbreaks

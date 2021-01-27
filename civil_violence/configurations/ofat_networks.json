@@ -11,8 +11,7 @@
   "cop_vision": 7,
   "initial_legitimacy_l0": 0.82,
   "directed": false,
-  "inf_threshold": 150,
   "active_threshold_t": 0.1,
   "graph_type": "BARABASI_ALBERT",
-  "removal_step": 100
+  "removal_step": 201
 }

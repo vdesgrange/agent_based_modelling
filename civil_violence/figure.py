@@ -1,10 +1,7 @@
 import matplotlib.pyplot as plt
 import pandas as pd
 import seaborn as sns
-import collections
-
 import networkx as nx
-from networkx import Graph
 
 
 def create_fig(data, draw=False):
@@ -97,5 +94,7 @@ def draw_multiple_graphs(num_nodes=100, p=0.2, p_ws=0.1, seed=None):
     ax[7].set_xlabel('Degree distribution')
     plt.show()
 
-draw_multiple_graphs()
+
+if __name__ == '__main__':
+    draw_multiple_graphs()
 
