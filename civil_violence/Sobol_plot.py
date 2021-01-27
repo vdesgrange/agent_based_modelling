@@ -4,23 +4,34 @@ import numpy as np
 import matplotlib.pyplot as plt
 from itertools import combinations
 
-from Sobol import problem
+# from Sobol import problem
+
+problem = {
+    'num_vars': 6,
+    'names': ['active_threshold_t', 'initial_legitimacy_l0',
+              'max_jail_term',
+              'p', 'agent_vision', 'cop_vision'
+              ],
+    'bounds': [[0.01, 1], [0.01, 1], [1, 100], [0.01, 0.4], [1, 20], [1, 20]]
+}
+
 
 file_path = [
-    './archives/saved_data_Sobol1611680089.npy',
+    # './archives/saved_data_Sobol1611686089.npy',
+    './archives/saved_data_Sobol1611776923.npy',
 ]
 
 for path in file_path:
     with open(path, 'rb') as f:
         data = np.load(f, allow_pickle=True)[()]
 
-    # param ='OUTBREAKS'
-    # plot_all_vars(data, param)
-    # plt.show()
+data = pd.DataFrame(data, columns = ['active_threshold_t', 'initial_legitimacy_l0',
+                                     'max_jail_term',
+                                     'p', 'agent_vision', 'cop_vision',
+                                     'Run', 'QUIESCENT',
+                                     'ACTIVE', 'JAILED', 'OUTBREAKS'])
 
-    # for param in ('OUTBREAKS', "ACTIVE"):
-    #     plot_all_vars(data, param)
-    #     plt.show()
+print(data)
 
 Si_outbreaks = sobol.analyze(problem, data['OUTBREAKS'].values, print_to_console=False)
 
