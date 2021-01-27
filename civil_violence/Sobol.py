@@ -17,13 +17,13 @@ distinct_samples = 2
 
 path = 'archives/saved_data_Sobol{0}.npy'.format(int(time.time()))
 
-number_of_variables = 6
+number_of_variables = 5
 
 problem = {
     'num_vars': number_of_variables,
     'names': ['active_threshold_t', 'initial_legitimacy_l0',
-              'max_jail_term', 'p', 'agent_vision', 'cop_vision'],
-    'bounds': [[0.01, 1], [0.01, 1], [1, 100], [0.01, 0.4], [1, 20], [1, 20]]
+              'max_jail_term', 'agent_vision', 'cop_vision'],
+    'bounds': [[0.01, 1], [0.01, 1], [1, 100], [1, 20], [1, 20]]
 }
 
 model_reporters = {"QUIESCENT": lambda m: m.count_type_citizens("QUIESCENT"),
@@ -44,7 +44,7 @@ batch = BatchRunner(CivilViolenceModel,
 count = 0
 data = pd.DataFrame(index=range(replicates*len(param_values)),
                     columns=['active_threshold_t', 'initial_legitimacy_l0',
-                             'max_jail_term', 'p', 'agent_vision', 'cop_vision'])
+                             'max_jail_term', 'agent_vision', 'cop_vision'])
 data['Run'], data['QUIESCENT'], data['ACTIVE'], data['JAILED'], data['OUTBREAKS'] =\
     None, None, None, None, None
 
@@ -53,8 +53,8 @@ for i in range(replicates):
         # Change parameters that should be integers
         vals = list(vals)
         vals[2] = int(vals[2])
+        vals[3] = int(vals[3])
         vals[4] = int(vals[4])
-        vals[5] = int(vals[5])
         # print(vals)
         # Transform to dict with parameter names and their values
         variable_parameters = {}
@@ -64,8 +64,8 @@ for i in range(replicates):
         batch.run_iteration(variable_parameters, tuple(vals), count)
         iteration_data = batch.get_model_vars_dataframe().iloc[count]
         iteration_data['Run'] = count # Don't know what causes this, but iteration number is not correctly filled
-        data.iloc[count, 0:6] = vals
-        data.iloc[count, 6:11] = iteration_data
+        data.iloc[count, 0:5] = vals
+        data.iloc[count, 5:10] = iteration_data
         count += 1
 
         # clear_output()
