@@ -172,10 +172,10 @@ class CivilViolenceModel(Model):
 
         # Count amount of outbreaks
         # print(self.count_type_citizens("ACTIVE"))
-        if self.count_type_citizens("ACTIVE") > 200 and self.outbreak_now == 0:
+        if self.count_type_citizens("ACTIVE") > 50 and self.outbreak_now == 0:
             self.outbreaks += 1
             self.outbreak_now = 1
-        if self.count_type_citizens("ACTIVE") < 200:
+        if self.count_type_citizens("ACTIVE") < 50:
             self.outbreak_now = 0
 
         # print('legitimacy:', self.legitimacy)
