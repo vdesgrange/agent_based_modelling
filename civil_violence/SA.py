@@ -14,7 +14,7 @@ from civil_violence_model import CivilViolenceModel
 from server import get_user_model_parameters
 from utils import read_configuration
 
-path = 'archives/saved_data{0}.npy'.format(int(time.time()))
+path = 'archives/saved_data{0}'.format(int(time.time()))
 
 number_of_variables = 6
 
@@ -35,6 +35,7 @@ model_reporters = {"QUIESCENT": lambda m: m.count_type_citizens("QUIESCENT"),
                    "OUTBREAKS": lambda m: m.outbreaks}
 
 data = {}
+run_data = {}
 
 for i, var in enumerate(problem['names']):
     # Get the bounds for this variable and get <distinct_samples> samples within this space (uniform)
@@ -61,16 +62,30 @@ for i, var in enumerate(problem['names']):
                         iterations=replicates,
                         variable_parameters={var: samples},
                         fixed_parameters=model_params,
-                        model_reporters=model_reporters,
+                        model_reporters={'All_Data': lambda m: m.datacollector,
+                                         "QUIESCENT": lambda m: m.count_type_citizens("QUIESCENT"),
+                                         "ACTIVE": lambda m: m.count_type_citizens("ACTIVE"),
+                                         "JAILED": lambda m: m.count_type_citizens("JAILED"),
+                                         "OUTBREAKS": lambda m: m.outbreaks},  # attempt all
+                        # model_reporters=model_reporters,
                         display_progress=True)
 
     batch.run_all()
 
-    data[var] = batch.get_model_vars_dataframe()
+    batch_df = batch.get_model_vars_dataframe()
+    batch_df = batch_df.drop('All_Data', axis=1)
+
+    data[var] = batch_df
+    run_data[var] = batch.get_collector_model()
+    # data[var] = batch.get_model_vars_dataframe()
 
 
 with open(path, 'ab') as f:
     np.save(f, data)
+
+run_path = path+'_run'
+with open(run_path, 'ab') as f:
+    np.save(f, run_data)
 
 def plot_param_var_conf(ax, df, var, param, i):
     """
