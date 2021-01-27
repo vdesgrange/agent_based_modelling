@@ -6,12 +6,9 @@
   "agent_density": 0.7,
   "active_agent_density": 0.01,
   "cop_density": 0.04,
-  "agent_vision": 7,
-  "cop_vision": 7,
   "graph_type": "None",
   "inf_threshold": 10,
   "removal_step": 0,
-  "p": 0.1,
   "p_ws": 0.1,
   "directed": false
 }
