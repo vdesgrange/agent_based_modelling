@@ -2,21 +2,26 @@ import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
 
-from scipy import signal
 
-def load_datacollector():
-    file_paths = [
+THRESHOLD = 150
+file_paths = [
         # './archives/saved_data1611648500.npy'
         './archives/saved_data1611693859'
+        # './archives/saved_data1611747993_run'
     ]
+
+def load_datacollector():
+    data_dict = {}
 
     for path in file_paths:
         with open(path, 'rb+') as f:
+
             data = np.load(f, allow_pickle = True)[()]
-            print(data.keys(), '\n')
-            thresh_data = data['active_threshold_t']
-            print(thresh_data)
-    return thresh_data
+            keys = data.keys()
+            print('Keys of this dict: ', keys, '\n')
+            data_dict[path] = data
+    
+    return data_dict
 
 def show_active(data):
     actives = np.array(data['inf_threshold'])
@@ -60,9 +65,16 @@ def save_csv(df):
     path = 'archives/temp.csv'
     df.to_csv(path)
 
+
 thresh_data = load_datacollector()
 print('Thresh: ', thresh_data)
 save_csv(thresh_data)
+
+model_data = load_datacollector()
+
+for d in model_data:
+    print(model_data[d]['active_threshold_t'])
+
 
 test_data = np.array([10, 20, 30, 80, 201, 75, 100, 120, 220, 201, 190, 100, 80])
 peaks, sizes = get_outbreaks(test_data, 100)
