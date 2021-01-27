@@ -1,15 +1,21 @@
 {
   "width": 40,
   "height": 40,
+<<<<<<< HEAD
   "max_iter": 5,
   "max_jail_term": 30,
+=======
+  "max_iter": 200,
+>>>>>>> 525aa57de366507f2baf00c453845aef75168908
   "k": 2.3,
-  "agent_density": 0.69,
+  "agent_density": 0.7,
   "active_agent_density": 0.01,
   "cop_density": 0.04,
   "agent_vision": 7,
   "cop_vision": 7,
-  "initial_legitimacy_l0": 0.82,
+  "graph_type": "None",
+  "inf_threshold": 10,
+  "removal_step": 0,
   "p": 0.1,
   "p_ws": 0.1,
   "directed": false
