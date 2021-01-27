@@ -2,6 +2,15 @@ import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
 
+'''
+README:
+To run this script, please follow the following steps:
+    1. Adjust the following constants such that they correspond to those in the SA.py file. 
+    2. Run the SA.py script. 
+    3. Add the paths to the output files from the SA.py to the file_paths list (line36).
+    4. Run the SA_work.py script. 
+'''
+
 
 THRESHOLD   = 150
 ITERATIONS  =  10
@@ -24,10 +33,8 @@ BOUNDS = [[0, 1], [0, 1], [0, 100]]
 #####################
 
 
-
 file_paths = [
-        # './archives/saved_data1611648500.npy'
-        './archives/saved_data1611693859'
+        './archives/saved_data1611693859',
         './archives/saved_data1611747993_run'
     ]
 
@@ -48,7 +55,7 @@ def load_datacollector():
 
 def map_keys():
     """
-    Maps the used parameter bounds to key values for data dictionary.
+    Maps the used parameter bounds to key values for the data dictionary.
     """
     keys_dict = {}
     iter_list = np.arange(ITERATIONS*STEPS).reshape((STEPS, ITERATIONS))
@@ -64,24 +71,29 @@ def map_keys():
 
 def get_param_means(data, parameter):
     """
-    
+    For a provided parameter, calculates the determined output values for every parameter/iteration
+    configuration.
+
+    Returns a dataframe with the output type as column names. Every row contains the mean values of 
+    the set amount of iterations for every parameter configuration.
     """
+    # Initialize outputs
     output = np.zeros((STEPS, N_OUTPUT))
     peak_heights = []
     peak_widths = []
     keys = keys_dict[parameter]
     # print('KEYS: ', keys)
 
+    # Divide the key list in the different step sizes of the parameter.
     for i in range(STEPS):
         s_keys = keys[i*ITERATIONS : (i+1)*ITERATIONS]
-        # print('s_keys: ', s_keys)
-    
+        # Every key is an iteration
         for key in s_keys:
             actives = data[parameter][key]['ACTIVE']
             ph, pw = get_outbreaks(actives, THRESHOLD)
             peak_heights.extend(ph)
             peak_widths.extend(pw)
-            # print(key, ' success')
+        # Output calculation
         mean_n_peaks = len(peak_heights)/ITERATIONS
         mean_peak_height = np.mean(np.array(peak_heights))
         mean_peak_width = np.mean(peak_widths)
@@ -98,8 +110,8 @@ def get_param_means(data, parameter):
     df = pd.DataFrame({'PARAM_VAL': output[:, 0], 'MEAN_N': output[:, 1], 
         'MEAN_PEAK_HEIGHT': output[:, 2], 'MEAN_OUTBREAK_DURATION': output[:, 3], 
         'MAX_PEAK_HEIGHT': output[:, 4], 'MAX_OUTBREAK_DURATION': output[:, 5]})
-    return df
-    # return output, df
+    
+    return df # Can also return 'output' if the data is wanted in array form.
 
 def get_outbreaks(data, threshold):
     """
@@ -135,11 +147,14 @@ def get_outbreaks(data, threshold):
     return outbreak_peaks, outbreak_widths
 
 def save_csv(name, df):
-
+    """
+    Save an output dataframe as a CSV file in the archives folder.
+    """
     path = 'archives/'+name+'_out.csv'
     df.to_csv(path)
 
 
+# Run the script
 model_data = load_datacollector()
 run_data = model_data['./archives/saved_data1611747993_run']
 keys_dict = map_keys()
@@ -150,13 +165,6 @@ for param in run_data.keys():
 
 
 for df in output_data:
-    print('Tested parameter: ', df)
-    print(output_data[df])
-    save_cdv(str(df), output_data[df])
-
-# # print(model_data['./archives/saved_data1611693859']['active_threshold_t'])
-# for d in model_data:
-#     print(model_data[d]['active_threshold_t'].keys())
-
-# test_data = np.array([10, 20, 30, 80, 201, 75, 100, 120, 220, 201, 190, 100, 80])
-# peaks, sizes = get_outbreaks(test_data, 100)
+    print('Tested parameter: ', df) # Output feedback
+    print(output_data[df])          # Output feedback
+    save_csv(str(df), output_data[df])
