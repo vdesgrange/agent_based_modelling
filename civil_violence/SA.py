@@ -114,14 +114,14 @@ def load_ofat_archive():
     }
 
     file_path = [
-        './archives/saved_data_1611772209.npy',
+        './archives/saved_data_1611773618.npy',
     ]
     for path in file_path:
         with open(path, 'rb') as f:
             data = np.load(f, allow_pickle=True)[()]
 
-    pprint(data['active_threshold_t'])
-    for param in ("OUTBREAKS", "ACTIVE", "JAILED"):
+
+    for param in ("OUTBREAKS", "ACTIVE", "QUIESCENT", "JAILED", "INFLUENCERS", "LEGITIMACY"):
         plot_all_vars(problem, data, param)
         plt.show()
 
@@ -138,11 +138,11 @@ def ofat_main():
     }
 
     data, run_data = sensitive_analysis_no_network(problem)
-    for param in ("OUTBREAKS", "ACTIVE"):
+    for param in ("OUTBREAKS", "ACTIVE", "QUIESCENT", "JAILED", "INFLUENCERS", "LEGITIMACY"):
         plot_all_vars(problem, data, param)
-        plt.show()
+        plt.savefig('{:s}.png', param)
 
 
 if __name__ == '__main__':
-    ofat_main()
-    # load_ofat_archive()
+    # ofat_main()
+    load_ofat_archive()
