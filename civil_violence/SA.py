@@ -10,9 +10,9 @@ from pprint import pprint
 
 def sensitive_analysis_no_network(problem):
     path = 'archives/saved_data_{0}.npy'.format(int(time.time()))
-    replicates = 2
-    max_steps = 2
-    distinct_samples = 2
+    replicates = 10
+    max_steps = 200
+    distinct_samples = 20
     data = {}
     run_data = {}
 
