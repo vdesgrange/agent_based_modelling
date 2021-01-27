@@ -5,7 +5,7 @@ from mesa.datacollection import DataCollector
 import matplotlib.pyplot as plt
 
 from civil_violence_agents import Citizen, Cop
-from constants import State
+from cv_constants import State
 from graph_utils import generate_network, print_network
 
 from figure import create_fig

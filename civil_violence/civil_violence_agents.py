@@ -2,7 +2,7 @@ import random
 import math
 from mesa import Agent
 
-from constants import State, HardshipConst
+from cv_constants import State, HardshipConst
 
 
 class Citizen(Agent):

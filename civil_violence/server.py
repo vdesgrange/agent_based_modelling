@@ -6,7 +6,7 @@ from mesa.visualization.modules import CanvasGrid, ChartModule, PieChartModule
 from graph_utils import NetworkModuleExtended  # For NetworkGrid visualization
 from civil_violence_model import CivilViolenceModel
 from graphics_portrayal import get_agent_portrayal, get_network_portrayal, get_grievance_portrayal
-from constants import GRID_WIDTH, GRID_HEIGHT, GraphType, Color
+from cv_constants import GRID_WIDTH, GRID_HEIGHT, GraphType, Color
 from utils import read_configuration
 
 

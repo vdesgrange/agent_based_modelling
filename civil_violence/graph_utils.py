@@ -1,7 +1,7 @@
 import networkx as nx
 from mesa.visualization.modules import NetworkModule
 
-from constants import GraphType
+from cv_constants import GraphType
 
 
 class NetworkModuleExtended(NetworkModule):
