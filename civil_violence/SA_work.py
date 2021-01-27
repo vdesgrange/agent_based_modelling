@@ -55,9 +55,14 @@ def get_outbreaks(data, threshold):
 
     return outbreak_peaks, outbreak_widths
 
+def save_csv(df):
+
+    path = 'archives/temp.csv'
+    df.to_csv(path)
 
 thresh_data = load_datacollector()
 print('Thresh: ', thresh_data)
+save_csv(thresh_data)
 
 test_data = np.array([10, 20, 30, 80, 201, 75, 100, 120, 220, 201, 190, 100, 80])
 peaks, sizes = get_outbreaks(test_data, 100)
