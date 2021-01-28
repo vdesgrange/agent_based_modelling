@@ -1,7 +1,6 @@
 {
   "width": 40,
   "height": 40,
-  "max_iter": 5,
   "k": 2.3,
   "agent_density": 0.7,
   "active_agent_density": 0.01,
@@ -9,5 +8,11 @@
   "inf_threshold": 10,
   "removal_step": 0,
   "p_ws": 0.1,
-  "directed": false
+  "directed": false,
+  "agent_vision": 7,
+  "cop_vision":7,
+  "p":0.1,
+  "max_jail_term": 30,
+  "active_threshold_t": 0.1,
+  "initial_legitimacy_l0":0.82
 }
