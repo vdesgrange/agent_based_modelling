@@ -68,15 +68,15 @@ def sobol_plot_main():
     Si_outbreaks = sobol.analyze(problem, Y, print_to_console=False)
     Si = Si_outbreaks
 
-    plot_index(Si, problem['names'], '1', 'First order sensitivity')
-    plt.show()
-
-    # Second order
-    plot_index(Si, problem['names'], '2', 'Second order sensitivity')
-    plt.show()
+    # plot_index(Si, problem['names'], '1', 'First order sensitivity')
+    # plt.show()
+    #
+    # # Second order
+    # plot_index(Si, problem['names'], '2', 'Second order sensitivity')
+    # plt.show()
 
     # Total order
-    plot_index(Si, problem['names'], 'T', 'Total order sensitivity')
+    plot_index(Si, ['Active threshold', 'Initial legitimacy', 'Max jail term'], 'T', 'Total order sensitivity')
     plt.show()
 
 
