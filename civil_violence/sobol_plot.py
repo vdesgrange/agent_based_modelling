@@ -42,28 +42,30 @@ def plot_index(s, params, i, title=''):
 
 def sobol_plot_main():
     problem = {
-        'num_vars': 5,
-        'names': ['active_threshold_t', 'initial_legitimacy_l0',
-                  'max_jail_term', 'agent_vision', 'cop_vision'],
-        'bounds': [[0.01, 1], [0.01, 1], [1, 100], [1, 20], [1, 20]]
+        'num_vars': 3,
+        'names': ['active_threshold_t', 'initial_legitimacy_l0', 'max_jail_term'],
+        'bounds': [[0.01, 1], [0.01, 1], [1, 100]]
     }
 
     file_path = [
-        # './archives/saved_data_Sobol1611686089.npy',
-        './archives/saved_data_sobol_1611799445.npy',
+        # './archives/saved_data_sobol_1611799908.npy',
+        './archives/saved_data_sobol_no_network_1611861983.npy',
     ]
 
     for path in file_path:
         with open(path, 'rb') as f:
             data = np.load(f, allow_pickle=True)[()]
 
-    data = pd.DataFrame(data, columns = ['active_threshold_t', 'initial_legitimacy_l0',
-                                         'max_jail_term', 'agent_vision',
-                                         'cop_vision', 'Run',
-                                         'QUIESCENT', 'ACTIVE',
-                                         'JAILED', 'OUTBREAKS', 'LEGITIMACY'])
+    data = pd.DataFrame(data, columns = ['active_threshold_t', 'initial_legitimacy_l0', 'max_jail_term', 'Run',
+                                         'QUIESCENT', 'ACTIVE', 'JAILED', 'OUTBREAKS', 'LEGITIMACY'])
+    Y = data['OUTBREAKS'].values
 
-    Si_outbreaks = sobol.analyze(problem, data['OUTBREAKS'].values, print_to_console=False)
+    # loaded_data = pd.DataFrame(data, columns=['active_threshold_t', 'initial_legitimacy_l0', 'max_jail_term', 'Run',
+    #                                             'QUIESCENT', 'ACTIVE', 'JAILED', 'OUTBREAKS', 'LEGITIMACY'])
+    # loaded_data = loaded_data.drop(loaded_data.index[2992:])
+    # Y = loaded_data['OUTBREAKS'].values
+
+    Si_outbreaks = sobol.analyze(problem, Y, print_to_console=False)
     Si = Si_outbreaks
 
     plot_index(Si, problem['names'], '1', 'First order sensitivity')
