@@ -7,14 +7,14 @@ import matplotlib.pyplot as plt
 problem = {
     'num_vars': 6,
     'names': ['active_threshold_t', 'initial_legitimacy_l0',
-              'max_jail_term', 'p', 'agent_vision', 'cop_vision'],
+              'max_jail_term', 'agent_vision', 'cop_vision'],
     'bounds': [[0, 1], [0, 1], [0, 100], [0.01, 0.5], [4, 8], [4, 8]]
 }
 
 def load_plot_archive():
     file_path = [
         # './archives/saved_data1611750187.npy',
-        './archives/saved_data1611757193',
+        './archives/saved_data_local_SA.npy',
     ]
 
     # print(dir(data))
@@ -26,6 +26,9 @@ def load_plot_archive():
     print(data.keys())
     param ='OUTBREAKS'
     plot_all_vars(data, param)
+    # if param == "OUTBREAKS":
+    #     ylabel = "Number of outbreaks"
+    # # plt.ylabel(ylabel, loc='top')
     plt.show()
 
     # for param in ('OUTBREAKS', "ACTIVE"):
@@ -55,8 +58,24 @@ def plot_param_var_conf(ax, df, var, param, i):
     ax.plot(x, y, c='k')
     ax.fill_between(x, y - err, y + err)
 
-    ax.set_xlabel(var)
-    ax.set_ylabel(param)
+    if var == 'active_threshold_t':
+        xlabel = "Active threshold"
+    if var == 'initial_legitimacy_l0':
+        xlabel = "Initial legitimacy"
+    if var == 'max_jail_term':
+        xlabel = "Max jail term"
+    if var == 'agent_vision':
+        xlabel = "Citizen vision"
+    if var == 'cop_vision':
+        xlabel = "Cop vision"
+
+    if param == "OUTBREAKS":
+        ylabel = "Number of outbreaks"
+
+    ax.tick_params(axis='both', which='major', labelsize=6)
+    ax.set_xlabel(xlabel, size = 7)
+    if i ==2:
+        ax.set_ylabel(ylabel, size = 9)
 
 
 def plot_all_vars(df, param):
@@ -68,9 +87,13 @@ def plot_all_vars(df, param):
         param: the parameter to be plotted
     """
 
-    f, axs = plt.subplots(6, figsize=(3, 5))
+    f, axs = plt.subplots(5, figsize=(3, 5))
 
-    for i, var in enumerate(problem['names']):
+    # ['active_threshold_t', 'initial_legitimacy_l0',
+     # 'max_jail_term', 'agent_vision', 'cop_vision']
+
+    for i, var in enumerate(['active_threshold_t', 'initial_legitimacy_l0',
+                             'max_jail_term', 'agent_vision', 'cop_vision']):
         plot_param_var_conf(axs[i], df[var], var, param, i)
 
 
