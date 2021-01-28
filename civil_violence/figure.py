@@ -18,6 +18,44 @@ def create_fig(data, draw=False):
     else:
         pass
 
+def run_analysis(df, draw=False):
+
+    df.reset_index(inplace=True)
+    print(df)
+    df = df.drop(df[df['State'] == 'State.COP'].index)
+    
+    fig, axs = plt.subplots(3,2)
+    ax = axs.flatten()
+
+    # Draw grievance figure
+    df_griev = df[['Step', 'Grievance']].groupby('Step').mean()
+    df_griev.plot(ax=ax[0])
+
+    # Draw hardship
+    df_hard = df[['Step', 'Hardship']].groupby('Step').mean()
+    df_hard.plot(ax=ax[1])
+
+    # Draw State
+    df_state = pd.pivot_table(df, values='Legitimacy', index='Step', columns=['State'], aggfunc='count')
+    df_state = df_state.fillna(0)
+    df_state.plot(ax=ax[2])
+    print(df_state)
+
+    # Draw legitimicy
+    df_leg = df[['Step', 'Legitimacy']].groupby('Step').mean()
+    df_leg.plot(ax=ax[3])
+    
+    # Draw Influencer
+    df_infl = pd.pivot_table(df, values='Legitimacy', index='Step', columns=['Influencer'], aggfunc='count')
+    df_infl.plot(ax=ax[4])
+
+    # Draw connections
+    df['N_connections'] = [len(_) for _ in df['N_connections']]
+    df_conn = df.loc[df['Step'] == 1] 
+    sns.distplot(df['N_connections'], kde=True, ax=ax[5])
+
+    plt.savefig('mypng.png')
+
 
 def draw_multiple_graphs(num_nodes=100, p=0.2, p_ws=0.1, seed=None):
 
