@@ -67,7 +67,7 @@ class Citizen(Agent):
         self.network_neighbors = []
 
         self.jailable = jailable
-        self.influencer = influencer
+        self.influencer = False
 
         self.neighbors = []  # Neighbors in MultiGrid space
         self.empty_cells = []  # Empty cells around the agent in MultiGrid space
