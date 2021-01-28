@@ -12,7 +12,7 @@ To run this script, please follow the following steps:
 '''
 
 
-THRESHOLD   = 150
+THRESHOLD   =  50
 ITERATIONS  =  10
 STEPS       =  20
 N_PARAMS    =   6
@@ -25,17 +25,19 @@ OUTPUT_PARAMS = ['PARAM_VAL', 'MEAN_N', 'MEAN_PEAK_HEIGHT', 'MEAN_PEAK_WIDTH',
                 'MAX_PEAK_HEIGHT', 'MAX_PEAK_WIDTH']
 
 ### TEST SETTINGS ###
-ITERATIONS = 2
-STEPS = 2
-PARAMS = ['active_threshold_t', 'initial_legitimacy_l0','max_jail_term']
-BOUNDS = [[0, 1], [0, 1], [0, 100]]
+# ITERATIONS = 2
+# STEPS = 2
+# PARAMS = ['active_threshold_t', 'initial_legitimacy_l0','max_jail_term']
+# BOUNDS = [[0, 1], [0, 1], [0, 100]]
 
 #####################
 
 
 file_paths = [
-        './archives/saved_data1611693859',
-        './archives/saved_data1611747993_run'
+        # './archives/saved_data1611693859',
+        # './archives/saved_data1611747993_run'
+        './archives/saved_data_1611773618.npy',
+        './archives/saved_data_1611773618_run.npy'
     ]
 
 def load_datacollector():
@@ -58,13 +60,18 @@ def map_keys():
     Maps the used parameter bounds to key values for the data dictionary.
     """
     keys_dict = {}
-    iter_list = np.arange(ITERATIONS*STEPS).reshape((STEPS, ITERATIONS))
+    # iter_list = np.arange(ITERATIONS*STEPS).reshape((STEPS, ITERATIONS))
+    iter_list = np.arange(ITERATIONS)
     for i in range(len(PARAMS)):
         param_list = []
-        param_range = np.linspace(BOUNDS[i][0], BOUNDS[i][1], STEPS).reshape(STEPS, 1)
+        if PARAMS[i] == 'max_jail_term':
+            param_range = np.linspace(BOUNDS[i][0], BOUNDS[i][1], STEPS, dtype=np.int32).reshape(STEPS, 1)
+        else:
+            param_range = np.linspace(BOUNDS[i][0], BOUNDS[i][1], STEPS).reshape(STEPS, 1)
         param_matrix = np.repeat(param_range, ITERATIONS, axis=1)
         for j in range(STEPS):
-            param_list.extend(list(zip(param_matrix[j], iter_list[j])))
+            # param_list.extend(list(zip(param_matrix[j], iter_list[j])))
+            param_list.extend(list(zip(param_matrix[j], iter_list)))
         keys_dict[PARAMS[i]] = param_list
 
     return keys_dict
@@ -79,21 +86,25 @@ def get_param_means(data, parameter):
     """
     # Initialize outputs
     output = np.zeros((STEPS, N_OUTPUT))
-    peak_heights = []
-    peak_widths = []
+    
     keys = keys_dict[parameter]
     # print('KEYS: ', keys)
 
     # Divide the key list in the different step sizes of the parameter.
     for i in range(STEPS):
+        peak_heights = []
+        peak_widths = []
         s_keys = keys[i*ITERATIONS : (i+1)*ITERATIONS]
         # Every key is an iteration
         for key in s_keys:
+            # print(s_keys)
+            # print(data[parameter].keys())
             actives = data[parameter][key]['ACTIVE']
             ph, pw = get_outbreaks(actives, THRESHOLD)
             peak_heights.extend(ph)
             peak_widths.extend(pw)
         # Output calculation
+            # print(parameter, key, peak_heights)
         mean_n_peaks = len(peak_heights)/ITERATIONS
         mean_peak_height = np.mean(np.array(peak_heights))
         mean_peak_width = np.mean(peak_widths)
@@ -125,6 +136,7 @@ def get_outbreaks(data, threshold):
     outbreak_widths = []
     counting = False
     current_peak = 0
+    start = 0
 
     for i in range(len(data)):
 
@@ -144,7 +156,31 @@ def get_outbreaks(data, threshold):
             current_peak = 0
             counting = False
 
+    # Capture cases where timeline ends in an outbreak.
+    # Obviously skewers data, but preferable over 0 or infinite outbreaks.
+    if not outbreak_peaks and counting:
+        outbreak_peaks.append(current_peak)
+        outbreak_widths.append(len(data))
+    elif outbreak_peaks and counting:
+        outbreak_peaks.append(current_peak)
+        outbreak_widths.append(len(data)-start)
+    elif not outbreak_peaks and not counting:
+        outbreak_peaks.append(0)
+        outbreak_widths.append(0)
+
     return outbreak_peaks, outbreak_widths
+
+def fix_keys(dictionary):
+    new_dictionary = {}
+    for k in dictionary:
+        if dictionary == 'max_jail_term':
+            new_k = (int(k[0]), k[-1])
+        else:
+            new_k = (k[0], k[-1])
+        # print('NEW KEY WHO DIS? ', new_k)
+        new_dictionary[new_k] = dictionary[k]
+    return new_dictionary
+
 
 def save_csv(name, df):
     """
@@ -156,11 +192,28 @@ def save_csv(name, df):
 
 # Run the script
 model_data = load_datacollector()
-run_data = model_data['./archives/saved_data1611747993_run']
+run_data = model_data['./archives/saved_data_1611773618_run.npy']
+
+print(run_data['max_jail_term'].keys())
+for dic in run_data:
+    run_data[dic] = fix_keys(run_data[dic])
+
+print(run_data['max_jail_term'].keys())
+
+# for key in run_data['active_threshold_t'].keys():
+#     print('MONKEY', key)
+
+# run_data['active_threshold_t'] = fix_keys(run_data['active_threshold_t'])
+
+# for key in run_data['active_threshold_t'].keys():
+#     print('MONKEY', key)    
+
 keys_dict = map_keys()
+# print(keys_dict['active_threshold_t'])
 output_data = {}
 
 for param in run_data.keys():
+    print('current param ', param)
     output_data[param] = get_param_means(run_data, param)
 
 
