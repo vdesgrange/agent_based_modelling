@@ -16,13 +16,14 @@ from figure import create_fig, run_analysis
 class CivilViolenceModel(Model):
     """ Civil violence model class """
     def __init__(self,
-                 height, width,
-                 agent_density, agent_vision,
-                 active_agent_density,
-                 cop_density, cop_vision, inf_threshold,
-                 removal_step, max_iter,
-                 k, graph_type,
-                 p, p_ws, directed,
+                 max_iter=200,
+                 height=40, width=40,
+                 agent_density=0.7, agent_vision=7,
+                 active_agent_density=0.01,
+                 cop_density=0.04, cop_vision=7, inf_threshold=10,
+                 removal_step=0,
+                 k=2.3, graph_type="None",
+                 p=0.1, p_ws=0.1, directed=False,
                  max_jail_term=30, active_threshold_t=0.1,
                  initial_legitimacy_l0=0.82,
                  movement=True, seed=None):
@@ -179,10 +180,10 @@ class CivilViolenceModel(Model):
 
         # Count amount of outbreaks
         # print(self.count_type_citizens("ACTIVE"))
-        if self.count_type_citizens("ACTIVE") > 200 and self.outbreak_now == 0:
+        if self.count_type_citizens("ACTIVE") > 50 and self.outbreak_now == 0:
             self.outbreaks += 1
             self.outbreak_now = 1
-        if self.count_type_citizens("ACTIVE") < 200:
+        if self.count_type_citizens("ACTIVE") < 50:
             self.outbreak_now = 0
 
         # print('legitimacy:', self.legitimacy)
