@@ -102,7 +102,7 @@ class CivilViolenceModel(Model):
         self.outbreak_now = 0
 
         date = datetime.now()
-        self.path = f'output/{date.month}_{date.day}_{date.hour}_{date.second}_'
+        self.path = f'output/{self.graph_type}_{date.month}_{date.day}_{date.hour}_{date.minute}_'
 
         # === Set Data collection ===
         self.datacollector = DataCollector(
@@ -190,11 +190,11 @@ class CivilViolenceModel(Model):
 
         # Save initial values
         if self.iteration == 1:
-            self.save_initial_values(save=False)
+            self.save_initial_values(save=True)
 
         # Stop the model after a certain amount of iterations.
         if self.iteration > self.max_iter:
-            self.save_data(save=False)
+            self.save_data(save=True)
             self.running = False
 
         # Remove influencer after certain amount of iterations.
@@ -271,7 +271,8 @@ class CivilViolenceModel(Model):
                 "State": lambda a: getattr(a, 'state', None),
                 "Legitimacy": lambda m: self.legitimacy,
                 "Influencer": lambda a: getattr(a, 'influencer', None),
-                "N_connections": lambda a: getattr(a, 'network_neighbors', None)}
+                "N_connections": lambda a: getattr(a, 'network_neighbors', None),
+                "InfluencePi": lambda a: getattr(a, 'influence', None)}
 
     def count_type_citizens(self, state_req):
         """
