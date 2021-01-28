@@ -42,7 +42,7 @@ def get_user_model_parameters():
                                                 description="Iteration at which a random influencer is removed from the model."),
         # "removal_step": UserSettableParameter("choice", "Removel of influencers", value=False,
         #                                       choices=[False, True]),
-        "graph_type": UserSettableParameter("choice", "GraphType",  value=GraphType.ERDOS_RENYI.name,
+        "graph_type": UserSettableParameter("choice", "GraphType",  value=GraphType.BARABASI_ALBERT.name,
                                               choices=["NONE", GraphType.ERDOS_RENYI.name, GraphType.BARABASI_ALBERT.name, GraphType.WATTS_STROGATZ.name])
     }
 
@@ -121,7 +121,7 @@ def run(configuration, seed=None):
 
     server = ModularServer(
         CivilViolenceModel,
-        get_visualization_elements(model_params, show_network=False),
+        get_visualization_elements(model_params, show_network=True),
         name="Civil violence with network model",
         model_params=model_params
     )
