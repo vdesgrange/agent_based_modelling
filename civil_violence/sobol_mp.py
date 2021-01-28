@@ -36,13 +36,21 @@ def sobol_analysis_no_network(problem):
     pool = Pool(available_processors)
 
     run_iter_args = enumerate([[max_steps, model_reporters, list(v)] for _ in range(replicates) for v in param_values])
-    print("Starting ...")
+    print("Number steps is {}. Starting ...".format(len(param_values) * replicates))
+
     with tqdm((len(param_values) * (replicates)), disable=False) as pbar:
         for count, vals, iteration_data in pool.imap_unordered(_mp_function, run_iter_args):
             data.iloc[count, 0:3] = vals
             data.loc[count, column_order] = iteration_data.loc[0, column_order]
             print(f'{count / (len(param_values) * (replicates)) * 100:.2f}% done')
-            pbar.update()
+
+            if count % 200 == 0:
+                path = 'archives/progress_data_sobol_{0}.npy'.format(int(time.time()))
+                with open(path, 'ab') as f:
+                    np.save(f, data)
+                    print("Progress saved in the file {:s}".format(path))
+
+    pbar.update()
 
     # Close multi-processing
     pool.close()
