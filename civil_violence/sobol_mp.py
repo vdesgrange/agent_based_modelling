@@ -45,16 +45,17 @@ def sobol_analysis_no_network(problem):
             print(f'{count / (len(param_values) * (replicates)) * 100:.2f}% done')
 
             if count % 200 == 0:
-                path = 'archives/progress_data_sobol_{0}.npy'.format(int(time.time()))
-                with open(path, 'ab') as f:
+                path_tmp = 'archives/progress_data_sobol_{0}.npy'.format(int(time.time()))
+                with open(path_tmp, 'ab') as f:
                     np.save(f, data)
-                    print("Progress saved in the file {:s}".format(path))
+                    print("Progress saved in the file {:s}".format(path_tmp))
 
     pbar.update()
 
     # Close multi-processing
     pool.close()
 
+    path = 'archives/saved_data_sobol_{0}.npy'.format(int(time.time()))
     with open(path, 'ab') as f:
         np.save(f, data)
         print("Results saved in file {:s}".format(path))
