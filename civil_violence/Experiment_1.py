@@ -1,5 +1,5 @@
 from mesa.batchrunner import BatchRunner
-from SALib.analyze import sobol
+# from SALib.analyze import sobol
 import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
@@ -11,7 +11,7 @@ from civil_violence_model import CivilViolenceModel
 from utils import read_configuration
 
 # network_types = [GraphType.ERDOS_RENYI.name, GraphType.BARABASI_ALBERT.name, GraphType.WATTS_STROGATZ.name]
-graph_type=GraphType.ERDOS_RENYI.name
+graph_type="None"
 path = 'archives/saved_data_experiment_1_{0}{1}'.format(int(time.time()), graph_type)
 
 replicates = 40
@@ -29,7 +29,7 @@ configuration = read_configuration()
 model_params = {}
 model_params.update(configuration)  # Overwritten user parameters don't appear in the graphic interface
 model_params.update({'seed': None})
-model_params['graph_type']=GraphType.ERDOS_RENYI.name
+model_params['graph_type']=graph_type
 model_params['max_iter']=max_steps
 print(model_params)
 
