@@ -16,11 +16,12 @@ from figure import create_fig, run_analysis
 class CivilViolenceModel(Model):
     """ Civil violence model class """
     def __init__(self,
+                 max_iter,
                  height=40, width=40,
                  agent_density=0.7, agent_vision=7,
                  active_agent_density=0.01,
                  cop_density=0.04, cop_vision=7, inf_threshold=10,
-                 removal_step=0, max_iter=200,
+                 removal_step=0,
                  k=2.3, graph_type="None",
                  p=0.1, p_ws=0.1, directed=False,
                  max_jail_term=30, active_threshold_t=0.1,
