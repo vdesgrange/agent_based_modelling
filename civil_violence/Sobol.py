@@ -42,7 +42,7 @@ def sobol_analysis_no_network(problem):
     with tqdm(replicates, disable=False) as pbar:
         for count, vals, iteration_data in pool.imap_unordered(_mp_function, run_iter_args):
             data.iloc[count, 0:5] = vals
-            data.loc[count, column_order] = iteration_data[column_order]
+            data.loc[count, column_order] = iteration_data.loc[0, column_order]
             pbar.update()
 
     # Close multi-processing

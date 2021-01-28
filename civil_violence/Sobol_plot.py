@@ -6,37 +6,6 @@ from itertools import combinations
 
 # from Sobol import problem
 
-problem = {
-    'num_vars':5,
-    'names': ['active_threshold_t', 'initial_legitimacy_l0',
-              'max_jail_term',
-              # 'p',
-              'agent_vision', 'cop_vision'
-              ],
-    'bounds': [[0.01, 1], [0.01, 1], [1, 100], [1, 20], [1, 20]]
-}
-
-
-file_path = [
-    # './archives/saved_data_Sobol1611686089.npy',
-    './archives/saved_data_Sobol1611777808.npy',
-]
-
-for path in file_path:
-    with open(path, 'rb') as f:
-        data = np.load(f, allow_pickle=True)[()]
-
-data = pd.DataFrame(data, columns = ['active_threshold_t', 'initial_legitimacy_l0',
-                                     'max_jail_term',
-                                     # 'p',
-                                     'agent_vision', 'cop_vision',
-                                     'Run', 'QUIESCENT',
-                                     'ACTIVE', 'JAILED', 'OUTBREAKS'])
-
-# print(data)
-
-Si_outbreaks = sobol.analyze(problem, data['OUTBREAKS'].values, print_to_console=False)
-
 def plot_index(s, params, i, title=''):
     """
     Creates a plot for Sobol sensitivity analysis that shows the contributions
@@ -70,14 +39,44 @@ def plot_index(s, params, i, title=''):
     plt.errorbar(indices, range(l), xerr=errors, linestyle='None', marker='o')
     plt.axvline(0, c='k')
 
-Si = Si_outbreaks
-plot_index(Si, problem['names'], '1', 'First order sensitivity')
-plt.show()
 
-# Second order
-plot_index(Si, problem['names'], '2', 'Second order sensitivity')
-plt.show()
+def sobol_plot_main():
+    problem = {
+        'num_vars': 5,
+        'names': ['active_threshold_t', 'initial_legitimacy_l0',
+                  'max_jail_term', 'agent_vision', 'cop_vision'],
+        'bounds': [[0.01, 1], [0.01, 1], [1, 100], [1, 20], [1, 20]]
+    }
 
-# Total order
-plot_index(Si, problem['names'], 'T', 'Total order sensitivity')
-plt.show()
+    file_path = [
+        # './archives/saved_data_Sobol1611686089.npy',
+        './archives/saved_data_sobol_1611799445.npy',
+    ]
+
+    for path in file_path:
+        with open(path, 'rb') as f:
+            data = np.load(f, allow_pickle=True)[()]
+
+    data = pd.DataFrame(data, columns = ['active_threshold_t', 'initial_legitimacy_l0',
+                                         'max_jail_term', 'agent_vision',
+                                         'cop_vision', 'Run',
+                                         'QUIESCENT', 'ACTIVE',
+                                         'JAILED', 'OUTBREAKS', 'LEGITIMACY'])
+
+    Si_outbreaks = sobol.analyze(problem, data['OUTBREAKS'].values, print_to_console=False)
+    Si = Si_outbreaks
+
+    plot_index(Si, problem['names'], '1', 'First order sensitivity')
+    plt.show()
+
+    # Second order
+    plot_index(Si, problem['names'], '2', 'Second order sensitivity')
+    plt.show()
+
+    # Total order
+    plot_index(Si, problem['names'], 'T', 'Total order sensitivity')
+    plt.show()
+
+
+if __name__ == '__main__':
+    sobol_plot_main()
