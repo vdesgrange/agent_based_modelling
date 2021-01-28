@@ -10,9 +10,9 @@ from utils import *
 
 
 def sobol_analysis_no_network(problem):
-    replicates = 2
-    max_steps = 2
-    distinct_samples = 2
+    replicates = 4
+    max_steps = 150
+    distinct_samples = 100
 
     path = 'archives/saved_data_sobol_{0}.npy'.format(int(time.time()))
 
@@ -25,22 +25,23 @@ def sobol_analysis_no_network(problem):
     # We get all our samples here
     param_values = saltelli.sample(problem, distinct_samples)
     data = pd.DataFrame(index=range(replicates*len(param_values)),
-                        columns=['active_threshold_t', 'initial_legitimacy_l0',
-                                 'max_jail_term', 'agent_vision', 'cop_vision'])
+                        columns=['active_threshold_t', 'initial_legitimacy_l0', 'max_jail_term'])
 
     data['Run'], data['QUIESCENT'], data['ACTIVE'], data['JAILED'], data['OUTBREAKS'], data['LEGITIMACY'] = \
         None, None, None, None, None, None
 
     column_order = ['Run', 'QUIESCENT', 'ACTIVE', 'JAILED', 'OUTBREAKS', 'LEGITIMACY']
     available_processors = cpu_count()
+    print("Sobol MP will use {} processors.".format(available_processors))
     pool = Pool(available_processors)
 
     run_iter_args = enumerate([[max_steps, model_reporters, list(v)] for _ in range(replicates) for v in param_values])
-
-    with tqdm(replicates, disable=False) as pbar:
+    print("Starting ...")
+    with tqdm((len(param_values) * (replicates)), disable=False) as pbar:
         for count, vals, iteration_data in pool.imap_unordered(_mp_function, run_iter_args):
-            data.iloc[count, 0:5] = vals
+            data.iloc[count, 0:3] = vals
             data.loc[count, column_order] = iteration_data.loc[0, column_order]
+            print(f'{count / (len(param_values) * (replicates)) * 100:.2f}% done')
             pbar.update()
 
     # Close multi-processing
@@ -61,11 +62,9 @@ def _mp_function(input):
     vals = iter_args[2]
 
     vals[2] = int(vals[2])
-    vals[3] = int(vals[3])
-    vals[4] = int(vals[4])
 
     variable_parameters = {}
-    names = ['active_threshold_t', 'initial_legitimacy_l0', 'max_jail_term', 'agent_vision', 'cop_vision']
+    names = ['active_threshold_t', 'initial_legitimacy_l0', 'max_jail_term']
     for name, val in zip(names, vals):
         variable_parameters[name] = val  # dictionary
 
@@ -83,9 +82,9 @@ def _mp_function(input):
 
 def sobol_main():
     problem = {
-        'num_vars': 5,
-        'names': ['active_threshold_t', 'initial_legitimacy_l0', 'max_jail_term', 'agent_vision', 'cop_vision'],
-        'bounds': [[0.01, 1], [0.01, 1], [1, 100], [1, 20], [1, 20]]
+        'num_vars': 3,
+        'names': ['active_threshold_t', 'initial_legitimacy_l0', 'max_jail_term'],
+        'bounds': [[0.01, 1], [0.01, 1], [1, 100]]
     }
 
     sobol_analysis_no_network(problem)
