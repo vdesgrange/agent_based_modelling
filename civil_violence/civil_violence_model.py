@@ -16,7 +16,7 @@ from figure import create_fig, run_analysis
 class CivilViolenceModel(Model):
     """ Civil violence model class """
     def __init__(self,
-                 max_iter,
+                 max_iter=200,
                  height=40, width=40,
                  agent_density=0.7, agent_vision=7,
                  active_agent_density=0.01,
