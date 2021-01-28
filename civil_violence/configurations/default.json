@@ -5,11 +5,6 @@
   "agent_density": 0.7,
   "active_agent_density": 0.01,
   "cop_density": 0.04,
-<<<<<<< HEAD
-  "agent_vision": 7,
-  "cop_vision": 7,
-=======
->>>>>>> 6a2a23069e31f69619f8ceefa1afc7c3e114a66b
   "inf_threshold": 10,
   "removal_step": 0,
   "p_ws": 0.1,
