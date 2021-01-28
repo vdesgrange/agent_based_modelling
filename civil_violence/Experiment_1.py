@@ -58,8 +58,3 @@ with open(path, 'ab') as f:
 run_path = path+'_run'
 with open(run_path, 'ab') as f:
     np.save(f, run_data)
-
-print(data)
-print(run_data)
-print(data.keys())
-print(data['max_iter'])
