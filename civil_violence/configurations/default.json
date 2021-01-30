@@ -7,7 +7,6 @@
   "active_agent_density": 0.01,
   "cop_density": 0.04,
   "inf_threshold": 150,
-  "removal_step": 0,
   "p_ws": 0.1,
   "directed": false,
   "agent_vision": 7,

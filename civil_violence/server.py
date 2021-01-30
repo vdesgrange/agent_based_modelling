@@ -38,10 +38,6 @@ def get_user_model_parameters():
                                                description="Maximum number of steps that jailed citizens stay in"),
         "inf_threshold": UserSettableParameter("slider", "Influencer threshold", 150, 0, 150, 
                                                 description="Amount of nodes that need to be connected to consider agents influencers."),
-        "removal_step": UserSettableParameter("slider", "Iteration of influencer removal", 0, 0, 100, step=5,
-                                                description="Iteration at which a random influencer is removed from the model."),
-        # "removal_step": UserSettableParameter("choice", "Removel of influencers", value=False,
-        #                                       choices=[False, True]),
         "graph_type": UserSettableParameter("choice", "GraphType",  value=GraphType.BARABASI_ALBERT.name,
                                               choices=["NONE", GraphType.ERDOS_RENYI.name, GraphType.BARABASI_ALBERT.name, GraphType.WATTS_STROGATZ.name])
     }
@@ -97,7 +93,6 @@ def run(configuration, seed=None):
     """
     to get results for multiple iterations, run underlying code and add this to default.json in configurations:  
     "inf_threshold": 50,
-    "removal_step": 50,
     "active_threshold_t": 0.5,
     "graph_type": "GraphType.ERDOS_RENYI.name" 
     """
@@ -121,7 +116,7 @@ def run(configuration, seed=None):
 
     server = ModularServer(
         CivilViolenceModel,
-        get_visualization_elements(model_params, show_network=True),
+        get_visualization_elements(model_params, show_network=False),
         name="Civil violence with network model",
         model_params=model_params
     )
