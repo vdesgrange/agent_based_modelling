@@ -1,6 +1,5 @@
 import numpy as np
 import pandas as pd
-import matplotlib.pyplot as plt
 
 '''
 README:
@@ -9,28 +8,22 @@ To run this script, please follow the following steps:
     2. Run the SA.py script. 
     3. Add the paths to the output files from the SA.py to the file_paths list (line27).
     4. Depending on if the output files is a Sensitivity Analysis (multiple dictionaries), 
-    	or a fixed run (single dictionary), several lines need to be commented in/out. 
-    	Lines: 55/56, 65/66, 
+    or a fixed run (single dictionary), several lines need to be commented in/out. 
     5. Run the SA_work.py script. 
 '''
 
+THRESHOLD = 50
+ITERATIONS = 10
+STEPS = 20
+N_PARAMS = 6
+N_OUTPUT = 6
 
-THRESHOLD   =  50
-ITERATIONS  =  10
-STEPS       =  20
-N_PARAMS    =   6
-N_OUTPUT    =   6
-
-PARAMS = ['active_threshold_t', 'initial_legitimacy_l0',
-              'max_jail_term', 'p', 'agent_vision', 'cop_vision']
+PARAMS = ['active_threshold_t', 'initial_legitimacy_l0', 'max_jail_term', 'p', 'agent_vision', 'cop_vision']
 BOUNDS = [[0.01, 1], [0.01, 1], [1, 100], [0.01, 0.4], [1, 20], [1, 20]]
-OUTPUT_PARAMS = ['PARAM_VAL', 'MEAN_N', 'MEAN_PEAK_HEIGHT', 'MEAN_PEAK_WIDTH', 
-                'MAX_PEAK_HEIGHT', 'MAX_PEAK_WIDTH']
+OUTPUT_PARAMS = ['PARAM_VAL', 'MEAN_N', 'MEAN_PEAK_HEIGHT', 'MEAN_PEAK_WIDTH', 'MAX_PEAK_HEIGHT', 'MAX_PEAK_WIDTH']
 
-file_paths = [
-        './archives/saved_data_1611773618.npy',
-        './archives/saved_data_1611773618_run.npy'
-    ]
+file_paths = ['./archives/saved_data_1611773618.npy', './archives/saved_data_1611773618_run.npy']
+
 
 def load_datacollector():
     """
@@ -46,6 +39,7 @@ def load_datacollector():
             data_dict[path] = data
     
     return data_dict
+
 
 def map_keys():
     """
@@ -68,6 +62,7 @@ def map_keys():
         keys_dict[PARAMS[i]] = param_list
 
     return keys_dict
+
 
 def get_param_means(data, parameter):
     """
@@ -103,11 +98,16 @@ def get_param_means(data, parameter):
 
         output[i] = [key[0], mean_n_peaks, mean_peak_height, mean_peak_width, max_peak_height, max_peak_width]
 
-    df = pd.DataFrame({'PARAM_VAL': output[:, 0], 'MEAN_N': output[:, 1], 
-        'MEAN_PEAK_HEIGHT': output[:, 2], 'MEAN_OUTBREAK_DURATION': output[:, 3], 
-        'MAX_PEAK_HEIGHT': output[:, 4], 'MAX_OUTBREAK_DURATION': output[:, 5]})
+    output_df = pd.DataFrame({
+        'PARAM_VAL': output[:, 0],
+        'MEAN_N': output[:, 1],
+        'MEAN_PEAK_HEIGHT': output[:, 2],
+        'MEAN_OUTBREAK_DURATION': output[:, 3],
+        'MAX_PEAK_HEIGHT': output[:, 4],
+        'MAX_OUTBREAK_DURATION': output[:, 5]})
     
-    return df # Can also return 'output' if the data is wanted in array form.
+    return output_df  # Can also return 'output' if the data is wanted in array form.
+
 
 def get_outbreaks(data, threshold):
     """
@@ -142,11 +142,11 @@ def get_outbreaks(data, threshold):
             outbreak_widths.append(i-start)
             current_peak = 0
             counting = False
-	
-	if not outbreak_peaks and not counting: # Captures data without outbreaks, empty list break further calculations.
+
+    if not outbreak_peaks and not counting: # Captures data without outbreaks, empty list break further calculations.
         outbreak_peaks.append(0)
         outbreak_widths.append(0)
-	
+
     # Capture cases where timeline ends in an outbreak.
     # Uncomment if final outbreak needs to be included in calculation.
     # Obviously skewers data, but might be preferable over 0 or infinite outbreaks.
@@ -160,13 +160,13 @@ def get_outbreaks(data, threshold):
  
     return outbreak_peaks, outbreak_widths
 
+
 def fix_keys(dictionary):
-	"""
-	This function trims the dictionary keys from ([all parameters], iteration)
-	to a more manageable ('changed parameter', iteration) format.
-	
-	Like in the SA.py file, the 'max_jail_term'-parameter steps are casted to int.
-	"""
+    """
+    This function trims the dictionary keys from ([all parameters], iteration) to a more manageable
+    ('changed parameter', iteration) format.
+    Like in the SA.py file, the 'max_jail_term'-parameter steps are casted to int.
+    """
     new_dictionary = {}
     for k in dictionary:
         if dictionary == 'max_jail_term':
@@ -185,19 +185,20 @@ def save_csv(name, df):
     df.to_csv(path)
 
 
-# Run the script
-model_data = load_datacollector()
-run_data = model_data[file_paths[1]] # Step-wise DataCollector is only captured in the *_run.npy files.
+if __name__ == '__main__':
+    # Run the script
+    model_data = load_datacollector()
+    run_data = model_data[file_paths[1]]  # Step-wise DataCollector is only captured in the *_run.npy files.
 
-for dic in run_data:
-    run_data[dic] = fix_keys(run_data[dic])
+    for dic in run_data:
+        run_data[dic] = fix_keys(run_data[dic])
 
-keys_dict = map_keys()
-output_data = {}
+    keys_dict = map_keys()
+    output_data = {}
 
-# Output calculation
-for param in run_data.keys():
-    output_data[param] = get_param_means(run_data, param)
-# Saving output
-for df in output_data:
-    save_csv(str(df), output_data[df])
+    # Output calculation
+    for param in run_data.keys():
+        output_data[param] = get_param_means(run_data, param)
+    # Saving output
+    for df in output_data:
+        save_csv(str(df), output_data[df])
