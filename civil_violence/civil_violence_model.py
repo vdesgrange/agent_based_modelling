@@ -1,5 +1,3 @@
-import networkx as nx
-import matplotlib.pyplot as plt
 import json
 import random
 from datetime import datetime
@@ -168,7 +166,6 @@ class CivilViolenceModel(Model):
         # print_network(self.G, self.network_dict)  # Uncomment to print the network.
 
         # With network in place, set the influencers.
-        # Change the parameter value to determine how many connections a node needs to be considered an influencer.
         self.set_influencers(self.inf_threshold)
 
         # Create the graph show the frequency of degrees for the nodes
@@ -248,21 +245,20 @@ class CivilViolenceModel(Model):
         else:
             pass
 
-
     def update_legitimacy(self):
         """
         Compute legitimacy (Epstein Working Paper 2001)
         """
         self.jailings_list[3] = self.jailings_list[2]
         self.jailings_list[2] = self.jailings_list[1]
-        self.jailings_list[1] = self.jailings_list[0]/(self.count_type_citizens("ACTIVE")+ self.count_type_citizens("QUIESCENT"))  # +1 otherwise it can divide by zero
+        nb_active_and_quiescent = self.count_type_citizens("ACTIVE") + self.count_type_citizens("QUIESCENT")
+        self.jailings_list[1] = self.jailings_list[0] / nb_active_and_quiescent  # + 1 to avoid division by zero
         self.jailings_list[0] = 0
-        self.legitimacy = self.initial_legitimacy_l0 * (1 - self.jailings_list[1] - self.jailings_list[2] ** 2 - self.jailings_list[3] ** 3)
+
+        sum_jailed = self.jailings_list[1] - self.jailings_list[2] ** 2 - self.jailings_list[3] ** 3
+        self.legitimacy = self.initial_legitimacy_l0 * (1 - sum_jailed)
         if self.legitimacy <= 0:
             self.legitimacy = 0
-        # print(self.initial_legitimacy_l0)
-        # print(self.legitimacy)
-
 
     def get_model_reporters(self):
         """
@@ -330,6 +326,7 @@ class CivilViolenceModel(Model):
         """
         If an agent in the network is connected to a large amount of nodes, this agent can
         be considered an influencer and receives a corresponding tag.
+        :param inf_threshold: determine how many connections a node needs to be considered an influencer
         """
         for agent in self.citizen_list:
             agent.set_influencer(len(list(self.G.neighbors(agent.network_node))), inf_threshold)
