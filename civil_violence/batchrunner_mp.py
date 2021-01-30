@@ -3,8 +3,18 @@ from multiprocessing import Pool, cpu_count
 from tqdm import tqdm
 from collections import OrderedDict
 
+
 class BatchRunnerMP(BatchRunner):
-    """ Child class of BatchRunner, extended with multiprocessing support. """
+    """
+    Child class of BatchRunner, extended with multiprocessing support.
+
+    BatchRunnerMP bug handling method:
+    This local class overwrite BatchRunnerMP class provided by mesa.
+    It resolves the bug making not possible to use "run_all" method for sensitivity analysis.
+    Note: You must give function name instead of lambda in data collector argument. Lambda can't be handle by
+    multiprocessing pool, however mesa can collect data from model by simply indicated the function name.
+    With this method you do not need to update datacollector class to make multiprocessing run.
+    """
 
     def __init__(self, model_cls, nr_processes=None, **kwargs):
         """Create a new BatchRunnerMP for a given model with the given
@@ -46,7 +56,14 @@ class BatchRunnerMP(BatchRunner):
                 for iter in range(self.iterations):
                     kwargs_repeated = kwargs.copy()
                     all_kwargs.append(
-                        [self.model_cls, kwargs_repeated, self.max_steps, iter, self.model_reporters, self.agent_reporters]
+                        [
+                            self.model_cls,
+                            kwargs_repeated,
+                            self.max_steps,
+                            iter,
+                            self.model_reporters,  # We add model_reporters and agent_reporters in order to by-pass
+                            self.agent_reporters  # the impossibility to transmit model in multi-processing pool
+                        ]
                     )
 
         elif len(self.fixed_parameters):
@@ -64,6 +81,12 @@ class BatchRunnerMP(BatchRunner):
         Based on requirement of Python multiprocessing requires @staticmethod decorator;
         this is primarily to ensure functionality on Windows OS and does not impact MAC or Linux distros
 
+        BatchRunnerMP bug handling method:
+        Instead of transmitting the model (like in original BatchRunnerMP) which is not possible in multiprocessing
+        pool, we obtain the necessary data (data_collector, model_var, agent_var) in upstream.
+        Note: we should give a function name instead of a lambda to [data_collector, model_var, agent_var] object since
+        lambda can't be handled by multiprocessing pool.
+
         :param iter_args: List of arguments for model run
             iter_args[0] = model object
             iter_args[1] = key word arguments needed for model object
@@ -78,8 +101,8 @@ class BatchRunnerMP(BatchRunner):
         kwargs = iter_args[1]
         max_steps = iter_args[2]
         iteration = iter_args[3]
-        model_reporters = iter_args[4]
-        agent_reporters = iter_args[5]
+        model_reporters = iter_args[4]  # Received in the arguments from _make_model_args_mp. By getting reporter values
+        agent_reporters = iter_args[5]  # here, we don't need to pass model class in multi-processing pool
 
         # instantiate version of model with correct parameters
         model = model_i(**kwargs)
@@ -110,25 +133,35 @@ class BatchRunnerMP(BatchRunner):
                     agent_record[var] = getattr(agent, reporter)
                 agent_var[agent.unique_id] = agent_record
 
+        # Instead of transmitting the model (like in original BatchRunnerMP) which is not possible in multiprocessing
+        # pool, we obtain the necessary data (data_collector, model_var, agent_var) in upstream.
+        # Note: we should give a function name instead of a lambda to [data_collector, model_var, agent_var] since
+        # lambda can't be handled by multiprocessing pool.
         return param_values, data_collector, model_var, agent_var
 
     def _result_prep_mp(self, results):
         """
         Helper Function
-        :param results: Takes results dictionary from Processpool and single processor debug run and fixes format to
+        Takes results from Processpool and single processor debug run and fixes format to
         make compatible with BatchRunner Output
+
+        BatchRunnerMP bug handling method:
+        Model object can't be transmitted through multiprocessing pool, upstream data processing enable us to solve
+        this issue.
+
+        :param results: A tuple of datacollector, model_var and agent_var pre-processed data.
         :updates model_vars and agents_vars so consistent across all batchrunner
         """
         # Take results and convert to dictionary so dataframe can be called
         for model_key, (datacollector, model_var, agent_var) in results.items():
             if self.model_reporters:
-                self.model_vars[model_key] = model_var
+                self.model_vars[model_key] = model_var  # Fix to original BatchRunnerMP
 
             if self.agent_reporters:
                 agent_vars = agent_var
                 for agent_id, reports in agent_vars.items():
                     agent_key = model_key + (agent_id,)
-                    self.agent_vars[agent_key] = reports
+                    self.agent_vars[agent_key] = reports  # Fix to original BatchRunnerMP
 
             if datacollector is not None:
                 if datacollector.model_reporters is not None:
@@ -159,6 +192,7 @@ class BatchRunnerMP(BatchRunner):
 
         if self.processes > 1:
             with tqdm(total_iterations, disable=not self.display_progress) as pbar:
+                # (data_collector, model_var, agent_var) replace model variable which can't be transmitted
                 for params, data_collector, model_var, agent_var in self.pool.imap_unordered(
                         self._run_wrappermp, run_iter_args
                 ):
@@ -169,8 +203,8 @@ class BatchRunnerMP(BatchRunner):
         # For debugging model due to difficulty of getting errors during multiprocessing
         else:
             for run in run_iter_args:
-                params, model_data = self._run_wrappermp(run)
-                results[params] = model_data
+                params, data_collector, model_var, agent_var = self._run_wrappermp(run)
+                results[params] = (data_collector, model_var, agent_var)
 
             self._result_prep_mp(results)
 

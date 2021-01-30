@@ -2,6 +2,7 @@ import networkx as nx
 from mesa.visualization.modules import NetworkModule
 from constant_variables import GraphType
 
+
 class NetworkModuleExtended(NetworkModule):
     """
     NetworkModuleExtended is exactly NetworkModule class.
@@ -16,10 +17,10 @@ class NetworkModuleExtended(NetworkModule):
 def generate_network(agent_list, graph_type, p, p_ws, directed=False, seed=None):
     """
     Generate a network based on the provided parameters
-    TODO : If  the signature for all graph is the same, this could be improved as we might not need switch
 
     :param agent_list: List of agents to be added to the network
     :param p: Probability for edge creation
+    :param p_ws: probability of rewiring each edge, used by Watts-Strogatz
     :param directed: True if directed, False if undirected
     :param seed: Indicator of random number generation state
     :param graph_type: constants to select a type of Graph.
@@ -39,7 +40,7 @@ def generate_network(agent_list, graph_type, p, p_ws, directed=False, seed=None)
     no_graph = nx.Graph()
     network_dict = dict()
     for idx, agent in enumerate(agent_list):
-        no_graph.add_node(idx)
+        no_graph.add_node(idx)  # Agents are added to a graph with no edge (for compatibility)
         agent.network_node = idx
         network_dict[agent.network_node] = agent
 
