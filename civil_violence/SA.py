@@ -7,7 +7,6 @@ from civil_violence_model import CivilViolenceModel
 from utils import *
 from pprint import pprint
 
-
 def sensitive_analysis_no_network(problem):
     path = 'archives/saved_data_{0}.npy'.format(int(time.time()))
     replicates = 10
@@ -57,15 +56,16 @@ def sensitive_analysis_no_network(problem):
         data[var] = batch_df
         run_data[var] = batch.get_collector_model()
 
+
     with open(path, 'ab') as f:
         np.save(f, data)
+
 
     run_path = path+'_run'
     with open(run_path, 'ab') as f:
         np.save(f, run_data)
 
     return data, run_data
-
 
 def plot_param_var_conf(ax, df, var, param, i):
     """
@@ -103,7 +103,6 @@ def plot_all_vars(problem, df, param):
     f, axs = plt.subplots(problem['num_vars'], figsize=(7, 10))
     for i, var in enumerate(problem['names']):
         plot_param_var_conf(axs[i], df[var], var, param, i)
-
 
 def load_ofat_archive():
     problem = {

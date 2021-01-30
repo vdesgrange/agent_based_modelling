@@ -1,6 +1,7 @@
 {
   "width": 40,
   "height": 40,
+  "max_iter": 200,
   "k": 2.3,
   "agent_density": 0.7,
   "active_agent_density": 0.01,

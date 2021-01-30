@@ -2,7 +2,6 @@ import random
 import math
 from mesa import Agent
 import networkx as nx
-
 from constant_variables import State, HardshipConst
 
 
