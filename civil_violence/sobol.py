@@ -1,15 +1,9 @@
-from SALib.sample import saltelli
-from mesa.batchrunner import BatchRunner
-from SALib.analyze import sobol
+import time
 import pandas as pd
 import numpy as np
-import matplotlib.pyplot as plt
-from itertools import combinations
-import time
-
+from SALib.sample import saltelli
+from mesa.batchrunner import BatchRunner
 from civil_violence_model import CivilViolenceModel
-from server import get_user_model_parameters
-from utils import read_configuration
 
 replicates = 2
 max_steps = 100
