@@ -7,8 +7,11 @@ README:
 To run this script, please follow the following steps:
     1. Adjust the following constants such that they correspond to those in the SA.py file. 
     2. Run the SA.py script. 
-    3. Add the paths to the output files from the SA.py to the file_paths list (line36).
-    4. Run the SA_work.py script. 
+    3. Add the paths to the output files from the SA.py to the file_paths list (line27).
+    4. Depending on if the output files is a Sensitivity Analysis (multiple dictionaries), 
+    	or a fixed run (single dictionary), several lines need to be commented in/out. 
+    	Lines: 55/56, 65/66, 
+    5. Run the SA_work.py script. 
 '''
 
 
@@ -24,18 +27,7 @@ BOUNDS = [[0.01, 1], [0.01, 1], [1, 100], [0.01, 0.4], [1, 20], [1, 20]]
 OUTPUT_PARAMS = ['PARAM_VAL', 'MEAN_N', 'MEAN_PEAK_HEIGHT', 'MEAN_PEAK_WIDTH', 
                 'MAX_PEAK_HEIGHT', 'MAX_PEAK_WIDTH']
 
-### TEST SETTINGS ###
-# ITERATIONS = 2
-# STEPS = 2
-# PARAMS = ['active_threshold_t', 'initial_legitimacy_l0','max_jail_term']
-# BOUNDS = [[0, 1], [0, 1], [0, 100]]
-
-#####################
-
-
 file_paths = [
-        # './archives/saved_data1611693859',
-        # './archives/saved_data1611747993_run'
         './archives/saved_data_1611773618.npy',
         './archives/saved_data_1611773618_run.npy'
     ]
@@ -57,11 +49,12 @@ def load_datacollector():
 
 def map_keys():
     """
-    Maps the used parameter bounds to key values for the data dictionary.
+    Maps the used parameter bounds to key values for the data dictionary. 
+    Keys are of the form: (Parameter value, iteration)
     """
     keys_dict = {}
-    # iter_list = np.arange(ITERATIONS*STEPS).reshape((STEPS, ITERATIONS))
-    iter_list = np.arange(ITERATIONS)
+    # iter_list = np.arange(ITERATIONS*STEPS).reshape((STEPS, ITERATIONS)) # In case of multiple exported dictionaries.
+    iter_list = np.arange(ITERATIONS)	# In case of a single exported dictionary
     for i in range(len(PARAMS)):
         param_list = []
         if PARAMS[i] == 'max_jail_term':
@@ -70,8 +63,8 @@ def map_keys():
             param_range = np.linspace(BOUNDS[i][0], BOUNDS[i][1], STEPS).reshape(STEPS, 1)
         param_matrix = np.repeat(param_range, ITERATIONS, axis=1)
         for j in range(STEPS):
-            # param_list.extend(list(zip(param_matrix[j], iter_list[j])))
-            param_list.extend(list(zip(param_matrix[j], iter_list)))
+            # param_list.extend(list(zip(param_matrix[j], iter_list[j]))) # In case of multiple exported dictionaries.
+            param_list.extend(list(zip(param_matrix[j], iter_list))) # In case of a single exported dictionary.
         keys_dict[PARAMS[i]] = param_list
 
     return keys_dict
@@ -85,26 +78,23 @@ def get_param_means(data, parameter):
     the set amount of iterations for every parameter configuration.
     """
     # Initialize outputs
-    output = np.zeros((STEPS, N_OUTPUT))
-    
+    output = np.zeros((STEPS, N_OUTPUT))   
     keys = keys_dict[parameter]
-    # print('KEYS: ', keys)
 
     # Divide the key list in the different step sizes of the parameter.
     for i in range(STEPS):
         peak_heights = []
         peak_widths = []
         s_keys = keys[i*ITERATIONS : (i+1)*ITERATIONS]
+        
         # Every key is an iteration
         for key in s_keys:
-            # print(s_keys)
-            # print(data[parameter].keys())
             actives = data[parameter][key]['ACTIVE']
             ph, pw = get_outbreaks(actives, THRESHOLD)
             peak_heights.extend(ph)
             peak_widths.extend(pw)
+            
         # Output calculation
-            # print(parameter, key, peak_heights)
         mean_n_peaks = len(peak_heights)/ITERATIONS
         mean_peak_height = np.mean(np.array(peak_heights))
         mean_peak_width = np.mean(peak_widths)
@@ -112,11 +102,6 @@ def get_param_means(data, parameter):
         max_peak_width = np.max(peak_widths)
 
         output[i] = [key[0], mean_n_peaks, mean_peak_height, mean_peak_width, max_peak_height, max_peak_width]
-        # print(parameter)
-        # print('MEAN_N | MEAN_PEAK_HEIGHT | MEAN_PEAK_WIDTH | MAX_PEAK_HEIGHT | MAX_PEAK_WIDTH ')
-        # print(mean_n_peaks, mean_peak_height, mean_peak_width, max_peak_height, max_peak_width)
-    # print(data[parameter][(0.0, 0)]['ACTIVE'])
-    # print(output)
 
     df = pd.DataFrame({'PARAM_VAL': output[:, 0], 'MEAN_N': output[:, 1], 
         'MEAN_PEAK_HEIGHT': output[:, 2], 'MEAN_OUTBREAK_DURATION': output[:, 3], 
@@ -126,10 +111,12 @@ def get_param_means(data, parameter):
 
 def get_outbreaks(data, threshold):
     """
-    Calculates the outbreaks from the actives data.
+    Calculates the outbreaks from the actives data based on a certain threshold.
+    The last codeblock defines the behavior when the provided data ends in an outbreak.
+    Depending on the user, they might want to include/exclude that final outbreak.
 
     Returns:
-        - An array with the outbreak peak sizes.
+        - An array with the peak size of every outbreak.
         - An array with the outbreak durations.
     """
     outbreak_peaks = []
@@ -155,29 +142,37 @@ def get_outbreaks(data, threshold):
             outbreak_widths.append(i-start)
             current_peak = 0
             counting = False
-
-    # Capture cases where timeline ends in an outbreak.
-    # Obviously skewers data, but preferable over 0 or infinite outbreaks.
-    if not outbreak_peaks and counting:
-        outbreak_peaks.append(current_peak)
-        outbreak_widths.append(len(data))
-    elif outbreak_peaks and counting:
-        outbreak_peaks.append(current_peak)
-        outbreak_widths.append(len(data)-start)
-    elif not outbreak_peaks and not counting:
+	
+	if not outbreak_peaks and not counting: # Captures data without outbreaks, empty list break further calculations.
         outbreak_peaks.append(0)
         outbreak_widths.append(0)
-
+	
+    # Capture cases where timeline ends in an outbreak.
+    # Uncomment if final outbreak needs to be included in calculation.
+    # Obviously skewers data, but might be preferable over 0 or infinite outbreaks.
+    
+    # if not outbreak_peaks and counting: # Data is a single massive outbreak.
+    #     outbreak_peaks.append(current_peak)
+    #     outbreak_widths.append(len(data))
+    # elif outbreak_peaks and counting: # Data ends in an outbreak.
+    #     outbreak_peaks.append(current_peak)
+    #     outbreak_widths.append(len(data)-start)
+ 
     return outbreak_peaks, outbreak_widths
 
 def fix_keys(dictionary):
+	"""
+	This function trims the dictionary keys from ([all parameters], iteration)
+	to a more manageable ('changed parameter', iteration) format.
+	
+	Like in the SA.py file, the 'max_jail_term'-parameter steps are casted to int.
+	"""
     new_dictionary = {}
     for k in dictionary:
         if dictionary == 'max_jail_term':
             new_k = (int(k[0]), k[-1])
         else:
             new_k = (k[0], k[-1])
-        # print('NEW KEY WHO DIS? ', new_k)
         new_dictionary[new_k] = dictionary[k]
     return new_dictionary
 
@@ -192,32 +187,17 @@ def save_csv(name, df):
 
 # Run the script
 model_data = load_datacollector()
-run_data = model_data['./archives/saved_data_1611773618_run.npy']
+run_data = model_data[file_paths[1]] # Step-wise DataCollector is only captured in the *_run.npy files.
 
-print(run_data['max_jail_term'].keys())
 for dic in run_data:
     run_data[dic] = fix_keys(run_data[dic])
 
-print(run_data['max_jail_term'].keys())
-
-# for key in run_data['active_threshold_t'].keys():
-#     print('MONKEY', key)
-
-# run_data['active_threshold_t'] = fix_keys(run_data['active_threshold_t'])
-
-# for key in run_data['active_threshold_t'].keys():
-#     print('MONKEY', key)    
-
 keys_dict = map_keys()
-# print(keys_dict['active_threshold_t'])
 output_data = {}
 
+# Output calculation
 for param in run_data.keys():
-    print('current param ', param)
     output_data[param] = get_param_means(run_data, param)
-
-
+# Saving output
 for df in output_data:
-    print('Tested parameter: ', df) # Output feedback
-    print(output_data[df])          # Output feedback
     save_csv(str(df), output_data[df])
