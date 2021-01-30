@@ -2,10 +2,10 @@
 import time
 import numpy as np
 import matplotlib.pyplot as plt
-
 from batchrunner_mp import BatchRunnerMP
 from civil_violence_model import CivilViolenceModel
 from utils import *
+
 
 def ofat_barabasi_albert_analysis(problem):
     """
@@ -26,13 +26,8 @@ def ofat_barabasi_albert_analysis(problem):
         "INFLUENCERS": compute_influencers,
         "OUTBREAKS": compute_outbreaks
     }
-    agent_reporters = {
-        "HARDSHIP_CONT": "hardship_cont",
-        "GRIEVANCE": "grievance",
-    }
 
     model_data = {}
-    agent_data = {}
 
     for i, var in enumerate(problem['names']):
         # Get the bounds for this variable and get <distinct_samples> samples within this space (uniform)
@@ -117,7 +112,7 @@ def ofat_main():
     }
 
     data = ofat_barabasi_albert_analysis(problem)
-    for param in ("OUTBREAKS", "INFLUENCERS"):  #  ,"HARDSHIP_CONT", "GRIEVANCE"
+    for param in ("OUTBREAKS", "INFLUENCERS"):
         plot_all_vars(problem, data, param)
         plt.show()
 
@@ -136,7 +131,7 @@ def load_ofat_barabasi_albert_archive():
         with open(path, 'rb') as f:
             data = np.load(f, allow_pickle=True)[()]
 
-    for param in ("OUTBREAKS", "INFLUENCERS"):  #  ,"HARDSHIP_CONT", "GRIEVANCE"
+    for param in ("OUTBREAKS", "INFLUENCERS"):
         plot_all_vars(problem, data, param)
         plt.show()
 

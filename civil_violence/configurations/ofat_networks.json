@@ -13,5 +13,4 @@
   "directed": false,
   "active_threshold_t": 0.1,
   "graph_type": "BARABASI_ALBERT",
-  "removal_step": 201
 }

@@ -21,26 +21,27 @@ class CivilViolenceModel(Model):
                  height=40, width=40,
                  agent_density=0.7, agent_vision=7,
                  active_agent_density=0.01,
-                 cop_density=0.04, cop_vision=7, inf_threshold=40,
-                 removal_step=0,
+                 cop_density=0.04, cop_vision=7,
+                 inf_threshold=40, tackle_inf=False,
                  k=2.3, graph_type=GraphType.BARABASI_ALBERT.name,
-                 p=0.1, p_ws=0.1, directed=False,
-                 max_jail_term=30, active_threshold_t=0.1,
-                 initial_legitimacy_l0=0.82,
+                 p=0.1, p_ws=0.1,
+                 directed=False, max_jail_term=30,
+                 active_threshold_t=0.1, initial_legitimacy_l0=0.82,
                  movement=True, seed=None):
         """
         Create a new civil violence model.
-        TODO - This class is not fully implemented
 
+        :param max_iter: Maximum number of steps in the simulation.
         :param height: Grid height.
         :param width: Grid width.
         :param agent_density: Approximate percentage of cells occupied by citizen agents.
         :param agent_vision: Radius of the agent vision in every direction.
+        :param active_agent_density: Enforce initial percentage of cells occupied by active agents.
         :param cop_density: Approximate percentage of cells occupied by cops.
         :param cop_vision: Radius of the cop vision in every direction.
         :param initial_legitimacy_l0: Initial legitimacy of the central authority.
         :param inf_threshold: Amount of nodes that need to be connected before an agent is considered an influencer.
-        :param max_iter: Maximum number of steps in the simulation.
+        :param tackle_inf: Remove influencer when outbreaks starting
         :param max_jail_term: Maximal jail term.
         :param active_threshold_t: Threshold where citizen agent became active.
         :param k: Arrest term constant k.
@@ -50,7 +51,7 @@ class CivilViolenceModel(Model):
         :param movement: Can agent move at end of an iteration
         :param seed: random seed
 
-        Additionnal attributes:
+        Additional attributes:
             running : is the model running
             iteration : current step of the simulation
             citizen_list : a list storing the citizen agents added to the model.   
@@ -66,7 +67,10 @@ class CivilViolenceModel(Model):
         """
         super().__init__()
 
+        # =============================
         # === Initialize attributes ===
+        # =============================
+
         self.seed = seed
         self.random.seed(self.seed)
 
@@ -93,7 +97,6 @@ class CivilViolenceModel(Model):
         self.cop_density = cop_density
         self.cop_vision = cop_vision
         self.inf_threshold = inf_threshold
-        self.removal_step = removal_step
 
         self.citizen_list = []
         self.cop_list = []
@@ -101,7 +104,8 @@ class CivilViolenceModel(Model):
         self.jailings_list = [0, 0, 0, 0]
         self.outbreaks = 0
         self.outbreak_now = 0
-        self.outbreak_influencer_now = 0
+        self.outbreak_influencer_now = False
+        self.tackle_inf = tackle_inf
 
         date = datetime.now()
         self.path = f'output/{self.graph_type}_{date.month}_{date.day}_{date.hour}_{date.minute}_'
@@ -112,14 +116,16 @@ class CivilViolenceModel(Model):
             agent_reporters=self.get_agent_reporters()
         )
 
+        # ==============================
         # === Initialize environment ===
+        # ==============================
 
         # Add agents to the model
         unique_id = 0
         for (contents, x, y) in self.grid.coord_iter():
             random_x = self.random.random()
             if random_x < self.agent_density:
-                # Add quiescent agents
+                # Add agents
                 agent = Citizen(
                     unique_id=unique_id, model=self,
                     pos=(x, y), hardship=self.random.random(), susceptibility=self.random.random(),
@@ -145,6 +151,7 @@ class CivilViolenceModel(Model):
                 self.citizen_list.append(agent)
                 self.grid.place_agent(agent, (x, y))  # Place agent in the MultiGrid
                 self.schedule.add(agent)
+
             elif random_x < (self.agent_density + self.active_agent_density + self.cop_density):
                 # Add law enforcement officer
                 agent = Cop(
@@ -156,46 +163,30 @@ class CivilViolenceModel(Model):
                 self.grid.place_agent(agent, (x, y))  # Place agent in the MultiGrid
                 self.schedule.add(agent)
 
-        # Generate a social network composed of every population agents
-
+        # Generate a social network composed of every civilian agents
         self.G, self.network_dict = generate_network(self.citizen_list, graph_type, p, p_ws, directed, seed)
-        # print_network(self.G, self.network_dict)  # Print the network. Can be commented.
+        # print_network(self.G, self.network_dict)  # Uncomment to print the network.
 
-        # With network in place, set the influencers. Change the parameter value to determine how
-        # many connections a node needs to be considered an influencer.
+        # With network in place, set the influencers.
+        # Change the parameter value to determine how many connections a node needs to be considered an influencer.
         self.set_influencers(self.inf_threshold)
-        # Remove influencers.
 
         # Create the graph show the frequency of degrees for the nodes
-        create_fig(self.G.degree, draw=False) # Set =True when we want to draw a figure
+        create_fig(self.G.degree, draw=False)  # Set draw=True to draw a figure
 
         self.running = True
         self.datacollector.collect(self)
 
     def step(self):
-        """ One step in agent-based model simulation """
-        # print(len(self.influencer_list))
+        """
+        One step in agent-based model simulation
+        """
+
         self.schedule.step()
-        self.datacollector.collect(self)
         self.iteration += 1
         self.update_legitimacy()
 
-        # Count amount of outbreaks
-        # print(self.count_type_citizens("ACTIVE"))
-        if self.count_type_citizens("ACTIVE") > 30 and self.outbreak_influencer_now == 0:
-            self.jail_influencer()
-            self.outbreak_influencer_now = 1
-
-        if self.count_type_citizens("ACTIVE") < 30:
-            self.outbreak_influencer_now = 0
-
-        if self.count_type_citizens("ACTIVE") > 50 and self.outbreak_now == 0:
-            self.outbreaks += 1
-            self.outbreak_now = 1
-        if self.count_type_citizens("ACTIVE") < 50:
-            self.outbreak_now = 0
-
-        # print('legitimacy:', self.legitimacy)
+        self.outbreak_score_monitoring()
         self.datacollector.collect(self)
 
         # Save initial values
@@ -207,12 +198,22 @@ class CivilViolenceModel(Model):
             self.save_data(save=False)
             self.running = False
 
-        # # Remove influencer after certain amount of iterations.
-        # if self.iteration == self.removal_step:
-        #     self.remove_influencer()
+    def outbreak_score_monitoring(self):
+        if self.tackle_inf:
+            if self.count_type_citizens("ACTIVE") > 30 and not self.outbreak_influencer_now:
+                self.jail_influencer()
+                self.outbreak_influencer_now = True
 
-        # for agent in self.influencer_list:
-        #     print('Agent ', agent.unique_id, ' is an influencer ')
+            if self.count_type_citizens("ACTIVE") < 30:
+                self.outbreak_influencer_now = False
+
+        # Count amount of outbreaks
+        if self.count_type_citizens("ACTIVE") > 50 and self.outbreak_now == 0:
+            self.outbreaks += 1  # Total number of outbreak
+            self.outbreak_now = 1  # Indicate if outbreak now
+
+        if self.count_type_citizens("ACTIVE") < 50:
+            self.outbreak_now = 0
 
     def save_data(self, save=True):
 
@@ -233,7 +234,6 @@ class CivilViolenceModel(Model):
                 'cop_density': self.cop_density,
                 'initial_legitimacy_l0': self.initial_legitimacy_l0,
                 'inf_threshold': self.inf_threshold,
-                'removal_step': self.removal_step,
                 'max_iter': self.max_iter,
                 'max_jail_term': self.max_jail_term,
                 'active_threshold_t': self.active_threshold_t,
@@ -265,7 +265,11 @@ class CivilViolenceModel(Model):
 
 
     def get_model_reporters(self):
-        """ Dictionary of model reporter names and attributes/funcs """
+        """
+        Dictionary of model reporter names and attributes/funcs
+        Reference to functions instead of lambda are provided to handle multiprocessing case.
+        Multiprocessing pool cannot directly handle lambda.
+        """
         return {"QUIESCENT": compute_quiescent,
                 "ACTIVE": compute_active,
                 "JAILED": compute_active,
@@ -274,8 +278,9 @@ class CivilViolenceModel(Model):
                 "OUTBREAKS": compute_outbreaks}
 
     def get_agent_reporters(self):
-        """ TODO Dictionary of agent reporter names and attributes/funcs
-            TODO Doesn't work the way it should"""
+        """
+        Dictionary of agent reporter names and attributes/funcs
+        """
 
         return {"Grievance": lambda a: getattr(a, 'grievance', None),
                 "Hardship": lambda a: getattr(a, 'hardship', None),
@@ -311,14 +316,15 @@ class CivilViolenceModel(Model):
 
     def add_jailed(self, agent):
         """
-        If the sentence of a jailed agent is over, place him back on a
-        random empty cell in the grid.
+        Un-jail an agent
+        If the sentence of a jailed agent is over, place him back on a random empty cell in the grid.
         """
-        if (len(self.grid.empties) == 0):
+
+        if len(self.grid.empties) == 0:
             raise Exception("There are no empty cells.")
+
         new_pos = self.random.choice(list(self.grid.empties))
         self.grid.place_agent(agent, new_pos)
-        # print(agent.unique_id, " was placed back on the grid at pos: ", new_pos) # TEST
 
     def set_influencers(self, inf_threshold=150):
         """
@@ -332,8 +338,8 @@ class CivilViolenceModel(Model):
 
     def remove_influencer(self):
         """
-        Function that removes a random agent with the influencer tag from the gird. Gives 
-        manual control over the model to evaluate the influence of influencers.
+        Removes a random agent with the influencer tag from the grid.
+        Gives manual control over the model to evaluate the influence of influencers.
         """
         if self.influencer_list:
             for i in range(len(self.influencer_list)):
@@ -344,12 +350,11 @@ class CivilViolenceModel(Model):
                 self.citizen_list.remove(to_remove)
                 self.schedule.remove(to_remove)
                 self.G.remove_node(to_remove.network_node)
-                # print(to_remove.unique_id, ' was an influencer and has been removed.')
 
     def jail_influencer(self):
         """
-        Function that removes a random agent with the influencer tag from the gird. Gives
-        manual control over the model to evaluate the influence of influencers.
+        Jail a random agent with the influencer tag from the grid.
+        Gives manual control over the model to evaluate the influence of influencers.
         """
         if self.influencer_list:
             for i in range(len(self.influencer_list)):
