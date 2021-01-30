@@ -66,7 +66,12 @@ def get_network_portrayal(model):
 
 
 def get_grievance_portrayal(agent):
-
+    """
+    Generate a portrayal of the agent grievance
+    (JSON-ready dictionary used by the relevant JavaScript code (sigma.js) to draw shapes)
+    :param agent: agent which grievance must be to portrayed
+    :return: json-ready dictionary
+    """
     portrayal = {
         "Shape": "rect",
         "x": agent.pos[0], "y": agent.pos[1],

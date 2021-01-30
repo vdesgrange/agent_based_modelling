@@ -1,16 +1,15 @@
 from enum import Enum
 
-GRID_WIDTH = GRID_HEIGHT = 10
-
 State = Enum('State', 'QUIESCENT ACTIVE JAILED COP')
 
 GraphType = Enum('GraphType', 'ERDOS_RENYI BARABASI_ALBERT WATTS_STROGATZ')
 
+
 class Color(Enum):
-    QUIESCENT = "lightblue"  # blue
-    ACTIVE = "red"  # purple
-    JAILED = "lightyellow"  # light gray
-    COP = "black" #red
+    QUIESCENT = "lightblue"
+    ACTIVE = "red"
+    JAILED = "lightyellow"
+    COP = "black"
 
 
 class Shape(Enum):
