@@ -1,13 +1,14 @@
 import networkx as nx
 import matplotlib.pyplot as plt
 import json
+import random
 from datetime import datetime
 from mesa import Model
 from mesa.space import MultiGrid
 from mesa.time import RandomActivation
 from mesa.datacollection import DataCollector
 from civil_violence_agents import Citizen, Cop
-from constant_variables import State
+from constant_variables import State, GraphType
 from graph_utils import generate_network, print_network
 from figure import create_fig, run_analysis
 from utils import *
@@ -20,9 +21,9 @@ class CivilViolenceModel(Model):
                  height=40, width=40,
                  agent_density=0.7, agent_vision=7,
                  active_agent_density=0.01,
-                 cop_density=0.04, cop_vision=7, inf_threshold=10,
+                 cop_density=0.04, cop_vision=7, inf_threshold=40,
                  removal_step=0,
-                 k=2.3, graph_type="None",
+                 k=2.3, graph_type=GraphType.BARABASI_ALBERT.name,
                  p=0.1, p_ws=0.1, directed=False,
                  max_jail_term=30, active_threshold_t=0.1,
                  initial_legitimacy_l0=0.82,
@@ -100,6 +101,7 @@ class CivilViolenceModel(Model):
         self.jailings_list = [0, 0, 0, 0]
         self.outbreaks = 0
         self.outbreak_now = 0
+        self.outbreak_influencer_now = 0
 
         date = datetime.now()
         self.path = f'output/{self.graph_type}_{date.month}_{date.day}_{date.hour}_{date.minute}_'
@@ -162,6 +164,7 @@ class CivilViolenceModel(Model):
         # With network in place, set the influencers. Change the parameter value to determine how
         # many connections a node needs to be considered an influencer.
         self.set_influencers(self.inf_threshold)
+        # Remove influencers.
 
         # Create the graph show the frequency of degrees for the nodes
         create_fig(self.G.degree, draw=False) # Set =True when we want to draw a figure
@@ -179,6 +182,13 @@ class CivilViolenceModel(Model):
 
         # Count amount of outbreaks
         # print(self.count_type_citizens("ACTIVE"))
+        if self.count_type_citizens("ACTIVE") > 30 and self.outbreak_influencer_now == 0:
+            self.jail_influencer()
+            self.outbreak_influencer_now = 1
+
+        if self.count_type_citizens("ACTIVE") < 30:
+            self.outbreak_influencer_now = 0
+
         if self.count_type_citizens("ACTIVE") > 50 and self.outbreak_now == 0:
             self.outbreaks += 1
             self.outbreak_now = 1
@@ -190,16 +200,16 @@ class CivilViolenceModel(Model):
 
         # Save initial values
         if self.iteration == 1:
-            self.save_initial_values(save=True)
+            self.save_initial_values(save=False)
 
         # Stop the model after a certain amount of iterations.
         if self.iteration > self.max_iter:
-            self.save_data(save=True)
+            self.save_data(save=False)
             self.running = False
 
-        # Remove influencer after certain amount of iterations.
-        if self.iteration == self.removal_step:
-            self.remove_influencer()
+        # # Remove influencer after certain amount of iterations.
+        # if self.iteration == self.removal_step:
+        #     self.remove_influencer()
 
         # for agent in self.influencer_list:
         #     print('Agent ', agent.unique_id, ' is an influencer ')
@@ -317,7 +327,7 @@ class CivilViolenceModel(Model):
         """
         for agent in self.citizen_list:
             agent.set_influencer(len(list(self.G.neighbors(agent.network_node))), inf_threshold)
-            if agent.influencer == True:
+            if agent.influencer:
                 self.influencer_list.append(agent)
 
     def remove_influencer(self):
@@ -326,11 +336,31 @@ class CivilViolenceModel(Model):
         manual control over the model to evaluate the influence of influencers.
         """
         if self.influencer_list:
-            to_remove = self.random.choice(self.influencer_list)
-            if to_remove.pos: # Check if influencer is jailed.
-                self.grid.remove_agent(to_remove)
-            self.influencer_list.remove(to_remove)
-            self.citizen_list.remove(to_remove)
-            self.schedule.remove(to_remove)
-            self.G.remove_node(to_remove.network_node)
-            # print(to_remove.unique_id, ' was an influencer and has been removed.')
+            for i in range(len(self.influencer_list)):
+                to_remove = self.random.choice(self.influencer_list)
+                if to_remove.pos: # Check if influencer is jailed.
+                    self.grid.remove_agent(to_remove)
+                self.influencer_list.remove(to_remove)
+                self.citizen_list.remove(to_remove)
+                self.schedule.remove(to_remove)
+                self.G.remove_node(to_remove.network_node)
+                # print(to_remove.unique_id, ' was an influencer and has been removed.')
+
+    def jail_influencer(self):
+        """
+        Function that removes a random agent with the influencer tag from the gird. Gives
+        manual control over the model to evaluate the influence of influencers.
+        """
+        if self.influencer_list:
+            for i in range(len(self.influencer_list)):
+                arrestee = self.random.choice(self.influencer_list)
+                if arrestee.state == State.JAILED: # Check if influencer is jailed.
+                    continue
+                sentence = random.randint(1, self.max_jail_term)
+                arrestee.jail_sentence = sentence
+                arrestee.state = State.JAILED
+                self.jailings_list[0] += 1
+                if sentence > 0:
+                    self.remove_agent_grid(arrestee)
+
+                print(arrestee.unique_id, ' was an influencer and has been jailed.')

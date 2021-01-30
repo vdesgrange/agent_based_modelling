@@ -67,7 +67,7 @@ class Citizen(Agent):
         self.network_neighbors = []
 
         self.jailable = jailable
-        self.influencer = influencer
+        self.influencer = False
 
         # Data collector - sensitivity analysis
         # self.degree = self.model.G.degree(self.network_node)
