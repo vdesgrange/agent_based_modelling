@@ -214,7 +214,7 @@ class CivilViolenceModel(Model):
         # for agent in self.influencer_list:
         #     print('Agent ', agent.unique_id, ' is an influencer ')
 
-    def save_data(self, save=False):
+    def save_data(self, save=True):
 
         if save is not False:
             df_end = self.datacollector.get_agent_vars_dataframe()
