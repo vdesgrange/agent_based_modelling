@@ -5,11 +5,11 @@ import pandas as pd
 README:
 To run this script, please follow the following steps:
     1. Adjust the following constants such that they correspond to those in the SA.py file. 
-    2. Run the SA.py script. 
-    3. Add the paths to the output files from the SA.py to the file_paths list (line27).
+    2. Run the ofat_mp.py script. 
+    3. Add the paths to the output files from the ofat_mp.py to the file_paths list (line27).
     4. Depending on if the output files is a Sensitivity Analysis (multiple dictionaries), 
     or a fixed run (single dictionary), several lines need to be commented in/out. 
-    5. Run the SA_work.py script. 
+    5. Run the ofat_work.py script. 
 '''
 
 THRESHOLD = 50
