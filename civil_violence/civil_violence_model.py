@@ -278,13 +278,12 @@ class CivilViolenceModel(Model):
         Dictionary of agent reporter names and attributes/funcs
         """
 
-        return {"Grievance": lambda a: getattr(a, 'grievance', None),
-                "Hardship": lambda a: getattr(a, 'hardship', None),
-                "State": lambda a: getattr(a, 'state', None),
-                "Legitimacy": lambda m: self.legitimacy,
-                "Influencer": lambda a: getattr(a, 'influencer', None),
-                "N_connections": lambda a: getattr(a, 'network_neighbors', None),
-                "InfluencePi": lambda a: getattr(a, 'influence', None)}
+        return {"Grievance": "grievance",
+                "Hardship": "hardship",
+                "State": "state",
+                "Influencer": "influencer",
+                "N_connections": "network_neighbors",
+                "InfluencePi": "influence"}
 
     def count_type_citizens(self, state_req):
         """

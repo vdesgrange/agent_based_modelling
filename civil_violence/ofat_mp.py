@@ -6,17 +6,17 @@ from civil_violence_model import CivilViolenceModel
 from utils import *
 
 
-def sensitive_analysis_no_network(problem):
+def sensitive_analysis_no_network(problem, replicates=10, max_steps=200, distinct_samples=20, nr_processes=None):
     """
     One-factor-at-a-time (OFAT) sensitivity analysis of civil violence model with network (no bias)
+    Work with multiprocessing
+    :param problem: details of the variable parameters
+    :param replicates: number of replicates to be run
+    :param max_steps: Maximal number of steps of the simulations
+    :param distinct_samples: Number of samples per variables
+    :param nr_processes: number of CPUs to be used. If None, by default all available CPUs will be used.
     """
 
-    path = 'archives/saved_data_{0}.npy'.format(int(time.time()))
-
-    # Sensitivity analysis initial configuration
-    replicates = 10
-    max_steps = 200
-    distinct_samples = 20
     data = {}
     run_data = {}
 
@@ -25,15 +25,12 @@ def sensitive_analysis_no_network(problem):
         samples = np.linspace(*problem['bounds'][i], num=distinct_samples)
 
         # max_jail_term, agent_vision and cop_vision must be integers.
-        if var == 'max_jail_term':
-            samples = np.linspace(*problem['bounds'][i], num=distinct_samples, dtype=int)
-        if var == 'agent_vision':
-            samples = np.linspace(*problem['bounds'][i], num=distinct_samples, dtype=int)
-        if var == 'cop_vision':
+        integer_param = ['max_jail_term', 'agent_vision', 'cop_vision']
+        if var in integer_param:
             samples = np.linspace(*problem['bounds'][i], num=distinct_samples, dtype=int)
 
         # Get default configuration
-        configuration = read_configuration()
+        configuration = read_configuration('./configurations/ofat_no_network.json')
         model_params = {}
         model_params.update(configuration)  # Overwritten user parameters don't appear in the graphic interface
         model_params.update({'seed': None})
@@ -41,6 +38,7 @@ def sensitive_analysis_no_network(problem):
         # BatchRunnerMP used is a local modified version of the BatchRunnerMP class provided by mesa.
         # It handle the multiprocessing issue which prohibite
         batch = BatchRunnerMP(CivilViolenceModel,
+                            nr_processes=nr_processes,
                             max_steps=max_steps,
                             iterations=replicates,
                             variable_parameters={var: samples},
@@ -62,6 +60,13 @@ def sensitive_analysis_no_network(problem):
         data[var] = batch_df
         run_data[var] = batch.get_collector_model()
 
+        # Uncomment to save data per parameter.
+        # path = 'archives/progress_data_ofat_{0}_{1}.npy'.format(var, int(time.time()))
+        # with open(path, 'ab') as f:
+        #     np.save(f, data)
+
+    # Save final data
+    path = 'archives/saved_data_ofat_{0}.npy'.format(int(time.time()))
     with open(path, 'ab') as f:
         np.save(f, data)
 
@@ -105,29 +110,9 @@ def plot_all_vars(problem, df, param):
         param: the parameter to be plotted
     """
 
-    f, axs = plt.subplots(problem['num_vars'], figsize=(7, 10))
+    f, axs = plt.subplots(problem['num_vars'], figsize=(5, 10))
     for i, var in enumerate(problem['names']):
         plot_param_var_conf(axs[i], df[var], var, param, i)
-
-
-def load_ofat_archive():
-    problem = {
-        'num_vars': 6,
-        'names': ['active_threshold_t', 'initial_legitimacy_l0',
-                  'max_jail_term', 'p', 'agent_vision', 'cop_vision'],
-        'bounds': [[0.01, 1], [0.01, 1], [1, 100], [0.01, 0.4], [1, 20], [1, 20]]
-    }
-
-    file_path = [
-        './archives/saved_data_1611773618.npy',
-    ]
-    for path in file_path:
-        with open(path, 'rb') as f:
-            data = np.load(f, allow_pickle=True)[()]
-
-    for param in ("OUTBREAKS", "ACTIVE", "QUIESCENT", "JAILED", "INFLUENCERS", "LEGITIMACY"):
-        plot_all_vars(problem, data, param)
-        plt.show()
 
 
 def ofat_main():
@@ -135,18 +120,17 @@ def ofat_main():
     Main function of the one-factor-at-a-time sensitivity analysis.
     """
     problem = {
-        'num_vars': 6,
+        'num_vars': 5,
         'names': ['active_threshold_t', 'initial_legitimacy_l0',
-                  'max_jail_term', 'p', 'agent_vision', 'cop_vision'],
-        'bounds': [[0.01, 1], [0.01, 1], [1, 100], [0.01, 0.4], [1, 20], [1, 20]]
+                  'max_jail_term', 'agent_vision', 'cop_vision'],
+        'bounds': [[0.01, 1], [0.01, 1], [1, 100], [1, 20], [1, 20]]
     }
 
-    data, run_data = sensitive_analysis_no_network(problem)
+    data, run_data = sensitive_analysis_no_network(problem, 4, 10, 4, None)
     for param in ("OUTBREAKS", "ACTIVE", "QUIESCENT", "JAILED", "INFLUENCERS", "LEGITIMACY"):
         plot_all_vars(problem, data, param)
-        plt.savefig('{:s}.png', param)
+        plt.show()
 
 
 if __name__ == '__main__':
-    # ofat_main()
-    load_ofat_archive()
+    ofat_main()

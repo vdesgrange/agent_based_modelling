@@ -221,9 +221,10 @@ class Cop(Agent):
 
         # Data collector fix
         self.hardship = None
-        self.hardship_cont = None
         self.grievance = None
-        self.degree = None
+        self.influencer = None
+        self.network_neighbors = None
+        self.influence = None
 
         self.neighbors = []  # Neighbors in MultiGrid space
         self.empty_cells = []  # Empty cells around the agent in MultiGrid space

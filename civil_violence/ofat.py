@@ -47,16 +47,13 @@ def ofat_barabasi_albert_analysis(problem):
                             variable_parameters={var: samples},
                             fixed_parameters=model_params,
                             model_reporters=model_reporters,
-                            # agent_reporters=agent_reporters,
                             display_progress=True)
         batch.run_all()
         model_data[var] = batch.get_model_vars_dataframe()
-        # agent_data[var] = batch.get_agent_vars_dataframe()
 
     path = 'archives/ofat_data_{0}.npy'.format(int(time.time()))
     with open(path, 'ab') as f:
         np.save(f, model_data)
-        # np.save(f, agent_data)
 
     return model_data
 
