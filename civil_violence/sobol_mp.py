@@ -14,8 +14,6 @@ def sobol_analysis_no_network(problem):
     max_steps = 150
     distinct_samples = 100
 
-    path = 'archives/saved_data_sobol_{0}.npy'.format(int(time.time()))
-
     model_reporters = {"QUIESCENT": compute_quiescent,
                        "ACTIVE": compute_active,
                        "JAILED": compute_jailed,

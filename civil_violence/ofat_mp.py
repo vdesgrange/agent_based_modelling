@@ -126,7 +126,7 @@ def ofat_main():
         'bounds': [[0.01, 1], [0.01, 1], [1, 100], [1, 20], [1, 20]]
     }
 
-    data, run_data = sensitive_analysis_no_network(problem, 4, 10, 4, None)
+    data, run_data = sensitive_analysis_no_network(problem, 10, 200, 20, None)
     for param in ("OUTBREAKS", "ACTIVE", "QUIESCENT", "JAILED", "INFLUENCERS", "LEGITIMACY"):
         plot_all_vars(problem, data, param)
         plt.show()
