@@ -9,10 +9,6 @@
   "inf_threshold": 150,
   "p_ws": 0.1,
   "directed": false,
-  "agent_vision": 7,
-  "cop_vision":7,
   "p":0.1,
-  "max_jail_term": 30,
-  "active_threshold_t": 0.1,
-  "initial_legitimacy_l0":0.82
+  "max_jail_term": 30
 }
