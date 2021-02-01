@@ -1,0 +1,15 @@
+[[source]]
+url = "https://pypi.python.org/simple"
+verify_ssl = true
+name = "pypi"
+
+[packages]
+mesa = "~=0.8.8"
+networkx = "~=2.5"
+pandas = "~=1.1"
+numpy = "~=1.19"
+matplotlib = "~=3.3"
+seaborn = "~=0.11"
+jupyter = "~=1.0"
+ipynb = "~=0.5"
+salib = "~=1.3"
