@@ -35,9 +35,9 @@ Therefore, if the user wan't to have full control of the ABM, he should update t
 ## Screenshots
 
 <p float="left">
-    <img src="../report/pictures/demonstration/spread_1.png" width="300px" alt="beginning"/>
-    <img src="../report/pictures/demonstration/spread_2.png" width="300px" alt="spread"/>
-    <img src="../report/pictures/demonstration/spread_3.png" width="300px" alt="full"/>
+    <img src="./report/pictures/demonstration/spread_1.png" width="300px" alt="beginning"/>
+    <img src="./report/pictures/demonstration/spread_2.png" width="300px" alt="spread"/>
+    <img src="./report/pictures/demonstration/spread_3.png" width="300px" alt="full"/>
 </p>
 
 ## Architecture of the project
