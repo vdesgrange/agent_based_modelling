@@ -36,10 +36,13 @@ top=20mm,
 }
 
 \newcounter{nalg}
-\setcounter{nalg}{1}
+\setcounter{nalg}{0}
 \setcounter{page}{1}
 
-\DeclareCaptionLabelFormat{algocaption}{\texbtf{Algorithm} \nalg}
+% \renewcommand{\thenalg}{\thechapter \arabic{nalg}}
+% \DeclareCaptionLabelFormat{algocaption}{\texbtf{Algorithm} \thenalg}
+
+\DeclareCaptionLabelFormat{algocaption}{\texbtf{Algorithm} \thenalg}
 \lstnewenvironment{algorithm}[1][] %defines the algorithm listing environment
 {
 \captionsetup{labelformat=algocaption,labelsep=colon}
@@ -49,10 +52,10 @@ mathescape=true,
 frame=tB,
 numbers=left,
 numberstyle=\tiny,
+keywords={,input, output, return, datatype, function, in, is, and, or, not, if, else, get, foreach, while, begin, end, end if,}
 basicstyle=\scriptsize,
 xleftmargin=.04\textwidth,
 keywordstyle=\color{black}\bfseries\em,
-keywords={input, output, return, datatype, function, in, is, and, or, not, if, else, get, foreach, while, begin, end, end if}
 #1
 }
 }{}
@@ -71,7 +74,7 @@ keywords={input, output, return, datatype, function, in, is, and, or, not, if, e
 
     \begin{abstract}
     {\normalsize  This paper introduces an agent-based model of civil violence where a central authority tries to control violence among a population of civilian agents connected by a social network. It fixates on the influence of different network graph topologies, such as Erdos-Renyi, Watts-Strogatz \& Barbasi-Albert network, on civil violence. Additionally a special focus was on the Barabasi-Albert network, which contains so-called hubs, which are treated as the equivalent of a social media influencers. The impact of removing these influencers at the beginning of an outbreak is investigated.
-    The impact of the addition of a social network on the model resulted in longer peak duration ($p<0.001$) and larger outbreak size ($p<0.001$). Between the model with different social networks implemented the differences were less clear. However, the Watts-Strogatz model had a HIGHER/LOWER peak duration ($p<0.01$) and the Erdos-Renyi had a larger outbreak size ($p<0.01$) compared to the other to models. The removal of influencers at the start of the outbreak in the model with a Barabasi-Albert social network resulted in a shorter outbreak duration ($p = 0.03$) and a smaller outbreak size ($p < 0.001$).
+    The impact of the addition of a social network on the model resulted in longer peak duration ($p<0.001$) and larger outbreak size ($p<0.001$). Between the model with different social networks implemented the differences were less clear. However, the Watts-Strogatz model had a higher peak duration ($p<0.01$) and the Erdos-Renyi had a larger outbreak size ($p<0.01$) compared to the other to models. The removal of influencers at the start of the outbreak in the model with a Barabasi-Albert social network resulted in a shorter outbreak duration ($p = 0.03$) and a smaller outbreak size ($p < 0.001$).
     }
 
         \smallskip
@@ -94,7 +97,7 @@ keywords={input, output, return, datatype, function, in, is, and, or, not, if, e
 
     In contrary to \cite{lemos2015} which covers the `traditional' media, \cite{fonoberova2019} used the second network as a way to incorporate undirected social networks, e.g., \textit{Facebook} or \textit{Twitter}. The underlying structure of the network is as described in \cite{watts1998}. This network, better known as the `small world network', tries to give an accurate representation of close relatives and some far-away friends. The network is build by connecting agents within a close neighborhood and rewire some of these connection with probability $\beta$. \cite{fonoberova2019} found this implementation led to more frequent large-scale violent outbursts, while for higher law-enforcement concentrations, outcomes depended most strongly on the number of local neighbours. One of the drawbacks of this approach is that the `Watts-Strogatz' network does not fully reflect a real-world network. As the distant-neighbours connections are randomly assigned, while in the real-world people tend to connect by \textit{following} central figures who typically already have many connections.
 
-    Therefore, our research is aimed at the comparison of different network topologies that represent the real-world better, by observing the influence of these on the civil violence model. Additionally we study the role of well-connected individuals, the equivalent of influencers in the real world, in the Barabasi-Albert network on the emergence of outburst, as well as the consequences of manipulating these agent to control civil violence.
+    Therefore, our research is aimed at the comparison of different network topologies that represent the real-world better, by observing the influence of these on the civil violence model. Additionally we study the role of well-connected individuals, the equivalent of influencers in the real world, in the Barabasi-Albert network on the emergence of outburst, as well as the consequences of manipulating these agent to control civil violence. The hypothesis is that implementing these social networks to the Epstein model will lead to different outcomes and that removing well - connected agents will greatly reduce the frequency and size of violent outbreaks.
 
 % In our paper, we considered a similar approach as \cite{lemos2015} given that the integration of the social network into the state variables is the same as we seek. However, in contrary to \cite{lemos2015} in which the 'traditional' media is incorporated, we want to incorporate the social media. Therefore, a recent publication of \cite{fonoberova2019} caught our attention. \cite{fonoberova2019} used the second network as a way to incorporate undirected social network, for example representing a social media network as \textit{Facebook} or \textit{Twitter}. The underlying structure of the network is as described in \cite{watts1998}. This network, better known as the 'small world network', tries to give an accurate representation of close relatives and some far-away friends. The network is build by connecting agents within a close neighborhood and rewire some of these connection with probability $\beta$. The results showed that this implementation lead to more frequent large-scale violent outbursts, while for higher law-enforcement concentrations, outcomes depended most strongly on the number of local neighbours. One of the drawbacks of this approach is that the 'Watts-Strogatz' network does not fully reflect a real-world network. As the distant-neighbours connections are randomly assigned, while in the real-world people tend to connect by \textit{following} central figures who typically already have many connections.
 
@@ -102,7 +105,7 @@ keywords={input, output, return, datatype, function, in, is, and, or, not, if, e
 
     \section*{Theoretical background}
 
-    The first network we are implementing is the \cite{erdHos1960evolution} network. In contrary to the Watts-Strogatz network, this network is randomly created. For every node, all the possible edges are evaluated with a certain probability $P$. The final graph represents random connections between nodes and a relatively low cluster coefficient. The degree distribution of the nodes follows a normal distribution. Although these two factors are drawbacks when it comes to reflect the real-world. The random connections could reflect the large groups of activists most protesters are connected to.\\
+    The first network we are implementing is the \cite{erdHos1960evolution} network. In contrary to the Watts-Strogatz network, this network is randomly created. For every node, all the possible edges are evaluated with a certain probability $P$. The final graph represents random connections between nodes and a relatively low cluster coefficient. The degree distribution of the nodes follows a normal distribution. Although these two factors are drawbacks when it comes to reflect the real-world. The random connections could reflect the large groups of activists most protesters are connected to.
 
     The second network we want to introduce is the Barabasi-Albert Network. This network resolves the two major draw backs of the other networks, being the absence of a power-law distribution and low clustering coefficients. \cite{barabasi2009scale} had the network created node by node. These new nodes would not randomly select connections, however they have a tendency to make interactions to a node which already has a lot of connections, a phenomenon called preferential attachment. The result is a network in which a small number of nodes is well connected, while the vast majority has a relatively small number of connections. This automatically leads to the question what the influence is of these well-connected agents.
 
@@ -142,7 +145,8 @@ keywords={input, output, return, datatype, function, in, is, and, or, not, if, e
         G = H(1 - L)
     \end{equation}
 
-    This formula does not differ from the one in the model in \cite{epstein2002}. However, we calculate the hardship and the legitimacy in different ways, which we will introduce in two coming paragraphs. The \emph{net risk perception} ($N$) is calculated by multiplying the \emph{estimated arrest probability} ($P$) of the agent in the case that it turns active with the agent's \emph{individual risk aversion} ($R$), such that:
+
+    This formula does not differ from the one in the model in \cite{epstein2002}. However, hardship and legitimacy are calculated differently in this model, the ways which will be introduced in two upcoming sections. The \emph{net risk perception} ($N$) is calculated by multiplying the \emph{estimated arrest probability} ($P$) of the agent in the case that it turns active with the agent's \emph{individual risk aversion} ($R$), such that:
     \begin{equation}
         N = RP
     \end{equation}
@@ -180,7 +184,7 @@ keywords={input, output, return, datatype, function, in, is, and, or, not, if, e
     $A_i$, $B_j$ \& $E_j$ are drawn from uniform distribution $U(0,1)$. This model for grievance is an adjusted version of a model on collective violence outbursts by \citet{huang2018}. The underlying idea is derived from biological processes representing the spread of an infectious disease \citet{fu2014simulation}.
 
     \paragraph{Legitimacy}
-    In the standard Epstein model, the \emph{perceived legitimacy} $L_0$ of the government is fixed for every time step. In real situations however, it makes sense that the perception of a government's legitimacy is perceived differently over time based on the actions of that government. We integrated this idea into our model by making the legitimacy of the government dependent on the amount of people that were jailed in the last couple of time steps. The legitimacy $L_B(t)$ is calculated by:
+    In the standard Epstein model, the \emph{perceived legitimacy} $L_0$ of the government is fixed for every time step. In real situations however, it makes sense that the perception of a government's legitimacy is perceived differently over time based on the actions of that government. We integrated this idea into our model by making the legitimacy of the government dependent on the number of people that were jailed in the last couple of time steps. The legitimacy $L_B(t)$ is calculated by:
 
     \begin{equation}
         L_B(t) = L_0(1- \sum\limits_{i = 1}^{m} \beta^i_i)
@@ -195,9 +199,9 @@ keywords={input, output, return, datatype, function, in, is, and, or, not, if, e
     \subsubsection{Influencers}
     \label{section:influencer_entity}
 
-    The influencer agents are a subset of citizen agents. However, the principal attribute which segregate influencers from civilians is the number of connection to other agents in the social network. The idea behind making the influencer an extension of the civilian agent instead of a separated entity like a media or a propaganda agent, can be track down to the fact that the influencers do not follow similar 'professional' rules to media/propaganda entities. Media/propaganda entities from \citet{lemos2015} look for activity clusters in the environment, and spread the 'information' to civilian agents through a directed graph. However, the influencer citizen can be influenced by other connected agents and can change between the active quiescent or jailed state.
+    The influencer agents are a subset of citizen agents. However, the principal attribute which segregate influencers from civilians is the number of connections to other agents in the social network. The idea behind making the influencer an extension of the civilian agent instead of a separated entity like a media or a propaganda agent, can be track down to the fact that the influencers do not follow similar `professional' rules to media/propaganda entities. Media/propaganda entities from \citet{lemos2015} look for activity clusters in the environment, and spread the `information' to civilian agents through a directed graph. However, the influencer citizen can be influenced by other connected agents and can change between the active quiescent or jailed state.
 
-    Therefore, as a way to control our experiments in different context the civilian agent was extended with the following rules and attributes:
+    Therefore, as a way to control our experiments in different contexts, the civilian agent was extended with the following rules and attributes:
     \begin{itemize}
         \item Civilian agents are marked as \emph{influencer} beyond a threshold $T_c$, fixed at initialisation of the model (See Section \ref{section:model_initialisation}).
         \item At initialisation of the social network, influencer agents are listed.
@@ -216,7 +220,7 @@ keywords={input, output, return, datatype, function, in, is, and, or, not, if, e
         \textbf{Rule J}: Arrested active agents are jailed ($T_{A \rightarrow J}$) for the duration of its sentence.
     \end{quote}
 
-    During imprisonment the civilian agent does not perform any steps and is removed from the grid for the duration of its sentence. The duration of the jail sentence is randomly drawn from a uniform distribution between 0 and the maximal jail sentence $J_{max}$.
+    During imprisonment the civilian agent does not perform any steps and is removed from the grid for the duration of its sentence. The duration of the jail sentence is randomly drawn from a uniform distribution between $0$ and the maximal jail sentence $J_{max}$.
 
     \begin{table}[h]
         \centering
@@ -226,7 +230,7 @@ keywords={input, output, return, datatype, function, in, is, and, or, not, if, e
             \hline
             \hline
             Hardship & H & $[0,1]$ & Transmission rate & $\beta$ & $[0,1]$ \\
-            Legitimacy & L & $[0,1]$ & Activity threshold & $T_c$ & $[0,1]$ \\
+            Legitimacy & L & $[0,1]$ & Activity threshold & $T$ & $[0,1]$ \\
             Grievance & G & $[0,1]$ & Estimated arrest probability & P & $[0,1]$ \\
             Risk aversion & R & $[0,1]$ & Cop to agent ratio & $\frac{C_v}{A_v + 1}$ & $[0,\infty[$ \\
             Net risk perception & N & $[0,1]$ & Agent vision & $v_a$ & $[1, \infty[$ \\
@@ -243,9 +247,9 @@ keywords={input, output, return, datatype, function, in, is, and, or, not, if, e
 
     \subsection{Process overview and scheduling}
 
-    Our civil violence model is a discrete time model with a fixed limit defined at initialisation of the simulation. At each iteration, the model calls agents (civilian \& cops) in a random order to let them run their action. After iterating over all running agents, the model will update the central authority \emph{legitimacy} state variable $L$. In the next section, the model counts the number of active agents and determines if the outbreak threshold is exceeded. The model keeps track of the number of outbreaks for each simulation. The model is able to imprison the influencer agents at the start of those outbreaks. This will be done in the experiments that focus on the effect of removing influencer agents at the start of an outbreak. Finally, if the iteration step reached the maximal iteration parameter, the simulation stops. See details from flow chart in Appendix \ref{appendix:A} Figure \ref{fig:flow_chart_model}.
+    Our civil violence model is a discrete time model with a fixed limit defined at initialisation of the simulation. At each iteration, the model calls agents (civilian \& cops) in a random order to let them run their action. After iterating over all running agents, the model will update the central authority \emph{legitimacy} state variable $L$. In the next section, the model counts the number of active agents and determines if the outbreak threshold is exceeded. The model keeps track of the number of outbreaks for each simulation. The model is able to imprison the influencer agents at the start of those outbreaks. This will be done in the experiments that focus on the effect of removing influencer agents at the start of an outbreak. Finally, if the iteration step reached the maximal iteration parameter, the simulation stops. See details from flow chart in Appendix \ref{appendix:A} Figure \ref{fig:flow_chart_model}.\\
 
-    In every step a civilian agent will first update its current \emph{hardship} attribute (See Section \ref{section:civilian_entity}) before keeping track of its neighbors within its vision (cardinal directions) and the social network. From these information the civilian agent update its status according to the \emph{rule A} (See Section \ref{section:civilian_entity}). Eventually it will move randomly in one of the accessible empty cells around him (\emph{rule M}).Interaction between civilian agents will only leads to update of their state variables (\emph{Grievance}, \emph{Hardship}, etc.), while interaction with cops might results in imprisonment.
+    In every step a civilian agent will first update its current \emph{hardship} attribute (See Section \ref{section:civilian_entity}) before keeping track of agents within its vision (cardinal directions) and the social network. From this information the civilian agent updates its status according to the \emph{rule A} (See Section \ref{section:civilian_entity}). Eventually, it will move randomly to one of the accessible empty cells around him (\emph{rule M}). Interactions between civilian agents will only lead to update of their state variables (\emph{Grievance}, \emph{Hardship}, etc.), while interaction with cops might result in imprisonment.\\
 
 
     \begin{algorithm}[caption = {Role: Civilian agent}]
@@ -283,7 +287,8 @@ keywords={input, output, return, datatype, function, in, is, and, or, not, if, e
         active_neighbors = []
 
         for A in P.neighbors:
-        if A is CITIZEN and A.state is ACTIVE and A.jail_sentence is 0 and A.jailable:
+        if A is CITIZEN and A.state is ACTIVE and A.jail_sentence is 0
+        and A.jailable:
         add A in active_neighbors
 
         if active_neighbors:
@@ -316,7 +321,7 @@ keywords={input, output, return, datatype, function, in, is, and, or, not, if, e
     \subsection{Sensing}
     Every time step, a civilian agent calculates its own hardship by observing the hardship of other agents connected to him on the social network. It also observes the global legitimacy of the government and uses these two values to determine its personal grievance. To calculate its arrest probability it also observes the amount of active agents and cops in its neighborhood.
 
-    A cop agent actively checks its surrounding cells on the grid within its vision for active agents to arrest. If there are no active civilians within its vision, the cop moves to an empty cell instead.
+    A cop agent actively checks the cells surrounding it on the grid within its vision for active agents to arrest.
 
     \subsection{Interaction}
     The model includes two possible types of interactions between agents: between two civilian agents and between a civilian and a cop. At every time step, citizens exercise influence on each other leading to an increase in contagious hardship. When an active agent and a cop enter each other's neighborhood, an interaction in the form of an arrest of the active agent takes place.
@@ -377,23 +382,23 @@ keywords={input, output, return, datatype, function, in, is, and, or, not, if, e
     The model uses no additional input data.
 
     \subsection{Submodels}
-    There is no submodels defined in this implementation.
+    There are no submodels defined in this implementation.
 
     \newpage
 
     \section{Results}
 
     \subsection{Sensitivity analysis}
-    To investigate how the parameters influence our model a local (Figure \ref{fig:SA}) and global sensitivity analysis (Figure \ref{fig:global_sa}) was performed. The analysis were done on the model without a social network implemented, to minimise bias for parameter initialisation for one of the models. As output parameter the amount of outbreaks was used. It was reasoned that a sufficient amount of outbreaks needs to take place, to conclude that the models works.
+    To investigate how the parameters influence our model a local (Figure \ref{fig:SA}) and global sensitivity analysis (Figure \ref{fig:global_sa}) were performed. The analysis were done on the model without a social network implemented, to minimise bias for parameter initialisation for one of the models. The amount of outbreaks was used as output parameter. It was reasoned that a sufficient amount of outbreaks needs to take place, to conclude that the models works.
 
     \subsubsection{One factor at a time sensitivity analysis}
-    In the one factor at a time (OFAT) analysis five parameters were investigated: the active threshold, initial legitimacy, max jail term, citizen vision \& cop vision \ref{fig:SA}. For the active threshold a value around 0.1 should be chosen, otherwise the threshold for agents to become is too high and no outbreaks will occur. For the initial authority legitimacy the value should be lower than 0.9 for outbreaks to occur, otherwise the legitimacy is too high and no citizen will become active. The max jail term should be above 20, otherwise there will be one continuous outbreak. However, it should not become too large, then less outbreaks will occur since it takes too long before enough people have returned to the grid. For citizen vision a vision of 5-7 resulted in the highest number of outbreaks. A citizen should be able to see at least several other citizens, however, when it can see too much the amount of cops in its vision get too high and people, if they get active at all, will only become active for a short period of time, before they become quiescent again. For the cop vision the value should not be below three, since then cops won't be able to arrest the active citizens effectively and a continuous outbreak will be present. If the value on the other hand gets too large, the cops will jail the present active citizens immediately before an outbreak can occur. For the cop vision a value around 5-7 resulted in the highest number of outbreaks.
+    In the one factor at a time (OFAT) analysis five parameters were investigated: the active threshold, initial legitimacy, max jail term, citizen vision \& cop vision (See Figure \ref{fig:SA}). For the active threshold a value around $0.1$ should be chosen, otherwise the threshold for agents to become active is too high and no outbreaks will occur. For the initial authority legitimacy, the value should be lower than $0.9$ for outbreaks to occur, otherwise the legitimacy is too high and no citizens will become active. The max jail term should be above $20$, otherwise there will be one continuous outbreak. However, it should not become too large, as less outbreaks will occur in that case since it takes too long before enough people have returned to the grid. For citizens, a vision of $5-7$ resulted in the highest number of outbreaks. A citizen should be able to see at least several other citizens, however, when it can see too much the number of cops in its vision gets too high and people, if they turn active at all, will only become active for a short period of time before they become quiescent again. For the cop vision the value should not be below $3$, since then cops won't be able to arrest the active citizens effectively and a continuous outbreak will be present. If the value on the other hand gets too large, the cops will jail the present active citizens immediately before an outbreak can occur. For the cop vision a value around $2.5-7$ resulted in the highest number of outbreaks.
 
-    Next our findings for the optimal values were compared with earlier research that investigated the civil violence model or extensions of it by \cite{epstein2002}, \cite{fonoberova2019}, \cite{huang2018} \& \cite{lemos2015}. All of them used an active threshold of 0.1. For initial legitimacy values around 0.8 were used. The max jail term however differed between the studies, but our optimum at 30 was in line with the value used by \cite{lemos2015}. For the citizen and cop vision also different values are used in the earlier studies. Our optimal value of 5-7 for agent \& cop vision is in the range of parameter values used, and is the same as used by \cite{lemos2015} \& \cite{epstein2002}.
+    Next our findings for the optimal values were compared with earlier research that investigated the civil violence model or extensions of it by \cite{epstein2002}, \cite{fonoberova2019}, \cite{huang2018} \& \cite{lemos2015}. All of them used an active threshold of $0.1$. For initial legitimacy values around $0.8$ were used. The max jail term however differed between the studies, but our optimum at $30$ was in line with the value used by \cite{lemos2015}. For the citizen and cop vision also different values are used in the earlier studies. Our optimal value of $5-7$ for agent \& cop vision is in the range of parameter values used, and is the same as used by \cite{lemos2015} \& \cite{epstein2002}.
 
     \begin{figure}[h]
         \centering
-        \begin{subfigure}[b]{.4\linewidth}
+        \begin{subfigure}[b]{.45\linewidth}
             \includegraphics[width=\textwidth]{pictures/Sensitivity_analysis/Local SA2.png}
         \end{subfigure}
         \captionsetup{width=.5\linewidth}
@@ -410,7 +415,7 @@ keywords={input, output, return, datatype, function, in, is, and, or, not, if, e
             \includegraphics[width=\textwidth]{pictures/Sensitivity_analysis/Global SA_first2.png}
             % \caption{Global First Order SA}
             \label{fig:global_sa_first order}
-        \end{subfigure}
+        \end{subfigure}\hspace{5mm}
         \begin{subfigure}[b]{.45\linewidth}
             \includegraphics[width=\textwidth]{pictures/Sensitivity_analysis/Global SA_total2.png}
             % \caption{Global Total Order SA}
@@ -422,66 +427,60 @@ keywords={input, output, return, datatype, function, in, is, and, or, not, if, e
     \end{figure}
 
     \subsection{Comparing Network Structures}
-    The results obtained form the model with different social networks implemented are displayed in Figure \ref{fig:duration} and \ref{fig:size}. The three models with a network implemented had comparable behaviour. The most profound difference was between the in- and exclusion of a social network structure. The reference model without a network had a significant shorter peak duration (for all $ p < 0.001$) and a significant lower peak height (for all $ p < 0.001$) compared to the models with a social network implemented.
+    The results obtained from the model with different social networks implemented are displayed in Figure \ref{fig:duration} and \ref{fig:size}. The three models with a network implemented had comparable behaviour. The most profound difference was between the in- and exclusion of a social network structure. To check for significant differences first a Shapiro-Wilk test was performed to check for normality, since the results were not normally distributed a Mann-Whitney U-test was performed. The reference model without a network had a significant shorter peak duration (for all $ p < 0.001$) and a significant lower peak height (for all $ p < 0.001$) compared to the models with a social network implemented.
 
-    Furthermore, the implementation of the Watts-Strogatz network resulted in a significantly HIGHER/LOWER compared to the implementation of the other two networks (for both $p<0.01$). No difference was found between the model with the Barabasi-Albert and the Erdos-Renyi network ($p = 0.3$) in peak duration. However, the outbreak size in the model with the Erdos-Renyi network implemented was significantly higher compared to the size in the other two models (for both $p<0.01$). The implementation of the Barabasi-Albert or the Watts-Strogatz model did not result in different outbreak sizes ($p = 0.4$).
+    Furthermore, the implementation of the Watts-Strogatz network resulted in a significantly higher peak duration compared to the implementation of the other two networks (for both $p<0.01$). No difference was found between the model with the Barabasi-Albert and the Erdos-Renyi network ($p = 0.3$) in peak duration. However, the outbreak size in the model with the Erdos-Renyi network implemented was significantly higher compared to the size in the other two models (for both $p<0.01$). The implementation of the Barabasi-Albert or the Watts-Strogatz model did not result in different outbreak sizes ($p = 0.4$).
 
 % While the behavior between the different models is similar, it is worth noting that the Erdoys-Reyni model had the highest average outbreak size. The Barabasi-Albert model seemed to be slightly more densely distributed around its average outbreak duration than the other network models.
 
     \begin{figure}[h!]
         \centering
         \begin{subfigure}[b]{.45\linewidth}
-            \includegraphics[width=\textwidth]{pictures/Results/duration_comparison.png}
-            \caption{The outbreak duration per model with the different social networks implemented. The models with a social network had a significantly higher peak duration compared to the model without a social network (for all $p < 0.001$). Furthermore the Watts-Strogatz model had a significantly HIGHER/LOWER (NOT VISIBLE IN THIS GRAPH) peak duration compared to the Barabasi-Albert \& Erdos-Renyi model (for both $p < 0.01$). No significant difference was found between the Barabasi-Albert \& Erdos-Renyi model ($p = 0.3$). }
+            \includegraphics[width=\textwidth]{pictures/Results/boxplot_peakduration.png}
+            \caption{The outbreak duration per model with the different social networks implemented. The models with a social network had a significantly higher peak duration compared to the model without a social network (for all $p < 0.001$).
+            Furthermore the Watts-Strogatz model had a significantly higher peak duration compared to the Barabasi-Albert \& Erdos-Renyi model (for both $p < 0.01$). No significant difference was found between the Barabasi-Albert \& Erdos-Renyi model ($p = 0.3$). }
             \label{fig:duration}
-        \end{subfigure}
+        \end{subfigure}\hspace{5mm}
         \begin{subfigure}[b]{.45\linewidth}
-            \includegraphics[width=\textwidth]{pictures/Results/BP_peak_height.png}
+            \includegraphics[width=\textwidth]{pictures/Results/boxplot_peakheight.png}
             \caption{The outbreak size per model with the different social networks implemented. The models with a social network implemented had a significantly higher peak duration compared to the model without a social network (for all $p < 0.001$). Furthermore, the Erdos-Renyi network resulted in a significantly higher peak height compared to the Barabasi-Albert \& Watts-Strogatz model (for both $p < 0.01$). No significant difference was found between the Barabasi-Albert \& Watts-Strogatz model ($p = 0.4$). }
             \label{fig:size}
         \end{subfigure}
-        \captionsetup{width=0.9\linewidth}
+        \captionsetup{width=0.95\linewidth}
         \caption{The outbreak duration and outbreak size for the model with different social networks implemented.}
         \label{fig:results}
     \end{figure}
 
-    \subsection{Removing Influencers}
-    The natural structure of the Barabasi-Albert network contains certain hubs: nodes with a significant higher amount of connections than the average node. The experiment pertaining the removal of \textit{influencers} from the Barabasi-Albert network was set up in a way to investigate if the targeted removal of influential agent could prevent mass outbreaks from occurring. This prompt removal is ensured by jailing all influencer-agents in the model for a randomly sampled period of time just before the model reaches the outbreak threshold. The outbreak threshold was set at fifty and the threshold for influencer agents to be removed at thirty. The removal of the influencers did not result in less outbreak, however, the outbreaks that did occur were shorter  ($p = 0.03$) and smaller ($p < 0.001$). %Remarkably, the model where influencers were removed has two outliers with extreme long outbreak duration that both exceed the maximum recorded duration of the reference model.
+    \subsection{Removing influencers}
+    The natural structure of the Barabasi-Albert network contains certain hubs: nodes with a significant higher amount of connections than the average node. The experiment pertaining the removal of \textit{influencers} from the Barabasi-Albert network was set up in a way to investigate if the targeted removal of influential agent could prevent mass outbreaks from occurring. This prompt removal is ensured by jailing half of all the influencer-agents in the model for a randomly sampled period of time just before the model reaches the outbreak threshold. The outbreak threshold was set at fifty and the threshold for influencer agents to be removed at thirty. The same statistical test were used as before. The removal of the influencers did not result in less outbreak, however, the outbreaks that did occur were shorter ($p = 0.03$) and smaller ($p < 0.001$).
 
-    \begin{figure}[b!]
+    \begin{figure}[h!]
         \centering
         \begin{subfigure}[b]{.45\linewidth}
             \includegraphics[width=\textwidth]{pictures/Results/influencer_removal_duration.jpg}
-            \caption{The outbreak duration for the Barabasi-Albert model with and without removal of the influencers at the start of the outbreak. The model where the influencers were removed had a significantly shorter peak duration ($p= 0.03$).}
+            \caption{The outbreak duration for the Barabasi-Albert model with and without removal of half of all the influencers at the start of the outbreak. The model where the influencers were removed had a significantly shorter peak duration ($p= 0.03$).}
             \label{fig:ba_boxb}
-        \end{subfigure}
+        \end{subfigure}\hspace{5mm}
         \begin{subfigure}[b]{.45\linewidth}
             \includegraphics[width=\textwidth]{pictures/Results/influencer_removal.jpg}
-            \caption{The outbreak size for the Barabasi-Albert model with and without removal of the influencers at the start of the outbreak. The model where the influencers were removed had a significantly lower peak height ($p < 0.001$).}
+            \caption{The outbreak size for the Barabasi-Albert model with and without removal of half of all the influencers at the start of the outbreak. The model where the influencers were removed had a significantly lower peak height ($p < 0.001$).}
             \label{fig:ba_boxa}
         \end{subfigure}
-        \captionsetup{width = 0.9\linewidth}
-        \caption{The outbreak duration and outbreak size for the model with the Barabasi-Albert model was implemented. In the boxplots colored in blue the influencers were not removed at the start of an outbreak, whereas in the orange boxplot they were.}
+        \captionsetup{width = 0.95\linewidth}
+        \caption{The outbreak duration and outbreak size for the model with the Barabasi-Albert model was implemented. In the boxplots colored in blue the influencers were not removed at the start of an outbreak, whereas in the orange boxplot half of the influencers were removed at the start of the outbreak.}
         \label{fig:inf_comp}
-    \end{figure}
-
-    Closer inspection of peak heights of the two models (Figure \ref{fig:inf_dens}) display that the influencer removal model has generated an additional densely distributed area around the outbreak threshold. This bimodal distribution can explain the outliers around the lower outbreak sizes that are present in Figure \ref{fig:ba_boxa}. While in the influencer removal model relatively more smaller outbreaks are present, the bulk of the outbreaks retain their relatively large peak heights. Probably this can be attributed to the fact that the perceived legitimacy of the system decreases, when the amount of jailed citizens increases.
-
-    \begin{figure}
-        \centering
-        \includegraphics[width=.50\textwidth]{pictures/Results/only2density.png}
-        \captionsetup{width=0.5\linewidth}
-        \caption{Bimodal distribution of outbreak peak height for the Barabasi-Albert model with and without removal of the influencer agents at the start of the outbreak. Emerging civil violence (mode at 50), it appears that removing influencer agents prevent outbreaks to spread. Outbreaks which spreads to a majority of the population (mode at 500), the removal of influencer agents do not generate significant difference.}
-        \label{fig:inf_dens}
     \end{figure}
 
     \newpage
 
-    \section{Conclusion}
+    \section*{Conclusion and future work}
+    In the introduction of this paper, the hypothesis was stated that the expansion of the civil violence model introduced by Epstein, with the addition of a social network, would lead to big differences depending on the graph topology used to represent this network. It also started with the presumption that well-connected agents were one of the main points of interest to control spreading of civil violence by a central authority.
 
-    This paper started with the assumption that expansion of civil violence model introduce by Epstein with social networks would leads to broad difference depending on the graph topology used to represent this network. It also started with the presumption that well-connected agents were one of the main points of interest to control spreading of civil violence by a central authority.\\
-    In the midst of our experiments, we discovered that although the model output does not differ significantly between the tested network structures, the addition of a social network does in fact lead to a bimodal distribution with lower frequency of longer and larger outbreaks. Thus, the inclusion of a social network leads to a definite change in social dynamics in the model.\\
-    Subsequent discoveries involve the impact of well-connected, aka. Influencer, agents on the diffusion of outbreaks. While a large number of outbreaks are effectively snuffed out at their inception with the removal of influencers; violent outbreaks that are well underway remain relatively unaffected. This fact could be attributed to the fact that the perceived legitimacy of the system decreases, when the number of jailed citizens increases. These latest findings point the idea that targeted jailing at an early stage might not be an effective tactic to prevent large outbreaks, however it also raises some interrogations on the method used for the spread of information in social network, given that average agent and well-connected influence strength over hardship contagion does not differ much.
+    It was found that the addition of a social network in the model resulted in longer and larger outbreaks. However, between the three different social networks no large differences were found. The only noteworthy observation was a slightly longer outbreak duration when the Watts-Strogatz network was implemented and a slightly larger outbreak size for the Erdos-Renyi network.
+
+    Furthermore, it was found that the removal of half of the influencers just before an outbreak in the model where the Barabasi-Albert network was implemented resulted in shorter and smaller outbreaks. However, the removal did not result in less outbreaks. Possibly, this can be attributed to the fact that the perceived legitimacy of the system decreases, when a large number of citizens is jailed. This finding could indicate that targeted jailing at an early stage might not be an effective tactic to prevent large outbreaks. However, it also raises some questions on the methods and assumptions used to model the spread of information in social network. For example that the average agent and influencers have the same size of impact on the hardship contagion over other agents.
+
+% Subsequent discoveries involve the impact of well-connected, aka. influencer, agents on the diffusion of outbreaks. While a large number of outbreaks are effectively snuffed out at their inception with the removal of influencers; violent outbreaks that are well underway remain relatively unaffected. This could be attributed to the fact that the perceived legitimacy of the system decreases, when the number of jailed citizens increases. These latest findings indicate that targeted jailing at an early stage might not be an effective tactic to prevent large outbreaks, however it also raises some questions on the method used for the spread of information in social network, given that average agent and well-connected influence strength over hardship contagion does not differ much.
 
 % The finding that most large outbreaks stay present in the influencer removal model can probably  be attributed to the fact that the perceived legitimacy of the system decreases, when the amount of jailed citizens increases.
 
@@ -490,16 +489,15 @@ keywords={input, output, return, datatype, function, in, is, and, or, not, if, e
 % From this emphasized dynamic can be concluded that a large amount of outbreaks are effectively snuffed out at their inception. While violent outbreaks that are well underway remain relatively unaffected by the removal of influencers, their targeted jailing at an early stage appears to be an effective tactic to prevent outbreaks from happening at all.
 
 
-
-
-    \subsection{Future Work}
-    A possibility to improve further on the concept of influencers is to check for their parameter $\beta_i$, the parameter that controls the capability of the agent to influence other agents in the contagious hardship formula. Right now, the only requirement to be deemed as an influencer is to have a lot of connections. However, the impact of the value of $\beta_i$ on the total influence of an agent is big as well, that is the influence strength between average civilian agents and influencer agents  on hardship contagion does not differ. An improvement on the model could be to take this parameter into account. Furthermore, it could be interesting to change the value for the $\beta_i$ of influencer agents over different runs, to see how important it is that influencer agents are able to convince their followers.\\
+    A possibility to improve further on the concept of influencers is to check for their parameter $\beta_i$, the parameter that controls the capability of the agent to influence other agents in the contagious hardship formula. Right now, the only requirement to be deemed as an influencer is to have a lot of connections. However, the impact of the value of $\beta_i$ on the total influence of an agent is big as well, that is the influence strength between average civilian agents and influencer agents on hardship contagion does not differ. An improvement on the model could be to take this parameter into account. Furthermore, it could be interesting to change the value for the $\beta_i$ of influencer agents over different runs, to see how important it is that influencer agents are able to affect their followers.
 
     An additional idea for future research is to introduce a parameter that controls the behaviour of cops. For example, a parameter that gives a possibility for a cop to arrest an active agent in its neighborhood, instead of cops always arresting when they can. This way, the impact of the strictness of a government could be investigated. The dynamic between the legitimacy feedback and arrests of active agents could lead to interesting results.
 
-    \subsection{Source code}
+    \section*{Source code}
 
     For further details, the source code of this agent-based model is publicly available on GitHub at the address: \url{https://github.com/vdesgrange/agent_based_modelling}
+
+    \newpage
 
     \bibliography{ref}
 
